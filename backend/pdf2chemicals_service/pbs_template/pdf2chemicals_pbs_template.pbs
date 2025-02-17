@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -N pdf2chemicals_{{job_id}}
+#PBS -l nodes={{node_name}}
+#PBS -l walltime=72:00:00
+
+# Ir para o diretório de trabalho
+cd $PBS_O_WORKDIR || { echo "Failed to change to PBS_O_WORKDIR"; exit 1; }
+
+# Inicializar Conda para bash
+eval "$(/home/estevao/miniconda3/bin/conda shell.bash hook)"
+
+# Ativar ambiente Conda
+conda activate {{conda_env}}
+
+nvidia-smi
+if [ $? -ne 0 ]; then
+    echo "Error: GPU not available."
+    exit 1
+fi
+
+# Verificar se o ambiente foi ativado corretamente
+if [ $? -ne 0 ]; then
+    echo "Error activating conda environment {{conda_env}}"
+    exit 1
+fi
+
+# Verificar se Java está disponível
+java -version
+if [ $? -ne 0 ]; then
+    echo "Error checking Java installation"
+    exit 1
+fi
+
+# Executar o script principal
+python {{pdf2chemicals_path}} {{json_prefix}} {{pdf_path}} {{output_dir}}
+
+# Desativar ambiente Conda
+conda deactivate
