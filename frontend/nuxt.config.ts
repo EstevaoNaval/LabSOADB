@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { defineNuxtConfig } from 'nuxt/config'
+
 export default defineNuxtConfig({
   ssr: true,
   target: 'server',
@@ -61,9 +63,5 @@ export default defineNuxtConfig({
     }
   },
 
-  image: {
-    // Options
-  },
-
-  compatibilityDate: '2024-11-17'
+  compatibilityDate: '2025-02-16'
 })
