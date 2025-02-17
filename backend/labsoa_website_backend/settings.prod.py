@@ -205,6 +205,10 @@ SPECTACULAR_SETTINGS = {
     'EXCLUDE_PATHS': ['/schema/']
 }
 
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -222,27 +226,32 @@ LOGGING = {
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'stream': sys.stdout,  # Log para stdout
+            'stream': sys.stdout,
             'formatter': 'verbose',
         },
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
-        }
+            'filename': os.path.join(LOG_DIR, 'django.log'),
+        },
+        'celery_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'celery.log'),
+        },
     },
     'root': {
-        'handlers': ['console'],
+        'handlers': ['file'],  # Agora apenas o arquivo
         'level': 'INFO',
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'file'],  # Apenas no logger django
             'level': os.getenv("DJANGO_LOG_LEVEL", "INFO"),
             'propagate': True,
         },
         'celery': {
-            'handlers': ['console'],
+            'handlers': ['console', 'celery_file'],
             'level': 'INFO',
             'propagate': True,
         },

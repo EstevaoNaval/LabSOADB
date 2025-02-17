@@ -46,20 +46,20 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiHost: process.env.API_URL_HOST,
-      docsAPIEndpoint: process.env.DOCS_API_ENDPOINT,
-      loginAPIEndpoint: process.env.LOGIN_API_ENDPOINT,
-      logoutAPIEndpoint: process.env.LOGOUT_API_ENDPOINT,
-      resetPasswordAPIEndpoint: process.env.RESET_PASSWORD_API_ENDPOINT,
-      confirmResetPasswordAPIEndpoint: process.env.CONFIRM_RESET_PASSWORD_API_ENDPOINT,
-      userProfileAPIEndpoint: process.env.USER_PROFILE_API_ENDPOINT,
-      userRegisterAPIEndpoint: process.env.USER_REGISTER_API_ENDPOINT,
-      downloadChemicalConformationsEndpoint: process.env.DOWNLOAD_CHEMICAL_CONFORMATIONS_ENPOINT,
-      startExportChemicalEndpoint: process.env.START_EXPORT_CHEMICAL_ENDPOINT,
-      retrieveExportChemicalEndpoint: process.env.RETRIEVE_EXPORT_CHEMICAL_ENDPOINT,
-      verifyEmailAPIEndpoint: process.env.VERIFY_EMAIL_API_ENDPOINT,
-      resendEmailConfirmationAPIEndpoint: process.env.RESEND_EMAIL_CONFIRMATION_API_ENDPOINT,
-      pdf2ChemicalsPDFSubmitEndpoint: process.env.PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT
+      apiHost: process.env.NUXT_API_URL_HOST,
+      docsAPIEndpoint: process.env.NUXT_DOCS_API_ENDPOINT,
+      loginAPIEndpoint: process.env.NUXT_LOGIN_API_ENDPOINT,
+      logoutAPIEndpoint: process.env.NUXT_LOGOUT_API_ENDPOINT,
+      resetPasswordAPIEndpoint: process.env.NUXT_RESET_PASSWORD_API_ENDPOINT,
+      confirmResetPasswordAPIEndpoint: process.env.NUXT_CONFIRM_RESET_PASSWORD_API_ENDPOINT,
+      userProfileAPIEndpoint: process.env.NUXT_USER_PROFILE_API_ENDPOINT,
+      userRegisterAPIEndpoint: process.env.NUXT_USER_REGISTER_API_ENDPOINT,
+      downloadChemicalConformationsEndpoint: process.env.NUXT_DOWNLOAD_CHEMICAL_CONFORMATIONS_ENPOINT,
+      startExportChemicalEndpoint: process.env.NUXT_START_EXPORT_CHEMICAL_ENDPOINT,
+      retrieveExportChemicalEndpoint: process.env.NUXT_RETRIEVE_EXPORT_CHEMICAL_ENDPOINT,
+      verifyEmailAPIEndpoint: process.env.NUXT_VERIFY_EMAIL_API_ENDPOINT,
+      resendEmailConfirmationAPIEndpoint: process.env.NUXT_RESEND_EMAIL_CONFIRMATION_API_ENDPOINT,
+      pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT
     }
   },
 

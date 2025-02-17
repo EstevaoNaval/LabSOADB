@@ -19,7 +19,7 @@ services:
       - ENTRYPOINT_PATH=/src/scripts/docker-django-api-entrypoint.sh
     volumes:
       - ${DATA_ROOT_DIR}:${DATA_ROOT_DIR}:rw
-      - django-api-logs:/logs
+      - django-api-logs:/logs # Volume para logs
     ports:
       - "8000:8000"
     env_file:
@@ -30,6 +30,11 @@ services:
       - db
       - rabbitmq
       - redis
+    logging:
+      driver: "json-file" # Default logging driver
+      options:
+        max-size: "10m" # Limita o tamanho dos logs para 10MB
+        max-file: "3" # Mantém no máximo 3 arquivos de log
 
   django-worker:
     build:
@@ -60,8 +65,8 @@ services:
     logging:
       driver: "json-file" # Default logging driver
       options:
-        max-size: "10m" # Rotate logs after they reach 10 MB
-        max-file: "3" # Keep a maximum of 3 log files
+        max-size: "10m" # Limita o tamanho dos logs para 10MB
+        max-file: "3" # Mantém no máximo 3 arquivos de log
 
   # Serviço Celery Worker para PDF (com acesso ao Django e ao pdf_processor)
   pdf2chemicals-worker:
@@ -109,8 +114,8 @@ services:
     logging:
       driver: "json-file" # Default logging driver
       options:
-        max-size: "10m" # Rotate logs after they reach 10 MB
-        max-file: "3" # Keep a maximum of 3 log files
+        max-size: "10m" # Limita o tamanho dos logs para 10MB
+        max-file: "3" # Mantém no máximo 3 arquivos de log
 
   db:
     build:
@@ -205,5 +210,5 @@ volumes:
   media:
   clamav-data:
   clamav-logs:
-  django-api-logs:
+  django-api-logs: # Volume dedicado para logs do Django
   postgres_data:
