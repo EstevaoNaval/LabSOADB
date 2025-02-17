@@ -23,7 +23,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - backend/.env
+      - ./backend/.env
     networks:
       - bridge-network
     depends_on:
@@ -49,7 +49,7 @@ services:
     volumes:
       - ${DATA_ROOT_DIR}:${DATA_ROOT_DIR}:rw
     env_file:
-      - backend/.env
+      - ./backend/.env
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - ENTRYPOINT_PATH=/src/scripts/docker-django-worker-entrypoint.sh
@@ -96,7 +96,7 @@ services:
       - ${TORQUE_ROOT_DIR}/server_logs:${TORQUE_ROOT_DIR}/server_logs:ro
       - ${TORQUE_ROOT_DIR}/mom_logs:${TORQUE_ROOT_DIR}/mom_logs:ro
     env_file:
-      - backend/.env
+      - ./backend/.env
     environment:
       - ENTRYPOINT_PATH=/src/scripts/docker-pdf2chemicals-worker-entrypoint.sh
       - TORQUE_HOME=${TORQUE_HOME}
@@ -114,7 +114,7 @@ services:
 
   db:
     build:
-      context: backend/db
+      context: ./backend/db
       dockerfile: Dockerfile
     deploy:
       resources:
