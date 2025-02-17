@@ -12,6 +12,7 @@ db.sqlite3-journal
 media
 data/
 django-api-logs/
+pdf2chemicals/
 
 # Logs
 logs/
