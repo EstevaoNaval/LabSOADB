@@ -40,7 +40,6 @@ COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
 # Copiar código da aplicação
 COPY --chown=${USER}:${USER} . .
-#COPY . .
 
 # Set environment variables to optimize Python
 ENV PYTHONDONTWRITEBYTECODE=1

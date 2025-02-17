@@ -19,11 +19,11 @@ services:
       - ENTRYPOINT_PATH=/src/scripts/docker-django-api-entrypoint.sh
     volumes:
       - ${DATA_ROOT_DIR}:${DATA_ROOT_DIR}:rw
-      - ./django-api-logs:/logs
+      - backend/django-api-logs:/logs
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - backend/.env
     networks:
       - bridge-network
     depends_on:
@@ -49,7 +49,7 @@ services:
     volumes:
       - ${DATA_ROOT_DIR}:${DATA_ROOT_DIR}:rw
     env_file:
-      - ./backend/.env
+      - backend/.env
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - ENTRYPOINT_PATH=/src/scripts/docker-django-worker-entrypoint.sh
@@ -96,7 +96,7 @@ services:
       - ${TORQUE_ROOT_DIR}/server_logs:${TORQUE_ROOT_DIR}/server_logs:ro
       - ${TORQUE_ROOT_DIR}/mom_logs:${TORQUE_ROOT_DIR}/mom_logs:ro
     env_file:
-      - ./backend/.env
+      - backend/.env
     environment:
       - ENTRYPOINT_PATH=/src/scripts/docker-pdf2chemicals-worker-entrypoint.sh
       - TORQUE_HOME=${TORQUE_HOME}
@@ -114,7 +114,7 @@ services:
 
   db:
     build:
-      context: ./backend/db
+      context: backend/db
       dockerfile: Dockerfile
     deploy:
       resources:
@@ -127,6 +127,8 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_DB: ${DATABASE_NAME}
+    env_file:
+      - backend/.env
     command: >
       postgres -c port=5477
     volumes:
@@ -150,6 +152,8 @@ services:
       - redis-data:/data
     ports:
       - "6379:6379"
+    env_file:
+      - backend/.env
     environment:
       REDIS_PASSWORD: "${REDIS_PASSWORD}"
     restart: unless-stopped
@@ -195,6 +199,8 @@ networks:
     ipam:
       config:
         - subnet: ${LABSOA_WEBSITE_SUBNET}
+    env_file:
+      - backend/.env
 
 volumes:
   redis-data:
