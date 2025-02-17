@@ -20,7 +20,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         csv_file = options['csv_file']
         chem_confs_base_path = options['base_path']
-        user_email = options['user-email']
+        user_email = options['user_email']
         logger = logging.getLogger('django')
         
         CHEMICAL_CONFS_FILE_FORMAT = 'sdf'
