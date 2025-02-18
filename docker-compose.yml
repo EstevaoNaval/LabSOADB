@@ -165,20 +165,22 @@ services:
 
   # Serviço RabbitMQ (broker de mensagens)
   rabbitmq:
-    image: rabbitmq:4-management-alpine
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: "1G"
-    networks:
-      - bridge-network
-    environment:
-      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit consumer_timeout 31622400000"
-    ports:
-      - "5672:5672" # Porta padrão do RabbitMQ
-      - "15672:15672" # Porta para a interface de administração do RabbitMQ
-    restart: unless-stopped
+  image: rabbitmq:4-management-alpine
+  deploy:
+    resources:
+      limits:
+        cpus: "1"
+        memory: "1G"
+  networks:
+    - bridge-network
+  environment:
+    RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit consumer_timeout 31622400000"
+  ports:
+    - "5672:5672" # Porta padrão do RabbitMQ
+    - "15672:15672" # Porta para a interface de administração do RabbitMQ
+  restart: unless-stopped
+  volumes:
+    - rabbitmq_data:/var/lib/rabbitmq
 
   clam-container:
     container_name: clam-container-01
@@ -212,3 +214,5 @@ volumes:
   clamav-logs:
   django-api-logs: # Volume dedicado para logs do Django
   postgres_data:
+  rabbitmq_data:
+    driver: local
