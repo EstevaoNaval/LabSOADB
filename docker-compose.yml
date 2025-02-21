@@ -215,4 +215,3 @@ volumes:
   django-api-logs: # Volume dedicado para logs do Django
   postgres_data:
   rabbitmq_data:
-    driver: local
