@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 import daisyui from "daisyui"
+
 export default {
-  content: [ 
+  content: [
     '@srcDir/components/**/*.{vue,js,ts}',
     '@srcDir/layouts/**/*.vue',
     `@srcDir/pages/**/*.vue`,
@@ -22,7 +23,7 @@ export default {
     daisyui
   ],
   daisyui: {
-    themes: ["night","winter"]
+    themes: ["night", "winter"]
   },
   darkMode: 'media'
 }
