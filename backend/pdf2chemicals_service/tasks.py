@@ -30,20 +30,18 @@ from .cluster import (
     task_reject_on_worker_lost=True
 )
 def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
-    user = User.objects.get(email=kwargs['email'])
-    
     # Definindo o workflow
     workflow = chain(
         send_pdf2chemicals_hpc_task.s(pdf_path=kwargs['pdf_path']),
         monitor_pdf2chemicals_job.s(),
         load_chemical_from_json.s(),
-        process_chemical_list.s(user.id)
+        process_chemical_list.s(kwargs['user_id'])
     )
     
     # Aplicando o workflow com link_error
     workflow.apply_async(link_error=handle_pdf2chemicals_task_error.s(
         pdf_path=kwargs['pdf_path'],
-        email=kwargs['email']
+        user_id=kwargs['user_id']
     ))
 
 @shared_task(
@@ -55,13 +53,13 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
 )
 def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     # Extraindo os parâmetros necessários de kwargs
-    email = kwargs.get('email')
+    user_id = kwargs.get('user_id')
     pdf_path = kwargs.get('pdf_path')
 
     # Tentando novamente a tarefa original com os parâmetros corretos
     extract_and_save_chemicals_from_pdf.apply_async(
         kwargs={
-            'email': email,
+            'user_id': user_id,
             'pdf_path': pdf_path
         },
         countdown=60 * 5  # Waits 5 minutes to retry.

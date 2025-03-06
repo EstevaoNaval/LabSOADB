@@ -22,7 +22,7 @@ class PDFUploadView(APIView):
         
         if serializer.is_valid():
             uploaded_files = serializer.validated_data['pdf_files']
-            email = serializer.validated_data['email']
+            user_id = request.user.id
             
             temp_files = []
             
@@ -33,7 +33,7 @@ class PDFUploadView(APIView):
 
                     temp_files.append(pdf_file_path)
                     
-                    extract_and_save_chemicals_from_pdf.delay(email=email, pdf_path=pdf_file_path)
+                    extract_and_save_chemicals_from_pdf.delay(user_id=user_id, pdf_path=pdf_file_path)
 
                 return Response(
                     {"message": f"{len(uploaded_files)} files enqueued for processing."},
