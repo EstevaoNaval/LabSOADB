@@ -1,13 +1,14 @@
 import os
-from celery import shared_task
 import json
 import subprocess
-from celery import chain, group
+from celery import chain, group, shared_task, chord
 
 from django.conf import settings
 
-from pdf2chemicals_service.util.celery import ChainedTask
+from tasks.models import UserTask
+from tasks.util.tasks import BaseTask
 from user.models import User
+from pdf2chemicals_service.util.tasks import ChainedTask
 from pdf2chemicals_service.util.util import generate_random_alphanumeric_sequence
 from chemicals.tasks import post_chemical
 
@@ -30,19 +31,35 @@ from .cluster import (
     task_reject_on_worker_lost=True
 )
 def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
+    user = User.objects.get(id=kwargs['user_id'])
+
+    chemicals_process_group = group(
+        post_chemicals_in_db.s(kwargs['user_id']),
+        generate_chemicals_zip_download.s()
+    )
+    
     # Definindo o workflow
     workflow = chain(
         send_pdf2chemicals_hpc_task.s(pdf_path=kwargs['pdf_path']),
         monitor_pdf2chemicals_job.s(),
         load_chemical_from_json.s(),
-        process_chemical_list.s(kwargs['user_id'])
+        chord(chemicals_process_group)(return_pdf2chemicals_task_final_result.s())
     )
     
     # Aplicando o workflow com link_error
-    workflow.apply_async(link_error=handle_pdf2chemicals_task_error.s(
+    result = workflow.apply_async(link_error=handle_pdf2chemicals_task_error.s(
         pdf_path=kwargs['pdf_path'],
         user_id=kwargs['user_id']
     ))
+    
+    UserTask.objects.create(
+        user=user,
+        task_id=result.id,
+        task_name=extract_and_save_chemicals_from_pdf.name,
+        status=result.status
+    )
+    
+    return result.id
 
 @shared_task(
     base=ChainedTask,
@@ -66,7 +83,7 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     )
 
 @shared_task(
-    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_process_chemical_list', 
+    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_post_chemicals_in_db', 
     bind=True,  
     acks_late=True,
     queue='pdf2chemicals_tasks',
@@ -77,9 +94,45 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     retry_backoff=True,
     task_reject_on_worker_lost=True
 )
-def process_chemical_list(self, chemical_list, user_id):
+def post_chemicals_in_db(self, chemical_list, user_id):
     post_chemical_group = group(post_chemical.s(chemical=chemical, user_id=user_id) for chemical in chemical_list)
     post_chemical_group()
+
+@shared_task(
+    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_prepare_chemicals_zip_download', 
+    bind=True,  
+    acks_late=True,
+    queue='pdf2chemicals_tasks',
+    priority=1,
+    autoretry_for=(Exception,),
+    max_retries=5,
+    default_retry_delay=60 * 2, # Waits 2 minutes to execute 
+    retry_backoff=True,
+    task_reject_on_worker_lost=True
+)
+def generate_chemicals_zip_download(self, chemical_list):
+    pass
+
+@shared_task(
+    base=BaseTask,
+    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_return_pdf2chemicals_task_final_result', 
+    bind=True,  
+    acks_late=True,
+    queue='pdf2chemicals_tasks',
+    priority=1,
+    autoretry_for=(Exception,),
+    max_retries=5,
+    default_retry_delay=60 * 2, # Waits 2 minutes to execute 
+    retry_backoff=True,
+    task_reject_on_worker_lost=True
+)
+def return_pdf2chemicals_task_final_result(self, results):
+    download_result = None
+    
+    if len(results) > 1:
+        download_result = results[1]  # Espera-se que prepare_zip_download retorne o JSON relevante
+    
+    return download_result
 
 @shared_task(
     base=ChainedTask,
