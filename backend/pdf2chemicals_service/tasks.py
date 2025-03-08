@@ -34,7 +34,7 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
     user = User.objects.get(id=kwargs['user_id'])
 
     chemicals_process_group = group(
-        post_chemicals_in_db.s(kwargs['user_id']),
+        post_chemicals_in_db.s(user_id=kwargs['user_id']),
         generate_chemicals_zip_download.s()
     )
     
