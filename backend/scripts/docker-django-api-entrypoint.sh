@@ -1,4 +1,8 @@
 #!/bin/bash
+
+echo "Creating database migrations"
+python manage.py makemigrations --noinput || exit 1
+
 # Aplicar as migrações já criadas
 echo "Apply database migrations"
 python manage.py migrate --noinput || exit 1
