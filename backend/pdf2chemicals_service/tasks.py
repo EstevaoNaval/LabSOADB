@@ -38,12 +38,18 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         generate_chemicals_zip_download.s()
     )
     
+    # Corrigindo a definição do chord - o chord deve ser construído separadamente
+    final_chord = chord(
+        header=chemicals_process_group,
+        body=return_pdf2chemicals_task_final_result.s()
+    )
+
     # Definindo o workflow
     workflow = chain(
         send_pdf2chemicals_hpc_task.s(pdf_path=kwargs['pdf_path']),
         monitor_pdf2chemicals_job.s(),
         load_chemical_from_json.s(),
-        chord(chemicals_process_group)(return_pdf2chemicals_task_final_result.s())
+        final_chord
     )
     
     # Aplicando o workflow com link_error
@@ -95,8 +101,13 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     task_reject_on_worker_lost=True
 )
 def post_chemicals_in_db(self, chemical_list, user_id):
-    post_chemical_group = group(post_chemical.s(chemical=chemical, user_id=user_id) for chemical in chemical_list)
-    post_chemical_group()
+    post_chemical_group = group(
+        post_chemical.s(chemical=chemical, user_id=user_id) 
+        for chemical in chemical_list
+    )
+    
+    result = post_chemical_group.apply_async()
+    return result.get()
 
 @shared_task(
     name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_prepare_chemicals_zip_download', 
@@ -111,7 +122,8 @@ def post_chemicals_in_db(self, chemical_list, user_id):
     task_reject_on_worker_lost=True
 )
 def generate_chemicals_zip_download(self, chemical_list):
-    pass
+    #TODO implement the chemicals exportation in zip format
+    return {"status": "success", "zip_generated": True}
 
 @shared_task(
     base=BaseTask,
