@@ -106,8 +106,7 @@ def post_chemicals_in_db(self, chemical_list, user_id):
         for chemical in chemical_list
     )
     
-    result = post_chemical_group.apply_async()
-    return result.get()
+    post_chemical_group.apply_async()
 
 @shared_task(
     name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_prepare_chemicals_zip_download', 
