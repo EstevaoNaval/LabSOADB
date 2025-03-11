@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/chemicals/", include("chemicals.urls")),
     path("api/pdf2chemicals/", include("pdf2chemicals_service.urls")),
     path("auth/", include("authentication.urls")),
+    path("tasks/", include("tasks.urls"))
     #path("user/", include("user.urls")),
 ]
 
