@@ -5,7 +5,6 @@ from rest_framework.generics import get_object_or_404
 from user.models import User
 from .models import UserTask
 from .serializers import UserTaskSerializer
-# Create your views here.
 
 class UserTaskReadOnlyViewSet(ReadOnlyModelViewSet):
     queryset = UserTask.objects.all()
