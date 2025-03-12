@@ -8,6 +8,7 @@ class UserTask(models.Model):
         ('SUCCESS', 'Success'),
         ('FAILURE', 'Failure'),
         ('REVOKED', 'Revoked'),
+        ('RETRY', 'Retry')
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
