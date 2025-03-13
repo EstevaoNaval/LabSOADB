@@ -65,13 +65,18 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         task_id=task_id
     )
     
-    UserTask.objects.update_or_create(
-        user=user,
-        task_id=task_id,
-        task_name=extract_and_save_chemicals_from_pdf.name,
-        status=result.status,
-        label=f'PDF2Chemicals: {kwargs['pdf_path']}'
-    )
+    if UserTask.objects.filter(task_id=task_id).exists():
+        UserTask.objects.filter(task_id=task_id).update(
+            status=result.status
+        )
+    else:
+        UserTask.objects.create(
+            user=user,
+            task_id=task_id,
+            task_name=extract_and_save_chemicals_from_pdf.name,
+            status=result.status,
+            label=f'PDF2Chemicals: {kwargs['pdf_path']}'
+        )
     
     return task_id
 
