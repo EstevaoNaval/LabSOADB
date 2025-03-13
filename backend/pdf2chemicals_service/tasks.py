@@ -2,6 +2,7 @@ import os
 import json
 import subprocess
 from celery import chain, group, shared_task, chord
+import uuid
 
 from django.conf import settings
 
@@ -33,6 +34,8 @@ from .cluster import (
 def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
     user = User.objects.get(id=kwargs['user_id'])
 
+    task_id = kwargs.get('task_id', str(uuid.uuid4()))
+
     chemicals_process_group = group(
         post_chemicals_in_db.s(user_id=kwargs['user_id']),
         generate_chemicals_zip_download.s()
@@ -57,20 +60,20 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         link_error=handle_pdf2chemicals_task_error.s(
             pdf_path=kwargs['pdf_path'],
             user_id=kwargs['user_id'],
-            task_id=kwargs.get('task_id', None)
+            task_id=task_id
         ),
-        task_id=kwargs.get('task_id', None)
+        task_id=task_id
     )
     
     UserTask.objects.update_or_create(
         user=user,
-        task_id=result.id,
+        task_id=task_id,
         task_name=extract_and_save_chemicals_from_pdf.name,
         status=result.status,
         label=f'PDF2Chemicals: {kwargs['pdf_path']}'
     )
     
-    return result.id
+    return task_id
 
 @shared_task(
     base=ChainedTask,
@@ -83,7 +86,7 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     # Extraindo os parâmetros necessários de kwargs
     user_id = kwargs.get('user_id')
     pdf_path = kwargs.get('pdf_path')
-    task_id = kwargs.get('task_id')
+    task_id = kwargs.get('task_id', str(uuid.uuid4()))
 
     # Tentando novamente a tarefa original com os parâmetros corretos
     extract_and_save_chemicals_from_pdf.apply_async(
