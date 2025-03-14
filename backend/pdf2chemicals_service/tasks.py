@@ -3,6 +3,7 @@ import json
 import subprocess
 from celery import chain, group, shared_task, chord
 import uuid
+import logging
 
 from django.conf import settings
 
@@ -20,6 +21,8 @@ from .cluster import (
     generate_pbs_script, 
     is_pbs_job_completed
 )
+
+logger = logging.getLogger(__name__)
 
 @shared_task(
     base=ChainedTask,
@@ -92,8 +95,19 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     user_id = kwargs.get('user_id')
     pdf_path = kwargs.get('pdf_path')
     task_id = kwargs.get('task_id', str(uuid.uuid4()))
-
-    # Tentando novamente a tarefa original com os parâmetros corretos
+    
+    task = UserTask.objects.filter(task_id=task_id).first()
+    
+    if not task:
+        logger.error(f"Task {task_id} not found.")
+        return
+    
+    if task.status in ["REVOKED", "RETRY", "SUCCESS"]:
+        logger.info(f"Skipping retry for task {task_id} as it has status {task.status}.")
+        return
+    
+    logger.info(f"Retrying task {task_id} in 5 minutes for user {user_id}.")
+    
     extract_and_save_chemicals_from_pdf.apply_async(
         kwargs={
             'user_id': user_id,
