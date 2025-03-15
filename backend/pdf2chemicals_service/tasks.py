@@ -82,7 +82,7 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
             "user": user,
             "task_name": extract_and_save_chemicals_from_pdf.name,
             "status": result.status,
-            "label": f'PDF2Chemicals: {kwargs["pdf_path"]}'
+            "label": f'PDF2Chemicals: {kwargs["original_filename"]}'
         }
     )
     
@@ -251,7 +251,8 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
         'pbs_script_path': script_path,
         'job_id': job_id, 
         'node_name': node_name, 
-        'json_path': json_path
+        'json_path': json_path,
+        'pdf_path': kwargs['pdf_path']
     } 
 
 @shared_task(
@@ -281,6 +282,8 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
     
     if not file_exists(kwargs['json_path']):
         raise FileExistsError("Json file not found. PBS/TORQUE cluster job executed unsuccessfully.")
+    
+    remove_file(kwargs['pdf_path'])
     
     return {
         'json_path': kwargs['json_path']

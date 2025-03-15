@@ -20,30 +20,36 @@ class PDFUploadView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = PDFSerializer(data=request.data)
         
-        if serializer.is_valid():
-            uploaded_files = serializer.validated_data['pdf_files']
-            user_id = request.user.id
-            
-            temp_files = []
-            
-            try:
-                for file in uploaded_files:
-                    # Salva cada arquivo como temporário
-                    pdf_file_path = default_storage.save(f"tmp_pdfs/{generate_random_alphanumeric_sequence(FILE_RANDOM_NAME_SIZE)}.pdf", file)
-
-                    temp_files.append(pdf_file_path)
-                    
-                    extract_and_save_chemicals_from_pdf.delay(user_id=user_id, pdf_path=pdf_file_path)
-
-                return Response(
-                    {"message": f"{len(uploaded_files)} files enqueued for processing."},
-                    status=status.HTTP_202_ACCEPTED
-                )
-            except Exception as e:
-                # Garantia de limpeza em caso de erro
-                for temp_file in temp_files:
-                    default_storage.delete(temp_file)
-                
-                raise e
-        else:
+        if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        uploaded_files = serializer.validated_data['pdf_files']
+        user_id = request.user.id
+        
+        temp_files = []
+        
+        try:
+            for file in uploaded_files:
+                original_filename = file.name
+                
+                # Salva cada arquivo como temporário
+                pdf_file_path = default_storage.save(f"tmp_pdfs/{generate_random_alphanumeric_sequence(FILE_RANDOM_NAME_SIZE)}.pdf", file)
+                temp_files.append(pdf_file_path)
+                
+                extract_and_save_chemicals_from_pdf.delay(
+                    user_id=user_id, 
+                    pdf_path=pdf_file_path,
+                    original_filename=original_filename
+                )
+            return Response(
+                {"message": f"{len(uploaded_files)} files enqueued for processing."},
+                status=status.HTTP_202_ACCEPTED
+            )
+        except Exception as e:
+            # Garantia de limpeza em caso de erro
+            for temp_file in temp_files:
+                default_storage.delete(temp_file)
+            
+            raise e
+        
+            
