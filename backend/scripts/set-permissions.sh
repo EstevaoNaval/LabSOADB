@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Define o caminho do .env no diretório pai
-ENV_FILE_PATH="../.env"
+ENV_FILE_PATH="../../.env"
 
 # Verifica se o arquivo existe e carrega as variáveis
 if [ -f "$ENV_FILE_PATH" ]; then
