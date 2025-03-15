@@ -6,6 +6,7 @@ import uuid
 import logging
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from tasks.models import UserTask
 from tasks.util.tasks import BaseTask
@@ -35,10 +36,16 @@ logger = logging.getLogger(__name__)
     task_reject_on_worker_lost=True
 )
 def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
-    user = User.objects.get(id=kwargs['user_id'])
+    if 'task_id' not in kwargs:
+        kwargs['task_id'] = str(uuid.uuid4())
+    
+    task_id = kwargs['task_id']
 
-    task_id = kwargs.get('task_id', str(uuid.uuid4()))
-
+    try:
+        user = User.objects.get(id=kwargs['user_id'])
+    except ObjectDoesNotExist:
+        raise self.retry(countdown=10, max_retries=5)
+    
     chemicals_process_group = group(
         post_chemicals_in_db.s(user_id=kwargs['user_id']),
         generate_chemicals_zip_download.s()
@@ -68,18 +75,16 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         task_id=task_id
     )
     
-    if UserTask.objects.filter(task_id=task_id).exists():
-        UserTask.objects.filter(task_id=task_id).update(
-            status=result.status
-        )
-    else:
-        UserTask.objects.create(
-            user=user,
-            task_id=task_id,
-            task_name=extract_and_save_chemicals_from_pdf.name,
-            status=result.status,
-            label=f'PDF2Chemicals: {kwargs['pdf_path']}'
-        )
+    # Melhorando o gerenciamento da task no banco
+    UserTask.objects.update_or_create(
+        task_id=task_id,
+        defaults={
+            "user": user,
+            "task_name": extract_and_save_chemicals_from_pdf.name,
+            "status": result.status,
+            "label": f'PDF2Chemicals: {kwargs["pdf_path"]}'
+        }
+    )
     
     return task_id
 
@@ -274,12 +279,12 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
     
     remove_file(kwargs['pbs_script_path'])
     
-    if file_exists(kwargs['json_path']):
-        return {
-            'json_path': kwargs['json_path']
-        }
+    if not file_exists(kwargs['json_path']):
+        raise FileExistsError("Json file not found. PBS/TORQUE cluster job executed unsuccessfully.")
     
-    raise FileExistsError("Json file not found. PBS/TORQUE cluster job executed unsuccessfully.")
+    return {
+        'json_path': kwargs['json_path']
+    }
     
 @shared_task(
     base=ChainedTask,
