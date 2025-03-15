@@ -255,7 +255,7 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
         'job_id': job_id, 
         'node_name': node_name, 
         'json_path': json_path,
-        'pdf_path': kwargs['pdf_path']
+        'pdf_path': absolute_pdf_path
     } 
 
 @shared_task(
