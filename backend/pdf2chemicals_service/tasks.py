@@ -70,6 +70,7 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         link_error=handle_pdf2chemicals_task_error.s(
             pdf_path=kwargs['pdf_path'],
             user_id=kwargs['user_id'],
+            original_filename=kwargs['original_filename'],
             task_id=task_id
         ),
         task_id=task_id
@@ -82,7 +83,7 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
             "user": user,
             "task_name": extract_and_save_chemicals_from_pdf.name,
             "status": result.status,
-            "label": f'PDF2Chemicals: {kwargs["original_filename"]}'
+            "label": f'PDF2Chemicals: {kwargs['original_filename']}'
         }
     )
     
@@ -99,6 +100,7 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     # Extraindo os parâmetros necessários de kwargs
     user_id = kwargs.get('user_id')
     pdf_path = kwargs.get('pdf_path')
+    original_filename = kwargs.get('original_filename')
     task_id = kwargs.get('task_id', str(uuid.uuid4()))
     
     task = UserTask.objects.filter(task_id=task_id).first()
@@ -117,6 +119,7 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
         kwargs={
             'user_id': user_id,
             'pdf_path': pdf_path,
+            'original_filename': original_filename,
             'task_id': task_id
         },
         countdown=60 * 5  # Waits 5 minutes to retry.
