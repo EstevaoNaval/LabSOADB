@@ -27,7 +27,7 @@
                   />
                 </svg>
               </div>
-              <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">Concluded Tasks</div>
+              <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">Successful Tasks</div>
               <div :class="themeStore.isDarkMode ? 'stat-value text-success' : 'stat-value text-white'">89,400</div>
             </div>
           </div>
@@ -56,7 +56,7 @@
                   />
                 </svg>
               </div>
-              <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">Tasks in Progress</div>
+              <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">Pending Tasks</div>
               <div :class="themeStore.isDarkMode ? 'stat-value text-warning' : 'stat-value text-white'">89,400</div>
             </div>
           </div>
@@ -165,7 +165,7 @@
                 <td>T121</td>
                 <td>Extracting chemicals from 'paper.pdf'</td>
                 <td>2024-11-12, 02:15 PM</td>
-                <td :class="themeStore.isDarkMode ? 'text-warning' : 'text-amber-500'">In Progress</td>
+                <td :class="themeStore.isDarkMode ? 'text-warning' : 'text-amber-500'">Pending</td>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mx-auto">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
@@ -177,7 +177,7 @@
                 <td>T218</td>
                 <td>Uploading chemicals to LabSOADB</td>
                 <td>2026-10-10, 01:12 AM</td>
-                <td :class="themeStore.isDarkMode ? 'text-success' : 'text-green-500'">Concluded</td>
+                <td :class="themeStore.isDarkMode ? 'text-success' : 'text-green-500'">Success</td>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mx-auto">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />

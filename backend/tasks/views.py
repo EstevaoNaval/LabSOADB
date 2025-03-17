@@ -16,7 +16,7 @@ class UserTaskReadOnlyViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        user_id = self.kwargs.get('user_id')
+        user_id = self.request.user.id
         user = get_object_or_404(queryset=User, id=user_id)
         return UserTask.objects.filter(user=user)
 

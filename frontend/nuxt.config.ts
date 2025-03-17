@@ -59,7 +59,8 @@ export default defineNuxtConfig({
       retrieveExportChemicalEndpoint: process.env.NUXT_RETRIEVE_EXPORT_CHEMICAL_ENDPOINT,
       verifyEmailAPIEndpoint: process.env.NUXT_VERIFY_EMAIL_API_ENDPOINT,
       resendEmailConfirmationAPIEndpoint: process.env.NUXT_RESEND_EMAIL_CONFIRMATION_API_ENDPOINT,
-      pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT
+      pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT,
+      userTasksEndpoint: process.env.NUXT_USER_TASKS_ENDPOINT
     }
   },
 
