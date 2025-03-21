@@ -5,6 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework import filters
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from user.models import User
 from .models import UserTask
@@ -14,6 +17,8 @@ class UserTaskReadOnlyViewSet(ReadOnlyModelViewSet):
     queryset = UserTask.objects.all()
     serializer_class = UserTaskSerializer
     permission_classes = [IsAuthenticated]
+    ordering = ['-created_at']
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     
     def get_queryset(self):
         user_id = self.request.user.id
