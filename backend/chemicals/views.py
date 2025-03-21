@@ -151,6 +151,8 @@ class ChemicalPropListView(generics.ListAPIView):
 class UserChemicalsReadOnlyViewSet(ReadOnlyModelViewSet):
     serializer_class = UserChemicalSerializer
     permission_classes = [IsAuthenticated]
+    ordering = ['created_at']
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     
     def get_queryset(self):
         user_id = self.request.user.id

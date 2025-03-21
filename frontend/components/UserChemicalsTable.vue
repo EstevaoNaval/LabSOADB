@@ -12,14 +12,14 @@
             </tr>
         </thead>
         <tbody class="text-sm md:text-lg font-normal">
-            <tr class="hover">
-                <td>LSOA54875455</td>
+            <tr v-for="chemical in userTasks.chemicals" :key="chemical.api_id" class="hover">
+                <td>{{ chemical.api_id }}</td>
                 <td>
                     <div class="md:max-w-xs max-w-full whitespace-normal break-words lg:tooltip lg:tooltip-up" :data-tip="iupac">
-                        <span>Methyl benzyl((4-chlorophenyl)...</span>
+                        <span>{{ utils.truncateString(chemical.identifier.iupac_name) }}</span>
                     </div>
                 </td>
-                <td>C26H22N4O6</td>
+                <td>{{ chemical.identifier.chem_formula }}</td>
                 <td class="md:max-w-xs max-w-full whitespace-normal break-words">
                     <a 
                       href="https://www.doi.org/10.2174/1568026618666181002110116" 
@@ -27,10 +27,10 @@
                       rel="noopener noreferrer"
                       class="link-lg link-sm"
                     >
-                        10.2174/1568026618666181002110116
+                        {{ chemical.literature[0].doi }}
                     </a>
                 </td>
-                <td>2024-05-01, 15:07 PM</td>
+                <td>{{ utils.formatTimestamp(chemical.created_at) }}</td>
                 <td>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mx-auto">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
@@ -42,7 +42,15 @@
 </template>
 
 <script setup>
+    import utils from '~/utils/util'
+    import { onBeforeMount } from 'vue';
+    import { useUserChemicalsStore } from '~/stores/userChemicals';
+    
+    const userTasks = useUserChemicalsStore()
 
+    onBeforeMount(() => {
+        userTasks.fetchChemicalsPerUser()
+    })
 </script>
 
 <style scoped>

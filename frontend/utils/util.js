@@ -20,7 +20,14 @@ export function formatTimestamp(timestamp) {
     return `${year}-${month}-${day}, ${time}`;
 }
 
+export function truncateString(string, maxLength = 30) {
+    return string.length > maxLength
+        ? string.slice(0, maxLength) + '...'
+        : string;
+}
+
 export default {
     roundValue,
-    formatTimestamp
+    formatTimestamp,
+    truncateString
 }
