@@ -471,4 +471,4 @@ class UserChemicalSerializer(serializers.ModelSerializer):
             'identifier',
             'literature'
         ]
-        read_only_fields=['api_id']
+        read_only_fields=['api_id','user']

@@ -3,13 +3,13 @@ from io import BytesIO
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_list_or_404
 from django.http import FileResponse
 
 from rest_framework import viewsets, permissions, filters
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -51,7 +51,7 @@ ORDERING_FIELDS_LIST = [
     'created_at'
 ]
 
-class DownloadChemicalConformationZipView(RetrieveAPIView):
+class DownloadChemicalConformationZipView(generics.RetrieveAPIView):
     lookup_field = 'api_id'
     filter_backends = [filters.OrderingFilter]
     serializer_class = ChemicalSerializer
@@ -72,7 +72,7 @@ class DownloadChemicalConformationZipView(RetrieveAPIView):
     
     @method_decorator(cache_page(CACHE_TTL))
     def retrieve(self, request, api_id, *args, **kwargs):
-        chemical = get_object_or_404(Chemical, api_id=api_id)
+        chemical = generics.get_object_or_404(queryset=Chemical, api_id=api_id)
         
         conformations = get_list_or_404(Conformation, chemical=chemical)
         
@@ -89,7 +89,7 @@ class ChemicalExportViewSet(import_export_views.ExportJobViewSet):
     permission_classes = [permissions.IsAuthenticated]
     resource_class = ChemicalResource
     
-class ChemicalPropListView(ListAPIView):
+class ChemicalPropListView(generics.ListAPIView):
     pagination_class = PropListPagination
     serializer_class = ChemicalPropListSerializer
     ordering = ['api_id']
@@ -149,30 +149,29 @@ class ChemicalPropListView(ListAPIView):
         return self.get_paginated_response(response_data)
 
 class UserChemicalsReadOnlyViewSet(ReadOnlyModelViewSet):
-    queryset = Chemical.objects.all()
     serializer_class = UserChemicalSerializer
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         user_id = self.request.user.id
-        user = get_object_or_404(queryset=User, id=user_id)
+        user = generics.get_object_or_404(queryset=User, id=user_id)
         return Chemical.objects.filter(user=user)
 
-class ChemicalSearchView(ListAPIView):
+class ChemicalSearchView(generics.ListAPIView):
     queryset = Chemical.objects.all()
     serializer_class = ChemicalSerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     ordering_fields = ORDERING_FIELDS_LIST
     filterset_class = ChemicalAdvancedSearchFilter
 
-class ChemicalSearchSummaryView(ListAPIView):
+class ChemicalSearchSummaryView(generics.ListAPIView):
     queryset = Chemical.objects.all()
     serializer_class = ChemicalSummarySerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     ordering_fields = ORDERING_FIELDS_LIST
     filterset_class = ChemicalAdvancedSearchFilter
 
-class AutocompleteSearchView(ListAPIView):
+class AutocompleteSearchView(generics.ListAPIView):
     queryset = Chemical.objects.all()
     serializer_class = ChemicalAutocompleteSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
