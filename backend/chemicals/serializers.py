@@ -441,3 +441,34 @@ class ChemicalPropListSerializer(serializers.ModelSerializer):
             'undesirable_substructure_alert',
             'druglike_rule'
         ]
+
+class IdentifierUserChemicalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Identifier
+        fields = ['iupac_name', 'chem_formula']
+
+class LiteratureUserChemicalSerializer(serializers.ModelSerializer):
+    doi = serializers.CharField(validators=[])
+    
+    class Meta:
+        model = Literature
+        fields = [
+            'api_id',
+            'doi'
+        ]
+        read_only_fields=['api_id', 'doi']
+
+class UserChemicalSerializer(serializers.ModelSerializer):
+    identifier = IdentifierUserChemicalSerializer(read_only=True, source='identifiers')
+    literature = LiteratureUserChemicalSerializer(required=False, many=True)
+    
+    class Meta:
+        model = Chemical
+        fields = [
+            'api_id',
+            'created_at',
+            'user',
+            'identifier',
+            'literature'
+        ]
+        read_only_fields=['api_id']

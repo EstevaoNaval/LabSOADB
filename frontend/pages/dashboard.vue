@@ -149,106 +149,14 @@
         <p class="text-2xl font-semibold">Recent Tasks</p>
         <!-- Recent Tasks Table -->
         <div class="overflow-x-auto rounded-box shadow-lg">
-          <table class="ml-auto table table-auto table-zebra table-pin-rows">
-            <!-- head -->
-            <thead class="text-sm md:text-lg">
-              <tr>
-                <th>ID</th>
-                <th>Description</th>
-                <th>Created At</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody class="text-sm md:text-lg font-normal">
-              <tr class="hover">
-                <td>T121</td>
-                <td>Extracting chemicals from 'paper.pdf'</td>
-                <td>2024-11-12, 02:15 PM</td>
-                <td :class="themeStore.isDarkMode ? 'text-warning' : 'text-amber-500'">Pending</td>
-                <td>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mx-auto">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                  </svg>
-                
-                </td>
-              </tr>
-              <tr class="hover">
-                <td>T218</td>
-                <td>Uploading chemicals to LabSOADB</td>
-                <td>2026-10-10, 01:12 AM</td>
-                <td :class="themeStore.isDarkMode ? 'text-success' : 'text-green-500'">Success</td>
-                <td>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mx-auto">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                  </svg>
-                
-                </td>
-              </tr>
-              <tr class="hover">
-                <td>T223</td>
-                <td>Extracting chemicals from 'academic15.pdf'</td>
-                <td>2023-01-10, 09:27 PM</td>
-                <td :class="themeStore.isDarkMode ? 'text-error' : 'text-rose-500'">Failed</td>
-                <td>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mx-auto">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                  </svg>
-                
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
+          <user-tasks-table></user-tasks-table>
         </div>
       </div>
       <div class="space-y-4">
-        <p class="text-2xl font-semibold">Recent Uploaded Chemicals</p>
+        <p class="text-2xl font-semibold">Recent User Chemicals</p>
         <!-- Recent Uploaded Chemicals Table -->
         <div class="overflow-x-auto rounded-box shadow-lg">
-          <table class="ml-auto table table-auto table-zebra table-pin-rows">
-            <!-- head -->
-            <thead class="text-sm md:text-lg">
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Formula</th>
-                <th>Reference</th>
-                <th>Created At</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody class="text-sm md:text-lg font-normal">
-              <tr class="hover">
-                <td>LSOA54875455</td>
-                <td>
-                  <div class="md:max-w-xs max-w-full whitespace-normal break-words lg:tooltip lg:tooltip-up" :data-tip="iupac">
-                    <span>Methyl benzyl((4-chlorophenyl)...</span>
-                  </div>
-                  
-                </td>
-                <td>C26H22N4O6</td>
-                <td class="md:max-w-xs max-w-full whitespace-normal break-words">
-                  <a 
-                    href="https://www.doi.org/10.2174/1568026618666181002110116" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    class="link-lg link-sm"
-                  >
-                  10.2174/1568026618666181002110116
-                  </a>
-                  
-                </td>
-                <td>2024-05-01, 15:07 PM</td>
-                <td>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mx-auto">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                  </svg>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
+          <user-chemicals-table></user-chemicals-table>
         </div>
       </div>
     </div>
@@ -263,8 +171,11 @@
 
 <script setup>
 import Modal from '~/components/Modal.vue';
+import UserTasksTable from '~/components/UserTasksTable.vue';
+import UserChemicalsTable from '~/components/UserChemicalsTable.vue'
 import { useThemeStore } from '~/stores/theme';
 import { defineAsyncComponent } from 'vue';
+import UserChemicalsTableVue from '../components/UserChemicalsTable.vue';
 
 const KetcherComponent = defineAsyncComponent({
   loader: () => import('~/components/KetcherComponent.vue')
@@ -306,13 +217,5 @@ definePageMeta({
 
 .dashboard-buttons-background-light {
   background-image: url('~/assets/dashboard_buttons_background_light.webp');
-}
-
-.link-sm {
-  @apply link link-secondary;
-}
-
-.link-lg {
-  @apply lg:link-primary duration-200 lg:hover:text-secondary;
 }
 </style>

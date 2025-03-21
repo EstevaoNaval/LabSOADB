@@ -7,18 +7,23 @@ from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import FileResponse
 
 from rest_framework import viewsets, permissions, filters
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from import_export_extensions.api import views as import_export_views
+
+from user.models import User
 
 from .resources import ChemicalResource
 from .serializers import (
     ChemicalAutocompleteSerializer, 
     ChemicalSerializer, 
     ChemicalSummarySerializer, 
-    ChemicalPropListSerializer
+    ChemicalPropListSerializer,
+    UserChemicalSerializer
 )
 from .models import (
     Chemical,
@@ -143,13 +148,23 @@ class ChemicalPropListView(ListAPIView):
 
         return self.get_paginated_response(response_data)
 
+class UserChemicalsReadOnlyViewSet(ReadOnlyModelViewSet):
+    queryset = Chemical.objects.all()
+    serializer_class = UserChemicalSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user_id = self.request.user.id
+        user = get_object_or_404(queryset=User, id=user_id)
+        return Chemical.objects.filter(user=user)
+
 class ChemicalSearchView(ListAPIView):
     queryset = Chemical.objects.all()
     serializer_class = ChemicalSerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     ordering_fields = ORDERING_FIELDS_LIST
     filterset_class = ChemicalAdvancedSearchFilter
-    
+
 class ChemicalSearchSummaryView(ListAPIView):
     queryset = Chemical.objects.all()
     serializer_class = ChemicalSummarySerializer

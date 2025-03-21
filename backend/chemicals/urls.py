@@ -9,7 +9,8 @@ from .views import (
     ChemicalSearchView,
     ChemicalSearchSummaryView,
     DownloadChemicalConformationZipView,
-    ChemicalExportViewSet
+    ChemicalExportViewSet,
+    UserChemicalsReadOnlyViewSet
 )
 
 router = DefaultRouter()
@@ -19,6 +20,7 @@ router.register(r'export', ChemicalExportViewSet, basename='chemical-export')
 router.register(r'', ChemicalReadOnlyViewSet, basename='chemical')
 
 urlpatterns = [
+    path(route='user/', view=UserChemicalsReadOnlyViewSet.as_view({'get': 'list'}), name="user-tasks"),
     path(route='prop-list/', view=ChemicalPropListView.as_view(), name='chemical-prop-list'),
     path(route='autocomplete/', view=AutocompleteSearchView.as_view(), name='chemical-autocomplete-search'),
     path(route='search/', view=ChemicalSearchView.as_view(), name='chemical-search'),

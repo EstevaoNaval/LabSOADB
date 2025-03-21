@@ -1,12 +1,11 @@
 <template>
-    <div v-if="showMainModal" class="container mx-auto p-6 ">
-      <h2 class="text-center text-2xl font-bold mb-4">Upload de Arquivos PDF</h2>
-  
-      <!-- Contêiner do Dashboard do Uppy -->
-      <div ref="dashboardContainer" class="bg-base-300 rounded-lg p-4"></div>
-    </div>
+  <div v-if="showMainModal" class="container mx-auto p-6 ">
+    <h2 class="text-center text-2xl font-bold mb-4">Upload de Arquivos PDF</h2>
+    <!-- Contêiner do Dashboard do Uppy -->
+    <div ref="dashboardContainer" class="bg-base-300 rounded-lg p-4"></div>
+  </div>
 
-    <PDF2ChemicalsLoginPrompt v-if="showLoginPrompt" @close="showLoginPrompt = false"></PDF2ChemicalsLoginPrompt>
+  <pdf-2-chemicals-login-prompt v-if="showLoginPrompt" @close="showLoginPrompt = false"></pdf-2-chemicals-login-prompt>
 </template>
 
 <script setup>
