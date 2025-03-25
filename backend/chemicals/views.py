@@ -8,7 +8,6 @@ from django.http import FileResponse
 
 from rest_framework import viewsets, permissions, filters
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -150,7 +149,7 @@ class ChemicalPropListView(generics.ListAPIView):
 
 class UserChemicalsReadOnlyViewSet(ReadOnlyModelViewSet):
     serializer_class = UserChemicalSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     ordering = ['-created_at']
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     

@@ -146,15 +146,15 @@
     <div class="gap-y-8 w-[95%] grid grid-cols-1 container mx-auto">
 
       <div class="space-y-4">
-        <p class="text-2xl font-semibold">Recent Tasks</p>
-        <!-- Recent Tasks Table -->
+        <p class="text-2xl font-semibold">User Tasks</p>
+        <!-- User Tasks Table -->
         <div class="overflow-x-auto rounded-box shadow-lg">
           <user-tasks-table></user-tasks-table>
         </div>
       </div>
       <div class="space-y-4">
-        <p class="text-2xl font-semibold">Recent User Chemicals</p>
-        <!-- Recent Uploaded Chemicals Table -->
+        <p class="text-2xl font-semibold">User Chemicals</p>
+        <!-- User Chemicals Table -->
         <div class="overflow-x-auto rounded-box shadow-lg">
           <user-chemicals-table></user-chemicals-table>
         </div>

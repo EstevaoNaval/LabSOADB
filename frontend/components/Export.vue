@@ -1,4 +1,5 @@
 <template>
+  <main>
     <div class="hidden lg:flex">
         <div class="dropdown dropdown-bottom dropdown-end m-auto">
           <div tabindex="0" role="button" class="btn btn-ghost btn-primary text-xl font-semibold hover:text-primary">
@@ -42,6 +43,7 @@
             </ul>
         </div>
     </div>
+  </main> 
 </template>
   
 <script setup>
@@ -56,8 +58,6 @@
     
     if(authStore.isAuthenticated) {
       await exportStore.downloadChemicalsExport()
-    }else{
-    
     }
   }
 </script>

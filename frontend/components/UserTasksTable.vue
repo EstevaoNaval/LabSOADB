@@ -13,7 +13,7 @@
         <tbody class="text-sm md:text-lg font-normal">
             <tr v-for="task in userTasks.tasks" :key="task.id" class="hover">
                 <td>{{ task.id }}</td>
-                <td>{{ task.label }}</td>
+                <td>{{ utils.truncateString(task.label) }}</td>
                 <td>
                     <time :datetime="task.created_at">
                         {{ utils.formatTimestamp(task.created_at) }}
