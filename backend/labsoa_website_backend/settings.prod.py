@@ -14,6 +14,8 @@ API_BASE_URL = os.getenv("API_BASE_URL")
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+HOST_IP = os.getenv("HOST_IP")
+
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 FRONTEND_EMAIL_CONFIRMATION_ENDPOINT = os.getenv("FRONTEND_EMAIL_CONFIRMATION_ENDPOINT")
 
@@ -21,7 +23,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',
-    'django-api'
+    'django-api',
+    HOST_IP
 ]
 
 CORS_EXPOSE_HEADERS = ["content-disposition"]

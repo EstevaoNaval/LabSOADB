@@ -1,11 +1,59 @@
 <template>
-  <div v-if="showMainModal" class="container mx-auto p-6 ">
-    <h2 class="text-center text-2xl font-bold mb-4">Upload de Arquivos PDF</h2>
-    <!-- Contêiner do Dashboard do Uppy -->
-    <div ref="dashboardContainer" class="bg-base-300 rounded-lg p-4"></div>
-  </div>
+  <main>
+    <div v-if="showMainModal" class="container mx-auto p-6 ">
+      <h2 class="text-center text-2xl font-bold mb-6">PDF2Chemicals: Submission Form</h2>
+      
+      <div class="grid md:grid-cols-2 mb-6">
+        <div>
+          <p class="text-lg">Conformations Format</p>
+          <div class="grid grid-cols-2 mb-4">
+            <label class="label cursor-pointer flex gap-2">
+              <input type="checkbox" required class="checkbox checkbox-primary" />
+              <span class="label-text mr-auto ">PDB</span>
+            </label>
+            <label class="label cursor-pointer flex gap-2">
+              <input type="checkbox" required class="checkbox checkbox-primary" />
+              <span class="label-text mr-auto ">SDF</span>
+            </label>
+            <label class="label cursor-pointer flex gap-2">
+              <input type="checkbox" required class="checkbox checkbox-primary" />
+              <span class="label-text mr-auto ">SMI</span>
+            </label>
+            <label class="label cursor-pointer flex gap-2">
+              <input type="checkbox" required class="checkbox checkbox-primary" />
+              <span class="label-text mr-auto ">MOL2</span>
+            </label>
+          </div>
+        </div>
 
-  <pdf-2-chemicals-login-prompt v-if="showLoginPrompt" @close="showLoginPrompt = false"></pdf-2-chemicals-login-prompt>
+        <div>
+          <p class="text-lg">2D Structure Format</p>
+          <div class="grid grid-cols-2">
+            <label class="label cursor-pointer flex gap-2">
+              <input type="checkbox" required class="checkbox checkbox-primary" />
+              <span class="label-text mr-auto ">PNG</span>
+            </label>
+            <label class="label cursor-pointer flex gap-2">
+              <input type="checkbox" required class="checkbox checkbox-primary" />
+              <span class="label-text mr-auto ">SVG</span>
+            </label>
+            <label class="label cursor-pointer flex gap-2">
+              <input type="checkbox" required class="checkbox checkbox-primary" />
+              <span class="label-text mr-auto ">JPG</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      
+      <!-- Contêiner do Dashboard do Uppy -->
+      <div ref="dashboardContainer" class="bg-base-300 rounded-lg p-4 mb-4"></div>
+
+      <h2 class="text-left text-slate-500 text-md font-bold ">* Limit of 10 PDF files per upload.</h2>
+    </div>
+  
+    <PDF2ChemicalsLoginPrompt v-if="showLoginPrompt" @close="showLoginPrompt = false"></PDF2ChemicalsLoginPrompt>
+  </main>
 </template>
 
 <script setup>
@@ -35,6 +83,13 @@ const showLoginPrompt = ref(false);
 const showMainModal = ref(false);
 
 // Configuração do Uppy e estado dos arquivos
+const uppyDashboardHeight = () => {
+  const isMobile = window.innerWidth < 480;
+  const isTablet = window.innerWidth < 768;
+
+  return isMobile ? 250 : isTablet ? 300 : 400
+}
+
 const uppy = new Uppy({
   restrictions: {
     maxNumberOfFiles: 10,
@@ -67,6 +122,7 @@ const initializeUppy = () => {
       showProgressDetails: true,
       note: 'Drag PDF files or click to select',
       width: '100%',
+      height: uppyDashboardHeight(),
       theme: themeStore.isDarkMode ? 'dark' : 'light'
     })
 
