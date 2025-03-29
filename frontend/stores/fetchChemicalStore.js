@@ -5,11 +5,11 @@ import { useChemicalSummaryStore } from '~/stores/chemicalSummaryStore'
 
 export const useFetchChemicalStore = defineStore('fetchChemicalStore', {
     state: () => ({
-       chemicals: [],
-       loading: false,
-       mode: 'summary',
-       type: 'search',
-       error: ''
+        chemicals: [],
+        loading: false,
+        mode: 'summary',
+        type: 'search',
+        error: ''
     }),
     actions: {
         async fetchChemicals() {
@@ -20,8 +20,8 @@ export const useFetchChemicalStore = defineStore('fetchChemicalStore', {
 
             // Chemical Search Service
             const chemicalService = getChemicalService(this.mode)
-        
-            try {    
+
+            try {
                 switch (this.type) {
                     case 'search':
                         await chemicalService.fetchSearch()
@@ -39,12 +39,12 @@ export const useFetchChemicalStore = defineStore('fetchChemicalStore', {
             }
 
             // Atualiza os dados para renderização
-            if(this.error === '') {
+            if (this.error === '') {
                 this.chemicals = this.mode === 'summary' ? chemicalSummaryStore.summaries : chemicalStore.chemicals
-            }else {
+            } else {
                 this.chemicals = []
             }
-            
+
             this.error = ''
             this.loading = false;
         },

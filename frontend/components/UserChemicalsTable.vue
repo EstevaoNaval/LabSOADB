@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody class="text-sm md:text-lg font-normal">
-            <tr v-for="chemical in userTasks.chemicals" :key="chemical.api_id" class="hover">
+            <tr v-for="chemical in userChemicalsStore.chemicals" :key="chemical.api_id" class="hover">
                 <td>{{ chemical.api_id }}</td>
                 <td>
                     <div class="md:max-w-xs max-w-full whitespace-normal break-words lg:tooltip lg:tooltip-up" :data-tip="iupac">
@@ -43,13 +43,17 @@
 
 <script setup>
     import utils from '~/utils/util'
-    import { onBeforeMount } from 'vue';
+    import { onBeforeMount, onUnmounted } from 'vue';
     import { useUserChemicalsStore } from '~/stores/userChemicals';
     
-    const userTasks = useUserChemicalsStore()
+    const userChemicalsStore = useUserChemicalsStore()
 
     onBeforeMount(() => {
-        userTasks.fetchChemicalsPerUser()
+        userChemicalsStore.fetchChemicalsPerUser()
+    })
+
+    onUnmounted(() => {
+        userChemicalsStore.$reset()
     })
 </script>
 

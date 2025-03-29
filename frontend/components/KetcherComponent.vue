@@ -92,7 +92,7 @@ const handleSearchByDrawnStructure = async () => {
     if (smiles !== '') {
       paginationStore.setPage(1);
 
-      filterStore.clearFilter();
+      filterStore.$reset();
 
       if (searchSelected.value === 'similarity') {
         const similarity_threshold = inputSimilarityPercent.value * 0.01

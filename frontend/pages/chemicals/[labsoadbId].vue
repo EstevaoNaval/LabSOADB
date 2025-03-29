@@ -890,7 +890,7 @@
 
 <script setup>
 import utils from "~/utils/util"
-import { ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import { useSelectedChemicalStore } from '~/stores/selectedChemicalStore';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from 'nuxt/app';
@@ -941,7 +941,7 @@ const similaritySearch = () => {
   const similarity_threshold = .85
 
   paginationStore.setPage(1);
-  filterStore.clearFilter();
+  filterStore.$reset();
 
   filterStore.setExactFilter('similarity_threshold', similarity_threshold)
 
@@ -960,7 +960,7 @@ const similaritySearch = () => {
 
 const substructureSearch = () => {
   paginationStore.setPage(1);
-  filterStore.clearFilter();
+  filterStore.$reset();
 
   filterStore.setExactFilter('query', selectedChemicalStore.selectedChemical.identifier.smiles)
   filterStore.setExactFilter('representation_type', 'smiles')
@@ -989,6 +989,10 @@ onMounted(() => {
   
     paginationStore.setPage(1);
   })
+})
+
+onUnmounted(() => {
+  selectedChemicalStore.$reset()
 })
 
 const sectionsRef = ref([

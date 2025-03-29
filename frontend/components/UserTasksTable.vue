@@ -11,7 +11,7 @@
             </tr>
         </thead>
         <tbody class="text-sm md:text-lg font-normal">
-            <tr v-for="task in userTasks.tasks" :key="task.id" class="hover">
+            <tr v-for="task in userTasksStore.tasks" :key="task.id" class="hover">
                 <td>{{ task.id }}</td>
                 <td>{{ utils.truncateString(task.label) }}</td>
                 <td>
@@ -32,12 +32,12 @@
 
 <script setup>
     import utils from '~/utils/util'
-    import { onBeforeMount } from 'vue';
+    import { onBeforeMount, onUnmounted } from 'vue';
     import { useThemeStore } from '~/stores/theme';
     import { useUserTaskStore } from '~/stores/userTasks';
     
     const themeStore = useThemeStore()
-    const userTasks = useUserTaskStore()
+    const userTasksStore = useUserTaskStore()
 
     const MAP_TASK_STATUS_TO_COLOR_STYLE_CLASS = {
         'SUCCESS': themeStore.isDarkMode ? 'text-success' : 'text-green-500',
@@ -48,6 +48,10 @@
     }
 
     onBeforeMount(() => {
-        userTasks.fetchTasksPerUser()
+        userTasksStore.fetchTasksPerUser()
+    })
+
+    onUnmounted(() => {
+        userTasksStore.$reset()
     })
 </script>

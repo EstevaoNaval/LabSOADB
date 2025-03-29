@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="js">
-  import { computed, reactive, watch } from "vue";
+  import { computed, onUnmounted, reactive, watch } from "vue";
   import { useThemeStore } from "~/stores/theme";
   import { useFilterStore } from '~/stores/filterStore'
   import { useFetchChemicalStore } from '~/stores/fetchChemicalStore'

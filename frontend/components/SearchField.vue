@@ -111,9 +111,9 @@
     if (querySearchByRepr.value !== '') {
       paginationStore.setPage(1)
 
-      histogramRangeSliderStore.resetProperties()
+      histogramRangeSliderStore.$reset()
 
-      filterStore.clearFilter()
+      filterStore.$reset()
       filterStore.setExactFilter('query', querySearchByRepr.value)
 
       fetchChemicalStore.setType('search')
@@ -130,9 +130,9 @@
     if (querySearchByCitation.value !== '') {
       paginationStore.setPage(1)
 
-      histogramRangeSliderStore.resetProperties()
+      histogramRangeSliderStore.$reset()
 
-      filterStore.clearFilter()
+      filterStore.$reset()
       filterStore.setExactFilter('citation', querySearchByCitation.value)
 
       fetchChemicalStore.setType('search')

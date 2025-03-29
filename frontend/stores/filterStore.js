@@ -119,6 +119,15 @@ export const useFilterStore = defineStore('filterStore', {
             this.filters.range[name][type] = null
         },
 
+        clearExactFilter() {
+            this.filters.exact = {
+                query: '',
+                citation: '',
+                doi: '',
+                title: ''
+            }
+        },
+
         clearAllRangeFilter() {
             this.filters.range = {
                 jplogp: {
@@ -167,65 +176,6 @@ export const useFilterStore = defineStore('filterStore', {
                     gte: null,
                     lte: null
                 },
-            };
-        },
-
-        clearFilter() {
-            this.filters = {
-                exact: {
-                    query: '',
-                    citation: '',
-                    doi: '',
-                    title: ''
-                },
-                range: {
-                    jplogp: {
-                        gte: null,
-                        lte: null
-                    },
-                    molecular_weight: {
-                        gte: null,
-                        lte: null
-                    },
-                    tpsa: {
-                        gte: null,
-                        lte: null
-                    },
-                    mp_lower_bound: {
-                        gte: null,
-                    },
-                    mp_upper_bound: {
-                        lte: null,
-                    },
-                    date: {
-                        after: null,
-                        before: null
-                    },
-                    count_heavy_atom: {
-                        gte: null,
-                        lte: null,
-                    },
-                    count_rotatable_bond: {
-                        gte: null,
-                        lte: null
-                    },
-                    count_h_bond_donor: {
-                        gte: null,
-                        lte: null
-                    },
-                    count_h_bond_acceptor: {
-                        gte: null,
-                        lte: null
-                    },
-                    count_lipinski_violation: {
-                        gte: null,
-                        lte: null
-                    },
-                    count_pains_alert: {
-                        gte: null,
-                        lte: null
-                    },
-                }
             };
         }
     },

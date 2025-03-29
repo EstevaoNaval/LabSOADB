@@ -33,10 +33,6 @@ export const useSelectedChemicalStore = defineStore('selectedChemical', {
             }
 
             return firstPublicationDate
-        },
-
-        reset() {
-            this.selectedChemical = {}
         }
     },
     persist: true,

@@ -6,7 +6,7 @@ from rest_framework import permissions
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 
-from dj_rest_auth.registration.views import VerifyEmailView, ResendEmailVerificationView
+from dj_rest_auth.registration.views import VerifyEmailView
 from allauth.account.utils import send_email_confirmation
 
 from knox.views import LoginView as KnoxLoginView
@@ -20,6 +20,7 @@ class UserConfirmEmailView(VerifyEmailView):
 
 class LoginView(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
+    serializer_class = AuthTokenSerializer
 
     def post(self, request, format=None):
         serializer = AuthTokenSerializer(data=request.data)
