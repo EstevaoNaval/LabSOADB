@@ -49,9 +49,6 @@ export const useChemicalPropertiesListStore = defineStore('chemicalPropertiesLis
                 heavy_atom: response.data.results.heavy_atom.map(utils.roundValue) || [],
                 rotatable_bond: response.data.results.rotatable_bond.map(utils.roundValue) || [],
             }
-
-            // Atualiza o total de itens na store de paginação
-            //paginationStore.setTotalItems(response.data.total_count)
         }
     },
     persist: true, // Persistência da store

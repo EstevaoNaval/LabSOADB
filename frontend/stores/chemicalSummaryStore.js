@@ -1,25 +1,24 @@
 import { defineStore } from 'pinia'
 import { useNuxtApp } from '#app'
-import { usePaginationStore } from './paginationStore.js'
 import { useSortStore } from './sortingStore.js'
 import { useFilterStore } from './filterStore.js'
 
 export const useChemicalSummaryStore = defineStore('chemicalSummary', {
     state: () => ({
         summaries: [],
+        totalSummaries: 0
     }),
     actions: {
-        async fetchAllChemicalsSummary() {
-            const paginationStore = usePaginationStore()
+        async fetchAllChemicalsSummary(params = {}) {
             const sortStore = useSortStore()
             const filterStore = useFilterStore()
             const { $axios } = useNuxtApp()
 
             const filters = filterStore.getFilterParams
 
-            const params = {
+            params = {
+                ...params,
                 ...filters,
-                page: paginationStore.page,
                 ordering: sortStore.getCurrSortOption(),
             }
 
@@ -28,22 +27,18 @@ export const useChemicalSummaryStore = defineStore('chemicalSummary', {
             })
 
             this.summaries = response.data.results
-
-            paginationStore.setTotalItems(response.data.count)
-            paginationStore.setPageSize(10)
-            paginationStore.calcTotalPages()
+            this.totalSummaries = response.data.count
         },
-        async fetchSearchSummary() {
-            const paginationStore = usePaginationStore()
+        async fetchSearchSummary(params = {}) {
             const sortStore = useSortStore()
             const filterStore = useFilterStore()
             const { $axios } = useNuxtApp()
 
             const filters = filterStore.getFilterParams
 
-            const params = {
+            params = {
+                ...params,
                 ...filters,
-                page: paginationStore.page,
                 ordering: sortStore.getCurrSortOption(),
             }
 
@@ -52,10 +47,7 @@ export const useChemicalSummaryStore = defineStore('chemicalSummary', {
             })
 
             this.summaries = response.data.results
-
-            paginationStore.setTotalItems(response.data.count)
-            paginationStore.setPageSize(10)
-            paginationStore.calcTotalPages()
+            this.totalSummaries = response.data.count
         }
     },
     persist: true,

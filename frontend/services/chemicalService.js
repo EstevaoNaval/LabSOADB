@@ -9,13 +9,13 @@ export function createChemicalService(mode) {
 
   if (mode === 'summary') {
     return {
-      fetchSearch: () => chemicalSummaryStore.fetchSearchSummary(),
-      fetchAll: () => chemicalSummaryStore.fetchAllChemicalsSummary()
+      fetchSearch: (params = {}) => chemicalSummaryStore.fetchSearchSummary(params),
+      fetchAll: (params = {}) => chemicalSummaryStore.fetchAllChemicalsSummary(params)
     }
   } else {
     return {
-      fetchSearch: () => chemicalStore.fetchSearch(),
-      fetchAll: () => chemicalStore.fetchAllChemicals(),
+      fetchSearch: (params = {}) => chemicalStore.fetchSearch(params),
+      fetchAll: (params = {}) => chemicalStore.fetchAllChemicals(params),
       fetchSelectedChemical: (id) => selectedChemicalStore.fetchSelectedChemical(id)
     }
   }

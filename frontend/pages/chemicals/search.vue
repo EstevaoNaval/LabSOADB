@@ -39,21 +39,31 @@
                         </div>
                     </div>
                 </section>
-                <div class="w-[90%] m-auto hidden xl:flex" v-if="paginationStore.totalItems > 0 && paginationStore.totalPages > 1">
+                <div class="w-[90%] m-auto hidden xl:flex" v-if="pagination.state.totalItems > 0 && pagination.getTotalPages() > 1">
                     <p class="text-lg mr-auto">
-                        Showing {{ 1 + paginationStore.pageSize * (paginationStore.page - 1)}} to {{ paginationStore.pageSize * paginationStore.page < paginationStore.totalItems ? paginationStore.pageSize * paginationStore.page : paginationStore.totalItems}} of {{ paginationStore.totalItems }} results
+                        Showing {{ 1 + pagination.state.pageSize * (pagination.state.page - 1)}} to {{ pagination.state.pageSize * pagination.state.page < pagination.state.totalItems ? pagination.state.pageSize * pagination.state.page : pagination.state.totalItems}} of {{ pagination.state.totalItems }} results
                     </p>
-                    <pagination></pagination>
+                    <Pagination
+                        :pagination="pagination"
+                    >
+                    </Pagination>
                 </div>
-                <div class="w-[90%] gap-4 items-center hidden m-auto md:flex md:flex-col xl:hidden" v-if="paginationStore.totalItems > 0 && paginationStore.totalPages > 1">
-                    <pagination></pagination>
+                <div class="w-[90%] gap-4 items-center hidden m-auto md:flex md:flex-col xl:hidden" v-if="pagination.state.totalItems > 0 && pagination.getTotalPages() > 1">
+                    <Pagination
+                        :pagination="pagination"
+                    >
+                    </Pagination>
                     <p class="text-lg">
-                        Showing {{ 1 + paginationStore.pageSize * (paginationStore.page - 1)}} to {{ paginationStore.pageSize * paginationStore.page < paginationStore.totalItems ? paginationStore.pageSize * paginationStore.page : paginationStore.totalItems}} of {{ paginationStore.totalItems }} results
+                        Showing {{ 1 + pagination.state.pageSize * (pagination.state.page - 1)}} to {{ pagination.state.pageSize * pagination.state.page < pagination.state.totalItems ? pagination.state.pageSize * pagination.state.page : pagination.state.totalItems}} of {{ pagination.state.totalItems }} results
                     </p>
                 </div>
-                <div class="w-[90%] flex flex-col mx-auto md:hidden" v-if="paginationStore.totalItems > 0 && paginationStore.totalPages > 1">
+                <div class="w-[90%] flex flex-col mx-auto md:hidden" v-if="pagination.state.totalItems > 0 && pagination.getTotalPages() > 1">
                     <div class="flex mx-auto flex-col gap-4">
-                        <pagination class="mx-auto"></pagination>
+                        <Pagination
+                            class="mx-auto"
+                            :pagination="pagination"
+                        >
+                        </Pagination>
                     </div>
                 </div>
 
@@ -68,8 +78,7 @@
                             </svg>
                             <h1 class="text-xl">Filter</h1>
                         </button>
-                        <sorting class="ml-auto"></sorting>
-
+                        <sorting></sorting>
                     </div>
 
                     <div class="mb-6 hidden md:flex lg:hidden">
@@ -80,7 +89,7 @@
                               <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
                             </svg>
                         </button>
-                        <sorting class="ml-auto"></sorting>
+                        <sorting></sorting>
                     </div>
 
                     <div class="mb-4 m-auto flex md:hidden">
@@ -91,7 +100,7 @@
                               <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
                             </svg>
                         </button>
-                        <sorting class="ml-auto"></sorting>
+                        <sorting></sorting>
                     </div>
 
                     <!-- Mostrar uma mensagem de carregamento ou de erro -->
@@ -115,21 +124,31 @@
                     </div>
                 </div>
 
-                <div class="mb-8 w-[90%] m-auto hidden xl:flex" v-if="paginationStore.totalItems > 0 && paginationStore.totalPages > 1">
+                <div class="mb-8 w-[90%] m-auto hidden xl:flex" v-if="pagination.state.totalItems > 0 && pagination.getTotalPages() > 1">
                     <p class="text-lg mr-auto">
-                        Showing {{ 1 + paginationStore.pageSize * (paginationStore.page - 1)}} to {{ paginationStore.pageSize * paginationStore.page < paginationStore.totalItems ? paginationStore.pageSize * paginationStore.page : paginationStore.totalItems}} of {{ paginationStore.totalItems }} results
+                        Showing {{ 1 + pagination.state.pageSize * (pagination.state.page - 1)}} to {{ pagination.state.pageSize * pagination.state.page < pagination.state.totalItems ? pagination.state.pageSize * pagination.state.page : pagination.state.totalItems}} of {{ pagination.state.totalItems }} results
                     </p>
-                    <pagination></pagination>
+                    <Pagination
+                        :pagination="pagination"
+                    >
+                    </Pagination>
                 </div>
-                <div class="mb-8 w-[90%] gap-4 items-center hidden m-auto md:flex md:flex-col xl:hidden" v-if="paginationStore.totalItems > 0 && paginationStore.totalPages > 1">
-                    <pagination></pagination>
+                <div class="mb-8 w-[90%] gap-4 items-center hidden m-auto md:flex md:flex-col xl:hidden" v-if="pagination.state.totalItems > 0 && pagination.getTotalPages() > 1">
+                    <Pagination
+                        :pagination="pagination"
+                    >
+                    </Pagination>
                     <p class="text-lg">
-                        Showing {{ 1 + paginationStore.pageSize * (paginationStore.page - 1)}} to {{ paginationStore.pageSize * paginationStore.page < paginationStore.totalItems ? paginationStore.pageSize * paginationStore.page : paginationStore.totalItems}} of {{ paginationStore.totalItems }} results
+                        Showing {{ 1 + pagination.state.pageSize * (pagination.state.page - 1)}} to {{ pagination.state.pageSize * pagination.state.page < pagination.state.totalItems ? pagination.state.pageSize * pagination.state.page : pagination.state.totalItems}} of {{ pagination.state.totalItems }} results
                     </p>
                 </div>
-                <div class="mb-8 w-[90%] flex flex-col mx-auto md:hidden" v-if="paginationStore.totalItems > 0 && paginationStore.totalPages > 1">
+                <div class="mb-8 w-[90%] flex flex-col mx-auto md:hidden" v-if="pagination.state.totalItems > 0 && pagination.getTotalPages() > 1">
                     <div class="flex mx-auto flex-col gap-4">
-                        <pagination class="mx-auto"></pagination>
+                        <Pagination
+                            :pagination="pagination"
+                            class="mx-auto"
+                        >
+                        </Pagination>
                     </div>
                 </div>
             </div>
@@ -142,13 +161,13 @@
 </template>
 
 <script setup>
-import { provide, ref, defineAsyncComponent, onUnmounted, onMounted} from 'vue';
-import { usePaginationStore } from '~/stores/paginationStore';
+import { provide, ref, defineAsyncComponent, onUnmounted, onBeforeMount, watch} from 'vue';
 import { useThemeStore } from '~/stores/theme';
 import { useSortStore } from '~/stores/sortingStore'
 import { useRouter } from 'vue-router'
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore'
 import { useFilterStore } from '~/stores/filterStore';
+import { usePagination } from '~/composables/usePagination';
 
 import Pagination from '~/components/Pagination.vue';
 import SearchField from '~/components/SearchField.vue'
@@ -156,7 +175,6 @@ import ChemicalCard from '~/components/ChemicalCard.vue';
 import Sorting from '~/components/Sorting.vue'
 import Export from '~/components/Export.vue'
 import Modal from '~/components/Modal.vue';
-
 
 const FilterComponent = defineAsyncComponent({
     loader: () => import('~/components/FilterComponent.vue')
@@ -168,16 +186,14 @@ var router = useRouter()
 
 // Stores
 const themeStore = useThemeStore()
-const paginationStore = usePaginationStore()
 const sortStore = useSortStore();
 const fetchChemicalStore = useFetchChemicalStore()
 const filterStore = useFilterStore()
 
+// Composables
+const pagination = usePagination()
+
 const searchResultsDiv = ref(1)
-
-paginationStore.setPageSize(10)
-paginationStore.calcTotalPages()
-
 
 function openFilterModal() {
     if(filterModalRef.value) {
@@ -186,7 +202,7 @@ function openFilterModal() {
 }
 
 function reloadSearchResultsDiv() {
-    paginationStore.setPage(1);
+    pagination.setPage(1);
     searchResultsDiv.value *= -1
 }
 
@@ -194,26 +210,35 @@ function routeToSelectedChemicalDetailPage(labsoadbId) {
     router.push({
         path: `/chemicals/${labsoadbId}`,
     })
-} 
+}
 
-onMounted(() => {
-    paginationStore.setPage(1);
-    fetchChemicalStore.fetchChemicals()
+async function fetchChemicals(page) {
+    await fetchChemicalStore.fetchChemicals({ page: page });
+    pagination.setPage(page);
+    //pagination.setTotalItems(fetchChemicalStore.totalChemicals)
+}
+
+onBeforeMount(async () => {
+    fetchChemicals(1);
 })
 
 onUnmounted(() => {
     fetchChemicalStore.$reset();
     sortStore.$reset();
-    filterStore.$reset()
+    filterStore.$reset();
 })
 
-watch(() => paginationStore.page, () => {
-    fetchChemicalStore.fetchChemicals();
+watch(() => fetchChemicalStore.totalChemicals, () => {
+    pagination.setPage(1)
+    pagination.setTotalItems(fetchChemicalStore.totalChemicals)
+})
+
+watch(() => pagination.state.page, () => {
+    fetchChemicals(pagination.state.page)
 });
 
 watch(() => [sortStore.currSortOptionId, sortStore.ascDirection], () => {
-    paginationStore.setPage(1);
-    fetchChemicalStore.fetchChemicals();
+    fetchChemicals(1);
 })
 
 provide('reloadSearchResultsDiv', reloadSearchResultsDiv);

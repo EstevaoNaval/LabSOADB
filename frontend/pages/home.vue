@@ -71,7 +71,6 @@
 <script setup>
   import { defineAsyncComponent } from 'vue';
   import { useRouter } from 'vue-router'
-  import { usePaginationStore } from '~/stores/paginationStore';
   import { useFilterStore } from '~/stores/filterStore';
   import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
   import { useHistogramRangeSliderStore } from '~/stores/histogramRangeSliderStore';
@@ -91,11 +90,8 @@
   const fetchChemicalStore = useFetchChemicalStore()
   const histogramRangeSliderStore = useHistogramRangeSliderStore()
   const filterStore = useFilterStore()
-  const paginationStore = usePaginationStore()
 
   const handleSearchAllChemicals = () => {
-    paginationStore.setPage(1)
-
     filterStore.$reset();
     histogramRangeSliderStore.$reset()
 

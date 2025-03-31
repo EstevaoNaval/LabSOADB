@@ -41,7 +41,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { usePaginationStore } from '~/stores/paginationStore';
 import { useFilterStore } from '~/stores/filterStore';
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
 import { useRouter } from 'vue-router'
@@ -85,13 +84,10 @@ const getSmiles = () => {
 const handleSearchByDrawnStructure = async () => {
   try {
     var smiles = await getSmiles()
-    const paginationStore = usePaginationStore()
     const fetchChemicalStore = useFetchChemicalStore()
     const filterStore = useFilterStore()
 
     if (smiles !== '') {
-      paginationStore.setPage(1);
-
       filterStore.$reset();
 
       if (searchSelected.value === 'similarity') {

@@ -3,7 +3,7 @@ import { useAuthStore } from './auth'
 
 export const useUserTaskStore = defineStore('userTaskStore', {
     state: () => ({
-        tasks: {},
+        tasks: [],
     }),
     actions: {
         async fetchTasksPerUser() {

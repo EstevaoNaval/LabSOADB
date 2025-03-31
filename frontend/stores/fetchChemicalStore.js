@@ -6,13 +6,14 @@ import { useChemicalSummaryStore } from '~/stores/chemicalSummaryStore'
 export const useFetchChemicalStore = defineStore('fetchChemicalStore', {
     state: () => ({
         chemicals: [],
+        totalChemicals: 0,
         loading: false,
         mode: 'summary',
         type: 'search',
         error: ''
     }),
     actions: {
-        async fetchChemicals() {
+        async fetchChemicals(params = {}) {
             this.loading = true
 
             const chemicalStore = useChemicalStore()
@@ -24,7 +25,7 @@ export const useFetchChemicalStore = defineStore('fetchChemicalStore', {
             try {
                 switch (this.type) {
                     case 'search':
-                        await chemicalService.fetchSearch()
+                        await chemicalService.fetchSearch(params)
                         break
                     case 'selected':
                         if (route.query.id) {
@@ -32,7 +33,8 @@ export const useFetchChemicalStore = defineStore('fetchChemicalStore', {
                         }
                         break
                     case 'all':
-                        await chemicalService.fetchAll()
+                        await chemicalService.fetchAll(params)
+                        break
                 }
             } catch (err) {
                 this.error = err.message
@@ -41,6 +43,7 @@ export const useFetchChemicalStore = defineStore('fetchChemicalStore', {
             // Atualiza os dados para renderização
             if (this.error === '') {
                 this.chemicals = this.mode === 'summary' ? chemicalSummaryStore.summaries : chemicalStore.chemicals
+                this.totalChemicals = this.mode === 'summary' ? chemicalSummaryStore.totalSummaries : chemicalStore.totalChemicals
             } else {
                 this.chemicals = []
             }

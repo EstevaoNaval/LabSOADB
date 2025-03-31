@@ -98,8 +98,8 @@
                 id="3d_conformations"
                 v-if="selectedChemicalStore.selectedChemical &&
                 selectedChemicalStore.selectedChemical.conformation && 
-                paginationStore.page > 0 &&
-                selectedChemicalStore.selectedChemical.conformation[paginationStore.page - 1]"
+                confsPagination.state.page > 0 &&
+                selectedChemicalStore.selectedChemical.conformation[confsPagination.state.page - 1]"
               >
                 <h1 class="text-lg md:text-2xl font-bold"> 3D Conformation </h1>
 
@@ -127,8 +127,8 @@
                     <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box md:text-lg z-[1] w-52 p-2 shadow">
                       <li>
                         <a 
-                          :href="selectedChemicalStore.selectedChemical.conformation[paginationStore.page - 1].conf_file" 
-                          :download="getFileName(selectedChemicalStore.selectedChemical.conformation[paginationStore.page - 1].conf_file)"
+                          :href="selectedChemicalStore.selectedChemical.conformation[confsPagination.state.page - 1].conf_file" 
+                          :download="getFileName(selectedChemicalStore.selectedChemical.conformation[confsPagination.state.page - 1].conf_file)"
                           target="_blank" 
                           rel="noopener noreferrer" 
                         >
@@ -151,13 +151,16 @@
 
                 <ngl-viewer
                   :key="nglViewerKey" 
-                  :file="selectedChemicalStore.selectedChemical.conformation[paginationStore.page - 1].conf_file" 
+                  :file="selectedChemicalStore.selectedChemical.conformation[confsPagination.state.page - 1].conf_file" 
                   class="pb-8 rounded-box h-[12rem] md:h-[21rem] shadow-md duration-200 hover:shadow-xl"
                 >
                 </ngl-viewer>
 
                 <div class="flex justify-center pb-8">
-                  <pagination></pagination>
+                  <pagination 
+                    :pagination="confsPagination"
+                  >
+                  </pagination>
                 </div>
               </section>
             </div>
@@ -895,10 +898,10 @@ import { useSelectedChemicalStore } from '~/stores/selectedChemicalStore';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from 'nuxt/app';
 import { useRouter } from 'vue-router'
-import { usePaginationStore } from '~/stores/paginationStore';
 import { useThemeStore } from '~/stores/theme'
 import { useFilterStore } from '~/stores/filterStore';
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
+import { usePagination } from '~/composables/usePagination'
 
 import NglViewer from '~/components/NglViewer.vue';
 import Pagination from '~/components/Pagination.vue';
@@ -909,12 +912,14 @@ const config = useRuntimeConfig()
 
 var nglViewerKey = ref(1)
 
-const paginationStore = usePaginationStore()
+// stores
 const selectedChemicalStore = useSelectedChemicalStore()
 const themeStore = useThemeStore()
 const filterStore = useFilterStore()
 const fetchChemicalStore = useFetchChemicalStore()
 
+// composables
+const confsPagination = usePagination()
 
 var isTableOfContentsOpened = ref(false)
 
@@ -929,7 +934,7 @@ const toggleTableOfContents = () => {
 }
 
 const fetchSelectedChemicalDetail = async () => {
-  selectedChemicalStore.reset()
+  selectedChemicalStore.$reset()
   await selectedChemicalStore.fetchSelectedChemical(route.params.labsoadbId)
 }
 
@@ -940,7 +945,7 @@ const getFileName = (url) => {
 const similaritySearch = () => {
   const similarity_threshold = .85
 
-  paginationStore.setPage(1);
+  confsPagination.setPage(1);
   filterStore.$reset();
 
   filterStore.setExactFilter('similarity_threshold', similarity_threshold)
@@ -959,7 +964,7 @@ const similaritySearch = () => {
 }
 
 const substructureSearch = () => {
-  paginationStore.setPage(1);
+  confsPagination.setPage(1);
   filterStore.$reset();
 
   filterStore.setExactFilter('query', selectedChemicalStore.selectedChemical.identifier.smiles)
@@ -975,19 +980,14 @@ const substructureSearch = () => {
   })
 }
 
-
-
 onMounted(() => {
   fetchSelectedChemicalDetail().then(() => {
     // Verifica se os dados da molécula estão disponíveis e têm conformações
     const totalConformations = selectedChemicalStore.selectedChemical?.conformation?.length || 0;
   
-    // Atualiza a paginação com base nos novos dados
-    paginationStore.setTotalItems(totalConformations);
-    paginationStore.setPageSize(1);
-    paginationStore.calcTotalPages();
-  
-    paginationStore.setPage(1);
+    confsPagination.setTotalItems(totalConformations);
+    confsPagination.setPageSize(1);
+    confsPagination.setPage(1);
   })
 })
 
@@ -1054,7 +1054,7 @@ const sectionsRef = ref([
   }
 ])
 
-watch(() => [paginationStore.page, themeStore.isDarkMode], () => {
+watch(() => [confsPagination.state.page, themeStore.isDarkMode], () => {
   nglViewerKey.value *= -1 
 })
 </script>

@@ -3,7 +3,7 @@ import { useAuthStore } from './auth'
 
 export const useUserChemicalsStore = defineStore('userChemicalsStore', {
     state: () => ({
-        chemicals: {},
+        chemicals: [],
     }),
     actions: {
         async fetchChemicalsPerUser() {
