@@ -893,7 +893,7 @@
 
 <script setup>
 import utils from "~/utils/util"
-import { onUnmounted, ref } from 'vue'
+import { onUnmounted, onMounted, ref } from 'vue'
 import { useSelectedChemicalStore } from '~/stores/selectedChemicalStore';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from 'nuxt/app';

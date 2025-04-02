@@ -98,13 +98,13 @@
             >
               <div class="stat m-auto">
                   <div :class="themeStore.isDarkMode ? 'stat-figure text-info' : 'stat-figure text-white'">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-file-earmark-pdf inline-block m-auto size-14" viewBox="0 0 16 16">
-                          <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-                          <path d="M4.603 14.087a.8.8 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.7 7.7 0 0 1 1.482-.645 20 20 0 0 0 1.062-2.227 7.3 7.3 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a11 11 0 0 0 .98 1.686 5.8 5.8 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.354.416.86.86 0 0 1-.51.138c-.331-.014-.654-.196-.933-.417a5.7 5.7 0 0 1-.911-.95 11.7 11.7 0 0 0-1.997.406 11.3 11.3 0 0 1-1.02 1.51c-.292.35-.609.656-.927.787a.8.8 0 0 1-.58.029m1.379-1.901q-.25.115-.459.238c-.328.194-.541.383-.647.547-.094.145-.096.25-.04.361q.016.032.026.044l.035-.012c.137-.056.355-.235.635-.572a8 8 0 0 0 .45-.606m1.64-1.33a13 13 0 0 1 1.01-.193 12 12 0 0 1-.51-.858 21 21 0 0 1-.5 1.05zm2.446.45q.226.245.435.41c.24.19.407.253.498.256a.1.1 0 0 0 .07-.015.3.3 0 0 0 .094-.125.44.44 0 0 0 .059-.2.1.1 0 0 0-.026-.063c-.052-.062-.2-.152-.518-.209a4 4 0 0 0-.612-.053zM8.078 7.8a7 7 0 0 0 .2-.828q.046-.282.038-.465a.6.6 0 0 0-.032-.198.5.5 0 0 0-.145.04c-.087.035-.158.106-.196.283-.04.192-.03.469.046.822q.036.167.09.346z"/>
-                      </svg>
-                    </div>
-                  <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">Uploaded Chemicals</div>
-                  <div :class="themeStore.isDarkMode ? 'stat-value text-info' : 'stat-value text-white'">{{ userChemicalsStore.chemicals.length }}</div>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 511.999 511.999" xml:space="preserve" fill="currentColor" class="inline-block m-auto size-14">
+                      <path d="M256 0 34.297 128v255.999l221.702 128 221.702-128V128zm0 473.828L67.355 364.914V147.085L256 38.171l188.644 108.914v217.829h.001z"/>
+                      <path d="M256 108.044c-81.583 0-147.956 66.372-147.956 147.956S174.416 403.957 256 403.957 403.958 337.585 403.958 256 337.583 108.044 256 108.044m0 262.854c-63.356 0-114.898-51.544-114.898-114.899S192.644 141.101 256 141.101s114.899 51.543 114.899 114.898S319.357 370.898 256 370.898"/>
+                    </svg>
+                  </div>
+                  <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">User Chemicals</div>
+                  <div :class="themeStore.isDarkMode ? 'stat-value text-info' : 'stat-value text-white'">{{ userChemicalsStore.totalChemicals }}</div>
               </div>
             </div>
           </div>
@@ -144,20 +144,92 @@
         </div>
       </section>
       
-      <div class="gap-y-8 w-[95%] grid grid-cols-1 container mx-auto">
+      <div class="gap-y-16 w-[95%] grid grid-cols-1 container mx-auto">
       
-        <div class="space-y-4">
-          <p class="text-2xl font-semibold">User Tasks</p>
+        <div class="space-y-8 flex flex-col">
+          <p class="text-2xl xl:text-3xl font-semibold text-center xl:text-left">User Tasks</p>
+          <div class="w-full m-auto hidden xl:flex" v-if="userTaskPagination.state.totalItems > 0 && userTaskPagination.getTotalPages() > 1">
+              <p class="text-lg mr-auto">
+                Showing {{ 1 + userTaskPagination.state.pageSize * (userTaskPagination.state.page - 1)}} to {{ userTaskPagination.state.pageSize * userTaskPagination.state.page < userTaskPagination.state.totalItems ? userTaskPagination.state.pageSize * userTaskPagination.state.page : userTaskPagination.state.totalItems}} of {{ userTaskPagination.state.totalItems }} results
+              </p>
+              <Pagination
+                :pagination="userTaskPagination"
+              >
+              </Pagination>
+          </div>
+          <div class="w-[90%] gap-4 items-center m-auto flex flex-col xl:hidden" v-if="userTaskPagination.state.totalItems > 0 && userTaskPagination.getTotalPages() > 1">
+              <Pagination
+                :pagination="userTaskPagination"
+              >
+              </Pagination>
+              <p class="text-lg">
+                Showing {{ 1 + userTaskPagination.state.pageSize * (userTaskPagination.state.page - 1)}} to {{ userTaskPagination.state.pageSize * userTaskPagination.state.page < userTaskPagination.state.totalItems ? userTaskPagination.state.pageSize * userTaskPagination.state.page : userTaskPagination.state.totalItems}} of {{ userTaskPagination.state.totalItems }} results
+              </p>
+          </div>
           <!-- User Tasks Table -->
           <div class="overflow-x-auto rounded-box shadow-lg">
             <user-tasks-table></user-tasks-table>
           </div>
+          <div class="w-full m-auto hidden xl:flex" v-if="userTaskPagination.state.totalItems > 0 && userTaskPagination.getTotalPages() > 1">
+              <p class="text-lg mr-auto">
+                Showing {{ 1 + userTaskPagination.state.pageSize * (userTaskPagination.state.page - 1)}} to {{ userTaskPagination.state.pageSize * userTaskPagination.state.page < userTaskPagination.state.totalItems ? userTaskPagination.state.pageSize * userTaskPagination.state.page : userTaskPagination.state.totalItems}} of {{ userTaskPagination.state.totalItems }} results
+              </p>
+              <Pagination
+                :pagination="userTaskPagination"
+              >
+              </Pagination>
+          </div>
+          <div class="w-[90%] gap-4 items-center m-auto flex flex-col xl:hidden" v-if="userTaskPagination.state.totalItems > 0 && userTaskPagination.getTotalPages() > 1">
+              <Pagination
+                :pagination="userTaskPagination"
+              >
+              </Pagination>
+              <p class="text-lg">
+                Showing {{ 1 + userTaskPagination.state.pageSize * (userTaskPagination.state.page - 1)}} to {{ userTaskPagination.state.pageSize * userTaskPagination.state.page < userTaskPagination.state.totalItems ? userTaskPagination.state.pageSize * userTaskPagination.state.page : userTaskPagination.state.totalItems}} of {{ userTaskPagination.state.totalItems }} results
+              </p>
+          </div>        
         </div>
-        <div class="space-y-4">
-          <p class="text-2xl font-semibold">User Chemicals</p>
+        <div class="space-y-8">
+          <p class="text-2xl xl:text-3xl font-semibold text-center xl:text-left">User Chemicals</p>
+          <div class="w-full m-auto hidden xl:flex" v-if="userChemicalsPagination.state.totalItems > 0 && userChemicalsPagination.getTotalPages() > 1">
+            <p class="text-lg mr-auto">
+              Showing {{ 1 + userChemicalsPagination.state.pageSize * (userChemicalsPagination.state.page - 1)}} to {{ userChemicalsPagination.state.pageSize * userChemicalsPagination.state.page < userChemicalsPagination.state.totalItems ? userChemicalsPagination.state.pageSize * userChemicalsPagination.state.page : userChemicalsPagination.state.totalItems}} of {{ userChemicalsPagination.state.totalItems }} results
+            </p>
+            <Pagination
+              :pagination="userChemicalsPagination"
+            >
+            </Pagination>
+          </div>
+          <div class="w-[90%] gap-4 items-center m-auto flex flex-col xl:hidden" v-if="userChemicalsPagination.state.totalItems > 0 && userChemicalsPagination.getTotalPages() > 1">
+            <Pagination
+              :pagination="userChemicalsPagination"
+            >
+            </Pagination>
+            <p class="text-lg">
+              Showing {{ 1 + userChemicalsPagination.state.pageSize * (userChemicalsPagination.state.page - 1)}} to {{ userChemicalsPagination.state.pageSize * userChemicalsPagination.state.page < userChemicalsPagination.state.totalItems ? userChemicalsPagination.state.pageSize * userChemicalsPagination.state.page : userChemicalsPagination.state.totalItems}} of {{ userChemicalsPagination.state.totalItems }} results
+            </p>
+          </div>
           <!-- User Chemicals Table -->
           <div class="overflow-x-auto rounded-box shadow-lg">
             <user-chemicals-table></user-chemicals-table>
+          </div>
+          <div class="w-full m-auto hidden xl:flex" v-if="userChemicalsPagination.state.totalItems > 0 && userChemicalsPagination.getTotalPages() > 1">
+            <p class="text-lg mr-auto">
+              Showing {{ 1 + userChemicalsPagination.state.pageSize * (userChemicalsPagination.state.page - 1)}} to {{ userChemicalsPagination.state.pageSize * userChemicalsPagination.state.page < userChemicalsPagination.state.totalItems ? userChemicalsPagination.state.pageSize * userChemicalsPagination.state.page : userChemicalsPagination.state.totalItems}} of {{ userChemicalsPagination.state.totalItems }} results
+            </p>
+            <Pagination
+              :pagination="userChemicalsPagination"
+            >
+            </Pagination>
+          </div>
+          <div class="w-[90%] gap-4 items-center m-auto flex flex-col xl:hidden" v-if="userChemicalsPagination.state.totalItems > 0 && userChemicalsPagination.getTotalPages() > 1">
+            <Pagination
+              :pagination="userChemicalsPagination"
+            >
+            </Pagination>
+            <p class="text-lg">
+              Showing {{ 1 + userChemicalsPagination.state.pageSize * (userChemicalsPagination.state.page - 1)}} to {{ userChemicalsPagination.state.pageSize * userChemicalsPagination.state.page < userChemicalsPagination.state.totalItems ? userChemicalsPagination.state.pageSize * userChemicalsPagination.state.page : userChemicalsPagination.state.totalItems}} of {{ userChemicalsPagination.state.totalItems }} results
+            </p>
           </div>
         </div>
       </div>
@@ -175,9 +247,13 @@
   import Modal from '~/components/Modal.vue';
   import UserTasksTable from '~/components/UserTasksTable.vue';
   import UserChemicalsTable from '~/components/UserChemicalsTable.vue'
+  import Pagination from '~/components/Pagination.vue'
+  
   import { useThemeStore } from '~/stores/theme';
-  import { defineAsyncComponent } from 'vue';
+  import { defineAsyncComponent, watch } from 'vue';
   import { useUserChemicalsStore } from '~/stores/userChemicals';
+  import { useUserTasksStore } from '~/stores/userTasks';
+  import { usePagination } from '~/composables/usePagination'
 
   const KetcherComponent = defineAsyncComponent({
     loader: () => import('~/components/KetcherComponent.vue')
@@ -189,6 +265,11 @@
 
   const userChemicalsStore = useUserChemicalsStore()
   const themeStore = useThemeStore()
+  const userTasksStore = useUserTasksStore()
+
+  //composables
+  const userTaskPagination = usePagination()
+  const userChemicalsPagination = usePagination()
 
   var ketcherModalRef =  ref(null)
 
@@ -206,9 +287,36 @@
     }
   }
 
+  async function fetchUserTasks(page) {
+    userTaskPagination.setPage(page)
+    await userTasksStore.fetchTasksPerUser({ page: page })
+    userTaskPagination.setTotalItems(userTasksStore.totalTasks)
+  }
+  
+  async function fetchUserChemicals(page) {
+    userChemicalsPagination.setPage(page)
+    await userChemicalsStore.fetchChemicalsPerUser({ page: page})
+    userChemicalsPagination.setTotalItems(userChemicalsStore.totalChemicals)
+  }
+
+  watch(() => userTaskPagination.state.page, () => {
+    fetchUserTasks(userTaskPagination.state.page)
+  })
+
+  watch(() => userChemicalsPagination.state.page, () => {
+    fetchUserChemicals(userChemicalsPagination.state.page)
+  })
+
+  onBeforeMount(() => {
+    fetchUserTasks(1)
+    fetchUserChemicals(1)
+  })
+
   definePageMeta({
     middleware: 'auth'
   });
+
+  
 </script>
 
 <style scoped>

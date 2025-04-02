@@ -4,9 +4,26 @@ from django_clamd.validators import validate_file_infection
 
 from rest_framework import serializers
 
-
 class PDFSerializer(serializers.Serializer):
-    email = serializers.EmailField(allow_blank=False)
+    CHEMICALS_EXPORT_FORMATS = ['zip', 'json']
+    CONF_FORMATS = ['pdb', 'sdf', 'mol2', 'smi']
+    STRUCTURE_FORMATS = ['png', 'jpg', 'svg']
+    
+    export_format = serializers.ChoiceField(
+        choices=CHEMICALS_EXPORT_FORMATS,
+        default='zip'
+    )
+    
+    conf_format = serializers.MultipleChoiceField(
+        choices=CONF_FORMATS,
+        required=False
+    )
+    
+    structure_format = serializers.MultipleChoiceField(
+        choices=STRUCTURE_FORMATS,
+        required=False
+    )
+    
     pdf_files = serializers.ListField(
         child=serializers.FileField(validators=[validate_file_infection]),
         allow_empty=False,

@@ -4,9 +4,10 @@ import { useAuthStore } from './auth'
 export const useUserChemicalsStore = defineStore('userChemicalsStore', {
     state: () => ({
         chemicals: [],
+        totalChemicals: 0
     }),
     actions: {
-        async fetchChemicalsPerUser() {
+        async fetchChemicalsPerUser(params = {}) {
             const config = useRuntimeConfig()
             const { $axios } = useNuxtApp()
             const authStore = useAuthStore()
@@ -15,10 +16,12 @@ export const useUserChemicalsStore = defineStore('userChemicalsStore', {
                 await $axios.get(
                     config.public.userChemicalsEndpoint,
                     {
-                        headers: { Authorization: `Bearer ${authStore.token}` }
+                        headers: { Authorization: `Bearer ${authStore.token}` },
+                        params: params
                     }
                 ).then((response) => {
                     this.chemicals = response.data.results
+                    this.totalChemicals = response.data.count
                 })
             }
 

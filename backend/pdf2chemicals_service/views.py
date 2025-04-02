@@ -24,6 +24,14 @@ class PDFUploadView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         uploaded_files = serializer.validated_data['pdf_files']
+        export_format = serializer.validated_data['export_format']
+        conf_format = serializer.validated_data['conf_format']
+        structure_format = serializer.validated_data['structure_format']
+        
+        print(export_format)
+        print(conf_format)
+        print(structure_format)
+        
         user_id = request.user.id
         
         temp_files = []

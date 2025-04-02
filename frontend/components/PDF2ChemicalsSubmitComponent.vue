@@ -3,48 +3,55 @@
     <div v-if="showMainModal" class="container mx-auto p-6 ">
       <h2 class="text-center text-2xl font-bold mb-6">PDF2Chemicals: Submission Form</h2>
       
-      <div class="grid md:grid-cols-2 mb-6">
-        <div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6">
+        <div class="mx-auto">
+          <p class="text-lg">Export Format</p>
+          <div class="grid grid-cols-1 mb-4">
+            <label class="label cursor-pointer flex gap-2">
+              <input type="radio" name="pdf2chemicals-export-format-radio" value="zip" v-model="exportFormatRadio" class="radio radio-primary" checked="checked" />
+              <span class="label-text mr-auto ">ZIP</span>
+            </label>
+            <label class="label cursor-pointer flex gap-2">
+              <input type="radio" name="pdf2chemicals-export-format-radio" value="json" v-model="exportFormatRadio" class="radio radio-primary" />
+              <span class="label-text mr-auto ">JSON</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="mx-auto">
           <p class="text-lg">Conformations Format</p>
           <div class="grid grid-cols-2 mb-4">
-            <label class="label cursor-pointer flex gap-2">
-              <input type="checkbox" required class="checkbox checkbox-primary" />
-              <span class="label-text mr-auto ">PDB</span>
-            </label>
-            <label class="label cursor-pointer flex gap-2">
-              <input type="checkbox" required class="checkbox checkbox-primary" />
-              <span class="label-text mr-auto ">SDF</span>
-            </label>
-            <label class="label cursor-pointer flex gap-2">
-              <input type="checkbox" required class="checkbox checkbox-primary" />
-              <span class="label-text mr-auto ">SMI</span>
-            </label>
-            <label class="label cursor-pointer flex gap-2">
-              <input type="checkbox" required class="checkbox checkbox-primary" />
-              <span class="label-text mr-auto ">MOL2</span>
+            <label v-for="confsFormat in chemicalsConfsFormats" :key="confsFormat.id" class="label cursor-pointer flex gap-2">
+              <input 
+                :id="confsFormat.id"
+                type="checkbox"
+                :value="confsFormat.value" 
+                v-model="chemicalsConfsFormatCheckbox"
+                class="checkbox checkbox-primary"
+                required 
+              />
+              <span class="label-text mr-auto ">{{ confsFormat.label }}</span>
             </label>
           </div>
         </div>
 
-        <div>
+        <div class="mx-auto">
           <p class="text-lg">2D Structure Format</p>
           <div class="grid grid-cols-2">
-            <label class="label cursor-pointer flex gap-2">
-              <input type="checkbox" required class="checkbox checkbox-primary" />
-              <span class="label-text mr-auto ">PNG</span>
-            </label>
-            <label class="label cursor-pointer flex gap-2">
-              <input type="checkbox" required class="checkbox checkbox-primary" />
-              <span class="label-text mr-auto ">SVG</span>
-            </label>
-            <label class="label cursor-pointer flex gap-2">
-              <input type="checkbox" required class="checkbox checkbox-primary" />
-              <span class="label-text mr-auto ">JPG</span>
+            <label v-for="chemical2DStructureFormat in chemicals2DStructureFormats" :key="chemical2DStructureFormat.id" class="label cursor-pointer flex gap-2">
+              <input 
+                type="checkbox" 
+                :id="chemical2DStructureFormat.id"
+                :value="chemical2DStructureFormat.value" 
+                v-model="chemicals2DStructureFormatCheckbox" 
+                class="checkbox checkbox-primary" 
+                required
+              />
+              <span class="label-text mr-auto ">{{ chemical2DStructureFormat.label }}</span>
             </label>
           </div>
         </div>
       </div>
-      
       
       <!-- Contêiner do Dashboard do Uppy -->
       <div ref="dashboardContainer" class="bg-base-300 rounded-lg p-4 mb-4"></div>
@@ -70,7 +77,6 @@ import PDF2ChemicalsLoginPrompt from '~/components/PDF2ChemicalsLoginPrompt.vue'
 import '@uppy/core/dist/style.min.css';
 import '@uppy/dashboard/dist/style.min.css';
 
-
 const config = useRuntimeConfig()
 
 const themeStore = useThemeStore()
@@ -81,6 +87,58 @@ const dashboardContainer = ref(null)
 
 const showLoginPrompt = ref(false);
 const showMainModal = ref(false);
+const exportFormatRadio = ref('zip')
+const chemicalsConfsFormatCheckbox = ref(['mol2'])
+const chemicals2DStructureFormatCheckbox = ref(['jpg'])
+
+const chemicalsConfsFormats = [
+  {
+    id: 'confsFormat-1',
+    label: 'PDB',
+    value: 'pdb',
+    is_available_on_json_export_format: false
+  },
+  {
+    id: 'confsFormat-2',
+    label: 'SDF',
+    value: 'sdf',
+    is_available_on_json_export_format: false
+  },
+  {
+    id: 'confsFormat-3',
+    label: 'MOL2',
+    value: 'mol2',
+    is_available_on_json_export_format: true
+  },
+  {
+    id: 'confsFormat-4',
+    label: 'SMI',
+    value: 'smi',
+    is_available_on_json_export_format: false
+  },
+]
+
+const chemicals2DStructureFormats = [
+  {
+    id: 'chemicals2DStructureFormat-1',
+    label: 'PNG',
+    value: 'png',
+    is_available_on_json_export_format: false
+  },
+  {
+    id: 'chemicals2DStructureFormat-3',
+    label: 'JPG',
+    value: 'jpg',
+    is_available_on_json_export_format: false
+  },
+  {
+    id: 'chemicals2DStructureFormat-2',
+    label: 'SVG',
+    value: 'svg',
+    is_available_on_json_export_format: true
+  },
+  
+]
 
 // Configuração do Uppy e estado dos arquivos
 const uppyDashboardHeight = () => {
@@ -112,7 +170,6 @@ const checkAuth = () => {
   }
 };
 
-
 const initializeUppy = () => {
   if(authStore.isAuthenticated) {
     // Inicializa o Dashboard dentro do contêiner
@@ -138,6 +195,32 @@ const initializeUppy = () => {
   }
 }
 
+const setJsonConfsDefaultFormat = () => {
+  chemicalsConfsFormatCheckbox.value = ['mol2']
+}
+
+const setJson2DStructureDefaultFormat = () => {
+  chemicals2DStructureFormatCheckbox.value = ['svg']
+}
+
+const toggleConfsFormatCheckboxDisabled = () => {
+  for (let i = 0; i < chemicalsConfsFormats.length; i++) {
+    if(!chemicalsConfsFormats[i].is_available_on_json_export_format) {
+      let confsFormatHTMLEntity = document.querySelector(`#${chemicalsConfsFormats[i].id}`)
+      confsFormatHTMLEntity.disabled = !confsFormatHTMLEntity.disabled
+    }
+  }
+}
+
+const toggle2DStructureFormatCheckboxDisabled = () => {
+  for (let i = 0; i < chemicals2DStructureFormats.length; i++) {
+    if(!chemicals2DStructureFormats[i].is_available_on_json_export_format) {
+      let chemical2DStructureFormatHTMLEntity = document.querySelector(`#${chemicals2DStructureFormats[i].id}`)
+      chemical2DStructureFormatHTMLEntity.disabled = !chemical2DStructureFormatHTMLEntity.disabled
+    }
+  }
+}
+
 onBeforeMount(() => {
   checkAuth()
 })
@@ -148,6 +231,16 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   uppy.destroy()
+})
+
+watch(() => exportFormatRadio.value, () => {
+  if(exportFormatRadio.value == 'json') {
+    setJsonConfsDefaultFormat()
+    setJson2DStructureDefaultFormat()
+  }
+
+  toggleConfsFormatCheckboxDisabled()
+  toggle2DStructureFormatCheckboxDisabled()
 })
 </script>
 

@@ -47,8 +47,8 @@
 </template>
   
 <script setup>
-  import {useExportStore} from '~/stores/exportStore.js'
-  import {useAuthStore} from '~/stores/auth.js'
+  import { useExportStore } from '~/stores/exportStore.js'
+  import { useAuthStore } from '~/stores/auth.js'
 
   const authStore = useAuthStore()
   const exportStore = useExportStore()

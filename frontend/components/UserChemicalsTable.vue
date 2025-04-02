@@ -48,8 +48,12 @@
     
     const userChemicalsStore = useUserChemicalsStore()
 
+    async function fetchUserChemicals(page) {
+        await userChemicalsStore.fetchChemicalsPerUser({ page: page })
+    }
+
     onBeforeMount(() => {
-        userChemicalsStore.fetchChemicalsPerUser()
+        fetchUserChemicals(1)
     })
 
     onUnmounted(() => {
