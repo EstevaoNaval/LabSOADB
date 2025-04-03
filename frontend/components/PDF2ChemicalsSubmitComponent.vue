@@ -55,8 +55,12 @@
       
       <!-- Contêiner do Dashboard do Uppy -->
       <div ref="dashboardContainer" class="bg-base-300 rounded-lg p-4 mb-4"></div>
-
-      <h2 class="text-left text-slate-500 text-md font-bold ">* Limit of 10 PDF files per upload.</h2>
+      
+      <div class="grid grid-cols-2 my-auto">
+        <h2 class="text-left text-slate-500 text-sm md:text-md font-bold my-auto">* Limit of 10 PDF files per upload.</h2>
+        <button @click="uploadFiles" class="btn btn-primary text-lg ml-auto">Upload</button>
+      </div>
+      
     </div>
   
     <PDF2ChemicalsLoginPrompt v-if="showLoginPrompt" @close="showLoginPrompt = false"></PDF2ChemicalsLoginPrompt>
@@ -70,7 +74,6 @@ import XHRUpload from '@uppy/xhr-upload'
 
 import { useThemeStore } from '~/stores/theme';
 import { useAuthStore } from '~/stores/auth'
-import { useUserStore } from '~/stores/user'
 
 import PDF2ChemicalsLoginPrompt from '~/components/PDF2ChemicalsLoginPrompt.vue';
 
@@ -81,7 +84,6 @@ const config = useRuntimeConfig()
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
-const userStore = useUserStore()
 
 const dashboardContainer = ref(null)
 
@@ -180,7 +182,8 @@ const initializeUppy = () => {
       note: 'Drag PDF files or click to select',
       width: '100%',
       height: uppyDashboardHeight(),
-      theme: themeStore.isDarkMode ? 'dark' : 'light'
+      theme: themeStore.isDarkMode ? 'dark' : 'light',
+      hideUploadButton: true
     })
 
     uppy.use(XHRUpload, {
@@ -190,9 +193,30 @@ const initializeUppy = () => {
       endpoint: uploadEndpoint,
       fieldName: 'pdf_files'
     })
-
-    uppy.setMeta({ email: userStore.user.email });
   }
+}
+
+const uploadFiles = () => {
+  setUppyUploadMeta()
+  uppy.upload()
+} 
+
+const setUppyUploadMeta = () => {
+  let uppyUploadMeta = {}
+
+  uppyUploadMeta['export_format'] = exportFormatRadio.value
+
+  if(chemicalsConfsFormatCheckbox.value.length > 0) {
+    uppyUploadMeta['conf_format'] = chemicalsConfsFormatCheckbox.value
+  }
+
+  if(chemicals2DStructureFormatCheckbox.value.length > 0) {
+    uppyUploadMeta['structure_format'] = chemicals2DStructureFormatCheckbox.value
+  }
+
+  console.log(uppyUploadMeta)
+
+  uppy.setMeta(uppyUploadMeta);
 }
 
 const setJsonConfsDefaultFormat = () => {
@@ -230,7 +254,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  uppy.destroy()
+  if (uppy) uppy.destroy();
 })
 
 watch(() => exportFormatRadio.value, () => {

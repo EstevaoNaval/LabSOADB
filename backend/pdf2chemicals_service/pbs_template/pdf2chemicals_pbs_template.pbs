@@ -3,13 +3,13 @@
 #PBS -l nodes={{node_name}}
 #PBS -l walltime=72:00:00
 
-# Ir para o diretório de trabalho
+# Go to working directory
 cd $PBS_O_WORKDIR || { echo "Failed to change to PBS_O_WORKDIR"; exit 1; }
 
-# Inicializar Conda para bash
+# Initialize Conda for bash
 eval "$(/home/estevao/miniconda3/bin/conda shell.bash hook)"
 
-# Ativar ambiente Conda
+# Enable Conda environment
 conda activate {{conda_env}}
 
 nvidia-smi
@@ -18,21 +18,21 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Verificar se o ambiente foi ativado corretamente
+# Verify that the environment was activated correctly
 if [ $? -ne 0 ]; then
     echo "Error activating conda environment {{conda_env}}"
     exit 1
 fi
 
-# Verificar se Java está disponível
+# Check if Java is available
 java -version
 if [ $? -ne 0 ]; then
     echo "Error checking Java installation"
     exit 1
 fi
 
-# Executar o script principal
+# Run the main script
 python {{pdf2chemicals_path}} {{json_prefix}} {{pdf_path}} {{output_dir}}
 
-# Desativar ambiente Conda
+# Disable Conda environment
 conda deactivate

@@ -23,14 +23,10 @@ class PDFUploadView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        uploaded_files = serializer.validated_data['pdf_files']
-        export_format = serializer.validated_data['export_format']
-        conf_format = serializer.validated_data['conf_format']
-        structure_format = serializer.validated_data['structure_format']
-        
-        print(export_format)
-        print(conf_format)
-        print(structure_format)
+        uploaded_files = serializer.validated_data.get('pdf_files')
+        export_format = serializer.validated_data.get('export_format', set())
+        conf_format = serializer.validated_data.get('conf_format', set())
+        structure_format = serializer.validated_data.get('structure_format', set())
         
         user_id = request.user.id
         
@@ -47,7 +43,10 @@ class PDFUploadView(APIView):
                 extract_and_save_chemicals_from_pdf.delay(
                     user_id=user_id, 
                     pdf_path=pdf_file_path,
-                    original_filename=original_filename
+                    original_filename=original_filename,
+                    export_format=export_format,
+                    conf_format=conf_format,
+                    structure_format=structure_format
                 )
             return Response(
                 {"message": f"{len(uploaded_files)} files enqueued for processing."},

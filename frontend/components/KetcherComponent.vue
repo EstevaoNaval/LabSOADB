@@ -3,9 +3,9 @@
     
     <iframe class="ketcher-iframe rounded-xl" ref='ketcherIFrame' v-if='isInView' :src='ketcherSrc' allowfullscreen></iframe>
     
-    <div class="flex mt-4 max-w-auto">
-      <div class="flex flex-col m-auto font-semibold">
-        <div v-if="searchSelected === searchOptions[1].value" class="flex m-auto max-w-auto">
+    <div class="grid grid-cols-2 mt-4 max-w-auto">
+      <div class="flex flex-col my-auto font-semibold">
+        <div v-if="searchSelected === searchOptions[1].value" class="flex my-auto max-w-auto">
           <div class="flex flex-col">
             <label for="rangeid" class="my-auto text-sm font-semibold">Tanimoto Similarity</label>
             <input v-model="inputSimilarityPercent" min="0" max="100" id="rangeid" type="range" class="range range-primary w-64" />
@@ -15,13 +15,13 @@
             <input v-model="inputSimilarityPercent" type="number" min="0" max="100" class="max-w-14 text-center rounded-box" /><p>%</p>
           </div>
         </div>
-        <label class="cursor-pointer label gap-2" v-if="searchSelected !== searchOptions[1].value">
+        <label class="cursor-pointer m-auto label gap-2" v-if="searchSelected !== searchOptions[1].value">
           <input type="checkbox" class="checkbox checkbox-primary" />
           <span class="label-text text-lg text-primary">Match Tautomers</span>
         </label>
       </div>
     
-      <div class="join flex m-auto">
+      <div :class="searchSelected !== searchOptions[1].value ? 'join flex m-auto' : 'join flex my-auto ml-auto'">
         <select v-model="searchSelected" class="join-item select select-bordered font-semibold text-lg" required>
           <option class="font-semibold" value="" disabled selected>Search Type</option>
           <option class="font-semibold" v-for="option in searchOptions" :key="option.id" :value="option.value">{{ option.text }}</option>

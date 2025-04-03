@@ -59,7 +59,8 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
 
     # Definindo o workflow
     workflow = chain(
-        send_pdf2chemicals_hpc_task.s(pdf_path=kwargs['pdf_path']),
+        create_pbs_script_task.s(pdf_path=kwargs['pdf_path']),
+        send_pdf2chemicals_hpc_task.s(),
         monitor_pdf2chemicals_job.s(),
         load_chemical_from_json.s(),
         final_chord
@@ -71,6 +72,9 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
             pdf_path=kwargs['pdf_path'],
             user_id=kwargs['user_id'],
             original_filename=kwargs['original_filename'],
+            export_format=kwargs['export_format'],
+            conf_format=kwargs['conf_format'],
+            structure_format=kwargs['structure_format'],
             task_id=task_id
         ),
         task_id=task_id
@@ -188,53 +192,96 @@ def return_pdf2chemicals_task_final_result(self, results):
 
 @shared_task(
     base=ChainedTask,
-    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_send_pdf2chemicals_hpc_task', 
-    bind=True,  
+    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_create_pbs_script_task',
+    bind=True,
     acks_late=True,
     queue='pdf2chemicals_tasks',
     priority=1,
     max_retries=None,
-    default_retry_delay=60 * 2, # Waits 2 minutes to execute 
+    default_retry_delay=60 * 2,  # Aguarda 2 minutos para executar
     retry_backoff=True,
     task_reject_on_worker_lost=True
 )
-def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
+def create_pbs_script_task(self, *args, **kwargs):
     JSON_FILENAME_LENGTH = 10
-    
+
+    # Geração do caminho e nome do arquivo JSON
     json_dir = os.path.join(settings.MEDIA_ROOT, 'json')
     json_filename = generate_random_alphanumeric_sequence(JSON_FILENAME_LENGTH) + ".json"
     json_path = os.path.join(json_dir, json_filename)
     json_prefix = f"--json --json-filename {json_filename}"
-    
+
+    # Caminho absoluto do PDF
     absolute_pdf_path = os.path.join(settings.MEDIA_ROOT, kwargs['pdf_path'])
-    
+
+    # Reserva de um nó no cluster
     cluster_node_manager = ClusterNodeManager()
-    
     node_name = cluster_node_manager.reserve_free_gpu_node()
-    
+
     if node_name == '':
         raise ResourceUnavailable("No pbs node is available at the moment.")
-    
+
     reservation_id = cluster_node_manager.get_reservation_id_from_node_name(node_name)
-    
+
+    # Geração do script PBS
     script_path = generate_pbs_script(
         pdf_path=absolute_pdf_path,
         output_dir=json_dir,
         json_prefix=json_prefix,
         node_name=node_name
     )
-    
+
+    # Verificação da existência do script
     if not file_exists(script_path):
         cluster_node_manager.mark_node_as_free(node_name)
         raise FileExistsError(f"PBS/TORQUE script file {script_path} not found.")
-    
+
+    # Verificação da validade da reserva
     if not cluster_node_manager.is_node_reservation_valid(node_name, reservation_id):
         remove_file(script_path)
         raise KeyError("Cluster node reservation id is invalid.")
-    
-    # Opens a subshell to navigate to TORQUE user's home directory and runs the PBS/TORQUE script, from there, via qsub.
-    cmd = f'sh -c "(cd {os.getenv("TORQUE_USER_HOME")} && {os.getenv("TORQUE_HOME")}/bin/qsub {script_path})"'
-    
+
+    # Retorno dos dados para a próxima task
+    return {
+        'pbs_script_path': script_path,
+        'node_name': node_name,
+        'reservation_id': reservation_id,
+        'json_path': json_path,
+        'pdf_path': absolute_pdf_path
+    }
+
+@shared_task(
+    base=ChainedTask,
+    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_send_pdf2chemicals_hpc_task',
+    bind=True,
+    acks_late=True,
+    queue='pdf2chemicals_tasks',
+    priority=1,
+    max_retries=None,
+    default_retry_delay=60 * 2,  # Aguarda 2 minutos para executar
+    retry_backoff=True,
+    task_reject_on_worker_lost=True
+)
+def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
+    # Dados recebidos da task anterior
+    pbs_script_path = kwargs.get('pbs_script_path')
+    node_name = kwargs.get('node_name')
+    reservation_id = kwargs.get('reservation_id')
+    json_path = kwargs.get('json_path')
+    pdf_path = kwargs.get('pdf_path')
+
+    # Instanciação do gerenciador de nós
+    cluster_node_manager = ClusterNodeManager()
+
+    # Verificação adicional da validade da reserva (opcional, mas recomendado)
+    if not cluster_node_manager.is_node_reservation_valid(node_name, reservation_id):
+        remove_file(pbs_script_path)
+        raise KeyError("Cluster node reservation id is invalid.")
+
+    # Comando para submeter o job ao cluster
+    cmd = f'sh -c "(cd {os.getenv("TORQUE_USER_HOME")} && {os.getenv("TORQUE_HOME")}/bin/qsub {pbs_script_path})"'
+
+    # Execução do comando
     result = subprocess.run(
         cmd,
         shell=True,
@@ -242,21 +289,23 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
         text=True,
         check=False
     )
-    
+
+    # Tratamento de falhas na submissão
     if result.returncode != 0:
-        remove_file(script_path)
+        remove_file(pbs_script_path)
         cluster_node_manager.mark_node_as_free(node_name)
         raise subprocess.CalledProcessError('Job was not received in the HPC cluster.')
-    
+
     job_id = result.stdout.strip()
-    
+
+    # Retorno dos dados
     return {
-        'pbs_script_path': script_path,
-        'job_id': job_id, 
-        'node_name': node_name, 
+        'pbs_script_path': pbs_script_path,
+        'job_id': job_id,
+        'node_name': node_name,
         'json_path': json_path,
-        'pdf_path': absolute_pdf_path
-    } 
+        'pdf_path': pdf_path
+    }
 
 @shared_task(
     base=ChainedTask,
