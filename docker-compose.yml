@@ -9,9 +9,8 @@ services:
     user: ${DJANGO_API_UID}:${DATA_GID}
     build:
       context: backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
       args:
-        - BASE_ROOT_DIR=${BASE_ROOT_DIR}
         - USER=${DJANGO_API_USER}
         - UID=${DJANGO_API_UID}
         - GID=${DATA_GID}
@@ -20,7 +19,6 @@ services:
       - ENTRYPOINT_PATH=/src/scripts/docker-django-api-entrypoint.sh
     volumes:
       - ${DATA_ROOT_DIR}:${DATA_ROOT_DIR}:rw
-      - ${BASE_ROOT_DIR}:$BASE_ROOT_DIR:rw
       - django-api-logs:/logs # Volume para logs
     ports:
       - "8000:8000"
@@ -41,9 +39,8 @@ services:
   django-worker:
     build:
       context: backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
       args:
-        - BASE_ROOT_DIR=${BASE_ROOT_DIR}
         - USER=${DJANGO_WORKER_USER}
         - UID=${DJANGO_WORKER_UID}
         - GID=${DATA_GID}
@@ -56,7 +53,6 @@ services:
           memory: "4G"
     volumes:
       - ${DATA_ROOT_DIR}:${DATA_ROOT_DIR}:rw
-      - ${BASE_ROOT_DIR}:$BASE_ROOT_DIR:rw
     env_file:
       - .env
     environment:
@@ -76,9 +72,8 @@ services:
   pdf2chemicals-worker:
     build:
       context: backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
       args:
-        - BASE_ROOT_DIR=${BASE_ROOT_DIR}
         - USER=${PDF2CHEMICALS_WORKER_USER}
         - UID=${PDF2CHEMICALS_WORKER_UID}
         - GID=${DATA_GID}
@@ -105,7 +100,6 @@ services:
       - ${TORQUE_ROOT_DIR}/server_priv/accounting:${TORQUE_ROOT_DIR}/server_priv/accounting:ro
       - ${TORQUE_ROOT_DIR}/server_logs:${TORQUE_ROOT_DIR}/server_logs:ro
       - ${TORQUE_ROOT_DIR}/mom_logs:${TORQUE_ROOT_DIR}/mom_logs:ro
-      - ${BASE_ROOT_DIR}:$BASE_ROOT_DIR:rw
     env_file:
       - .env
     environment:
