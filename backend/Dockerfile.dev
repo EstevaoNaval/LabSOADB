@@ -1,6 +1,8 @@
 # Stage 1: Build stage
 FROM python:3.12-slim AS builder
 
+ARG BASE_ROOT_DIR
+
 # Definir o diretório de trabalho no container
 WORKDIR ${BASE_ROOT_DIR}
 
@@ -19,6 +21,7 @@ FROM python:3.12-slim
 ARG USER
 ARG UID
 ARG GID
+ARG BASE_ROOT_DIR
 
 # Instalar dependências do sistema (caso necessário)
 RUN apt-get update && \
