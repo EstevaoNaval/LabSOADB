@@ -30,8 +30,7 @@ rm -rf /var/lib/apt/lists/*
 
 # Criar usuário não root
 RUN addgroup --gid ${GID} ${USER} && \
-adduser --disabled-password --no-create-home --uid ${UID} --gid ${GID} --shell /bin/sh ${USER} && \
-chown -R ${USER} ${BASE_ROOT_DIR}
+adduser --disabled-password --no-create-home --uid ${UID} --gid ${GID} --shell /bin/sh ${USER} 
 
 # Definir o diretório de trabalho
 WORKDIR ${BASE_ROOT_DIR}
