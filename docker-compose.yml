@@ -9,8 +9,9 @@ services:
     user: ${DJANGO_API_UID}:${DATA_GID}
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
+        - BASE_ROOT_DIR=${BASE_ROOT_DIR}
         - USER=${DJANGO_API_USER}
         - UID=${DJANGO_API_UID}
         - GID=${DATA_GID}
@@ -40,8 +41,9 @@ services:
   django-worker:
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
+        - BASE_ROOT_DIR=${BASE_ROOT_DIR}
         - USER=${DJANGO_WORKER_USER}
         - UID=${DJANGO_WORKER_UID}
         - GID=${DATA_GID}
@@ -74,8 +76,9 @@ services:
   pdf2chemicals-worker:
     build:
       context: backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
+        - BASE_ROOT_DIR=${BASE_ROOT_DIR}
         - USER=${PDF2CHEMICALS_WORKER_USER}
         - UID=${PDF2CHEMICALS_WORKER_UID}
         - GID=${DATA_GID}
