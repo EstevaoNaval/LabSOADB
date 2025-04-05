@@ -149,7 +149,7 @@ def replace_export_format_in_template(script_content: str, export_format: str):
     export_format_content = "--format json "
     
     if export_format == 'zip':
-        export_format_content = f"--format {export_format}"
+        export_format_content += f"--format {export_format} "
     
     script_content = script_content.replace("{{export_format}}", export_format_content)
     
@@ -159,7 +159,7 @@ def replace_conf_formats_in_template(script_content: str, conf_formats: list[str
     conf_formats_content = ""
     
     for fmt in conf_formats:
-        conf_formats_content += f"-conf-fmt {fmt}"
+        conf_formats_content += f"-conf-fmt {fmt} "
         
     script_content = script_content.replace("{{conf_formats}}", conf_formats_content)
     
@@ -169,7 +169,7 @@ def replace_structure_formats_in_template(script_content: str, structure_formats
     structure_formats_content = ""
     
     for fmt in structure_formats:
-        structure_formats_content += f"-structure-fmt {fmt}"
+        structure_formats_content += f"-structure-fmt {fmt} "
         
     script_content = script_content.replace("{{structure_formats}}", structure_formats_content)
     
