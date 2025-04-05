@@ -25,6 +25,23 @@ export const useUserTasksStore = defineStore('userTasksStore', {
                 })
             }
 
+        },
+        async revokeTask(taskId) {
+            const config = useRuntimeConfig()
+            const { $axios } = useNuxtApp()
+            const authStore = useAuthStore()
+
+            if (authStore.token) {
+                await $axios.post(
+                    config.public.taskRevokeEndpoint,
+                    {
+                        'task_id': taskId
+                    },
+                    {
+                        headers: { Authorization: `Bearer ${authStore.token}` },
+                    }
+                )
+            }
         }
     },
     persist: true

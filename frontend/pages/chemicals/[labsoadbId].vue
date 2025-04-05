@@ -946,7 +946,7 @@ const similaritySearch = () => {
   const similarity_threshold = .85
 
   confsPagination.setPage(1);
-  filterStore.$reset();
+  //filterStore.$reset();
 
   filterStore.setExactFilter('similarity_threshold', similarity_threshold)
 
@@ -965,7 +965,7 @@ const similaritySearch = () => {
 
 const substructureSearch = () => {
   confsPagination.setPage(1);
-  filterStore.$reset();
+  //filterStore.$reset();
 
   filterStore.setExactFilter('query', selectedChemicalStore.selectedChemical.identifier.smiles)
   filterStore.setExactFilter('representation_type', 'smiles')

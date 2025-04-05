@@ -61,7 +61,8 @@ export default defineNuxtConfig({
       resendEmailConfirmationAPIEndpoint: process.env.NUXT_RESEND_EMAIL_CONFIRMATION_API_ENDPOINT,
       pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT,
       userTasksEndpoint: process.env.NUXT_USER_TASKS_ENDPOINT,
-      userChemicalsEndpoint: process.env.NUXT_USER_CHEMICALS_ENDPOINT
+      userChemicalsEndpoint: process.env.NUXT_USER_CHEMICALS_ENDPOINT,
+      taskRevokeEndpoint: process.env.NUXT_TASK_REVOKE_ENDPOINT
     }
   },
 

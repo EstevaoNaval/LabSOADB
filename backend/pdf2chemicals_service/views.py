@@ -24,9 +24,9 @@ class PDFUploadView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         uploaded_files = serializer.validated_data.get('pdf_files')
-        export_format = list(serializer.validated_data.get('export_format', []))
-        conf_format = list(serializer.validated_data.get('conf_format', []))
-        structure_format = list(serializer.validated_data.get('structure_format', []))
+        export_format = serializer.validated_data.get('export_format', 'zip')
+        conf_formats = list(serializer.validated_data.get('conf_format', []))
+        structure_formats = list(serializer.validated_data.get('structure_format', []))
         
         user_id = request.user.id
         
@@ -45,8 +45,8 @@ class PDFUploadView(APIView):
                     pdf_path=pdf_file_path,
                     original_filename=original_filename,
                     export_format=export_format,
-                    conf_format=conf_format,
-                    structure_format=structure_format
+                    conf_formats=conf_formats,
+                    structure_formats=structure_formats
                 )
             return Response(
                 {"message": f"{len(uploaded_files)} files enqueued for processing."},

@@ -249,11 +249,15 @@
   import UserChemicalsTable from '~/components/UserChemicalsTable.vue'
   import Pagination from '~/components/Pagination.vue'
   
+  import { useRouter } from 'nuxt/app';
   import { useThemeStore } from '~/stores/theme';
   import { defineAsyncComponent, watch } from 'vue';
   import { useUserChemicalsStore } from '~/stores/userChemicals';
   import { useUserTasksStore } from '~/stores/userTasks';
+  import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
   import { usePagination } from '~/composables/usePagination'
+  import { useFilterStore } from '~/stores/filterStore';
+  import { useHistogramRangeSliderStore } from '~/stores/histogramRangeSliderStore';
 
   const KetcherComponent = defineAsyncComponent({
     loader: () => import('~/components/KetcherComponent.vue')
@@ -263,28 +267,49 @@
     loader: () => import('~/components/PDF2ChemicalsSubmitComponent.vue')
   })
 
+  const router = useRouter()
+
+  // stores
   const userChemicalsStore = useUserChemicalsStore()
   const themeStore = useThemeStore()
   const userTasksStore = useUserTasksStore()
+  const fetchChemicalStore = useFetchChemicalStore()
+  const filterStore = useFilterStore()
+  const histogramRangeSliderStore = useHistogramRangeSliderStore() 
 
-  //composables
+
+  // composables
   const userTaskPagination = usePagination()
   const userChemicalsPagination = usePagination()
 
+  // refs
   var ketcherModalRef =  ref(null)
+  var pdf2ChemicalsSubmitRef = ref(null)
 
+  // functions
   const openKetcherModal = () => {
     if(ketcherModalRef.value) {
       ketcherModalRef.value.toggleComponentModal();
     }
   }
 
-  var pdf2ChemicalsSubmitRef = ref(null)
-
   const openPDF2ChemicalsSubmitModal = () => {
     if(pdf2ChemicalsSubmitRef.value) {
       pdf2ChemicalsSubmitRef.value.toggleComponentModal()
     }
+  }
+
+  const handleSearchAllChemicals = () => {
+    filterStore.$reset();
+    histogramRangeSliderStore.$reset()
+
+    fetchChemicalStore.setType('all')
+    fetchChemicalStore.setMode('summary')
+    fetchChemicalStore.fetchChemicals()
+
+    router.push({
+      path: '/chemicals/search'
+    })
   }
 
   async function fetchUserTasks(page) {
@@ -299,6 +324,7 @@
     userChemicalsPagination.setTotalItems(userChemicalsStore.totalChemicals)
   }
 
+  // watches
   watch(() => userTaskPagination.state.page, () => {
     fetchUserTasks(userTaskPagination.state.page)
   })
@@ -307,6 +333,7 @@
     fetchUserChemicals(userChemicalsPagination.state.page)
   })
 
+  // hookers
   onBeforeMount(() => {
     fetchUserTasks(1)
     fetchUserChemicals(1)

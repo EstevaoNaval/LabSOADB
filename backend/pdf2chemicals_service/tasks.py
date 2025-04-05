@@ -59,7 +59,12 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
 
     # Definindo o workflow
     workflow = chain(
-        create_pbs_script_task.s(pdf_path=kwargs['pdf_path']),
+        create_pbs_script_task.s(
+            pdf_path=kwargs['pdf_path'], 
+            export_format=kwargs['export_format'], 
+            conf_formats=kwargs['conf_formats'], 
+            structure_formats=kwargs['structure_formats']
+        ),
         send_pdf2chemicals_hpc_task.s(),
         monitor_pdf2chemicals_job.s(),
         load_chemical_from_json.s(),
@@ -73,8 +78,8 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
             user_id=kwargs['user_id'],
             original_filename=kwargs['original_filename'],
             export_format=kwargs['export_format'],
-            conf_format=kwargs['conf_format'],
-            structure_format=kwargs['structure_format'],
+            conf_formats=kwargs['conf_formats'],
+            structure_formats=kwargs['structure_formats'],
             task_id=task_id
         ),
         task_id=task_id
@@ -227,7 +232,10 @@ def create_pbs_script_task(self, *args, **kwargs):
     script_path = generate_pbs_script(
         pdf_path=absolute_pdf_path,
         output_dir=json_dir,
-        json_prefix=json_prefix,
+        export_format=kwargs['export_format'], 
+        conf_formats=kwargs['conf_formats'], 
+        structure_formats=kwargs['structure_formats'],
+        filename=json_prefix,
         node_name=node_name
     )
 

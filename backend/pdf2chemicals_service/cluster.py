@@ -111,50 +111,82 @@ class ClusterNodeManager:
                 if timestamp < threshold:
                     self.redis_client.delete(key)
 
-# Function to load the PBS template and replace variables
-def load_and_replace_template(job_id, node_name, template_path, java_home, conda_env, pdf2chemicals_path, pdf_path, output_dir, json_prefix):
-    """
-    Loads the PBS template and replaces the variables with the correct values.
+def replace_job_id_in_template(script_content: str):
+    JOB_ID_SIZE = 10
+    job_id = generate_random_alphanumeric_sequence(JOB_ID_SIZE)
     
-    Parameters:
-    - job_id: PBS job id.
-    - template_path: Path to the template file.
-    - java_home: JAVA_HOME path.
-    - conda_env: Conda environment name.
-    - pdf2chemicals_path: Path to the pdf2chemicals script.
-    - pdf_path: Path to the PDF to be processed.
-    - output_dir: Directory where the output will be saved.
-    - json_prefix: Prefix for the output JSON file.
-    
-    Returns:
-    - The script content with the replaced variables.
-    """
-    # Load the template content
-    with open(template_path, 'r') as file:
-        script_content = file.read()
-
-    # Replace the variables in the template
     script_content = script_content.replace("{{job_id}}", job_id)
-    script_content = script_content.replace("{{node_name}}", node_name)
-    script_content = script_content.replace("{{JAVA_HOME}}", java_home)
-    script_content = script_content.replace("{{conda_env}}", conda_env)
-    script_content = script_content.replace("{{pdf2chemicals_path}}", pdf2chemicals_path)
-    script_content = script_content.replace("{{pdf_path}}", pdf_path)
-    script_content = script_content.replace("{{output_dir}}", output_dir)
-    script_content = script_content.replace("{{json_prefix}}", json_prefix)
     
     return script_content
 
+def replace_node_name_in_template(script_content: str, node_name: str):
+    script_content = script_content.replace("{{node_name}}", node_name)
+    return script_content
+
+def replace_java_home_in_template(script_content: str):
+    script_content = script_content.replace("{{JAVA_HOME}}", os.getenv('JAVA_HOME'))
+    return script_content
+
+def replace_conda_env_in_template(script_content: str):
+    script_content = script_content.replace("{{conda_env}}", os.getenv('CONDA_ENV'))
+    return script_content
+
+def replace_pdf2chemicals_path_in_template(script_content: str):
+    pdf2chemicals_path = get_pdf2chemicals_path()
+    
+    script_content = script_content.replace("{{pdf2chemicals_path}}", pdf2chemicals_path)
+    return script_content
+
+def replace_pdf_path_in_template(script_content: str, pdf_path: str):
+    script_content = script_content.replace("{{pdf_path}}", pdf_path)
+    return script_content
+
+def replace_output_dir_in_template(script_content: str, output_dir: str):
+    script_content = script_content.replace("{{output_dir}}", output_dir)
+    return script_content
+
+def replace_export_format_in_template(script_content: str, export_format: str):
+    export_format_content = "--format json "
+    
+    if export_format == 'zip':
+        export_format_content = f"--format {export_format}"
+    
+    script_content = script_content.replace("{{export_format}}", export_format_content)
+    
+    return script_content
+
+def replace_conf_formats_in_template(script_content: str, conf_formats: list[str]):
+    conf_formats_content = ""
+    
+    for fmt in conf_formats:
+        conf_formats_content += f"-conf-fmt {fmt}"
+        
+    script_content = script_content.replace("{{conf_formats}}", conf_formats_content)
+    
+    return script_content
+
+def replace_structure_formats_in_template(script_content: str, structure_formats: list[str]):
+    structure_formats_content = ""
+    
+    for fmt in structure_formats:
+        structure_formats_content += f"-structure-fmt {fmt}"
+        
+    script_content = script_content.replace("{{structure_formats}}", structure_formats_content)
+    
+    return script_content
+
+def replace_filename_formats_in_template(script_content: str, filename: str):
+    script_content = script_content.replace("{{filename}}", f"--filename {filename}")
+    return script_content
+
 # Function to generate a script name with a random suffix
-def generate_script_name(base_name="pbs_script") -> str:
+def generate_script_name(base_name="pbs-script") -> str:
     """
-    Generates a unique PBS script name with a random suffix.
+    Generates a unique PBS script name with a uuid4 suffix.
     Returns: The script name with the random suffix.
     """
-    PBS_SCRIPT_RANDOM_SUFFIX_SIZE = 10
-    
-    random_suffix = generate_random_alphanumeric_sequence(PBS_SCRIPT_RANDOM_SUFFIX_SIZE)
-    return f"{base_name}_{random_suffix}.pbs"
+        
+    return f"{base_name}-{uuid.uuid4()}.pbs"
 
 # Function to save the generated script in the media directory
 def save_script(script_content):
@@ -188,8 +220,17 @@ def get_pdf2chemicals_pbs_template_path():
 
 def get_pdf2chemicals_path():
     return os.path.join(settings.BASE_ROOT_DIR, 'libs', 'pdf2chemicals', 'pdf2chemicals.py')
-                    
-def generate_pbs_script(pdf_path, output_dir, json_prefix, node_name):
+                   
+def get_pbs_script_content():
+    template_path = get_pdf2chemicals_pbs_template_path()
+    
+    # Load the template content
+    with open(template_path, 'r') as file:
+        script_content = file.read()
+        
+    return script_content
+ 
+def generate_pbs_script(pdf_path, output_dir, export_format, conf_formats, structure_formats, filename, node_name):
     """
     Generates a PBS script for chemical processing by replacing the necessary variables.
     
@@ -200,27 +241,20 @@ def generate_pbs_script(pdf_path, output_dir, json_prefix, node_name):
     - output_dir: Directory where the results will be saved.
     - json_prefix: Prefix for the output JSON file.
     """
-    JOB_ID_SIZE = 10
-
-    job_id = generate_random_alphanumeric_sequence(JOB_ID_SIZE)
-
-    template_path = get_pdf2chemicals_pbs_template_path()
-
-    pdf2chemicals_path = get_pdf2chemicals_path()
-
-    # Load the template and replace the variables
-    script_content = load_and_replace_template(
-        job_id,
-        node_name,
-        template_path, 
-        os.getenv('JAVA_HOME'), 
-        os.getenv('CONDA_ENV'), 
-        pdf2chemicals_path, 
-        pdf_path, 
-        output_dir, 
-        json_prefix
-    )
-
+    script_content = get_pbs_script_content()
+    
+    script_content = replace_job_id_in_template(script_content)
+    script_content = replace_node_name_in_template(script_content, node_name)
+    script_content = replace_java_home_in_template(script_content)
+    script_content = replace_conda_env_in_template(script_content)
+    script_content = replace_pdf2chemicals_path_in_template(script_content)
+    script_content = replace_pdf_path_in_template(script_content, pdf_path)
+    script_content = replace_output_dir_in_template(script_content, output_dir)
+    script_content = replace_export_format_in_template(script_content, export_format)
+    script_content = replace_conf_formats_in_template(script_content, conf_formats)
+    script_content = replace_structure_formats_in_template(script_content, structure_formats)
+    script_content = replace_filename_formats_in_template(script_content, filename)
+    
     # Save the generated script in the media directory
     script_path = save_script(script_content)
     
