@@ -214,13 +214,10 @@ def return_pdf2chemicals_task_final_result(self, results):
     task_reject_on_worker_lost=True
 )
 def create_pbs_script_task(self, *args, **kwargs):
-    JSON_FILENAME_LENGTH = 10
-
     # Geração do caminho e nome do arquivo JSON
-    json_dir = os.path.join(settings.MEDIA_ROOT, 'json')
-    json_filename = generate_random_alphanumeric_sequence(JSON_FILENAME_LENGTH) + ".json"
-    json_path = os.path.join(json_dir, json_filename)
-    json_prefix = f"--json --json-filename {json_filename}"
+    pdf2chemicals_output_dir = os.path.join(settings.MEDIA_ROOT, 'pdf2chemicals_output')
+    output_filename = str(uuid.uuid4())
+    json_filepath = os.path.join(pdf2chemicals_output_dir, f'{output_filename}.json')
 
     # Caminho absoluto do PDF
     absolute_pdf_path = os.path.join(settings.MEDIA_ROOT, kwargs['pdf_path'])
@@ -237,11 +234,11 @@ def create_pbs_script_task(self, *args, **kwargs):
     # Geração do script PBS
     script_path = generate_pbs_script(
         pdf_path=absolute_pdf_path,
-        output_dir=json_dir,
+        output_dir=pdf2chemicals_output_dir,
         export_format=kwargs['export_format'], 
         conf_formats=kwargs['conf_formats'], 
         structure_formats=kwargs['structure_formats'],
-        filename=json_prefix,
+        filename=output_filename,
         node_name=node_name
     )
 
@@ -260,7 +257,7 @@ def create_pbs_script_task(self, *args, **kwargs):
         'pbs_script_path': script_path,
         'node_name': node_name,
         'reservation_id': reservation_id,
-        'json_path': json_path,
+        'json_filepath': json_filepath,
         'pdf_path': absolute_pdf_path
     }
 
@@ -281,7 +278,7 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
     pbs_script_path = kwargs.get('pbs_script_path')
     node_name = kwargs.get('node_name')
     reservation_id = kwargs.get('reservation_id')
-    json_path = kwargs.get('json_path')
+    json_filepath = kwargs.get('json_filepath')
     pdf_path = kwargs.get('pdf_path')
 
     # Instanciação do gerenciador de nós
@@ -317,7 +314,7 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
         'pbs_script_path': pbs_script_path,
         'job_id': job_id,
         'node_name': node_name,
-        'json_path': json_path,
+        'json_filepath': json_filepath,
         'pdf_path': pdf_path
     }
 
@@ -346,13 +343,13 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
     
     remove_file(kwargs['pbs_script_path'])
     
-    if not file_exists(kwargs['json_path']):
+    if not file_exists(kwargs['json_filepath']):
         raise FileExistsError("Json file not found. PBS/TORQUE cluster job executed unsuccessfully.")
     
     remove_file(kwargs['pdf_path'])
     
     return {
-        'json_path': kwargs['json_path']
+        'json_filepath': kwargs['json_filepath']
     }
     
 @shared_task(
@@ -368,9 +365,9 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
     task_reject_on_worker_lost=True
 )
 def load_chemical_from_json(self, *args, **kwargs):
-    with open(kwargs['json_path'], mode='r') as json_file:
+    with open(kwargs['json_filepath'], mode='r') as json_file:
         chemical_list = json.load(json_file)
     
-    remove_file(kwargs['json_path'])
+    remove_file(kwargs['json_filepath'])
     
     return chemical_list
