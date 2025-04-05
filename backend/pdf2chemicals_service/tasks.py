@@ -110,6 +110,9 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     user_id = kwargs.get('user_id')
     pdf_path = kwargs.get('pdf_path')
     original_filename = kwargs.get('original_filename')
+    export_format = kwargs.get('export_format')
+    conf_formats = kwargs.get('conf_formats')
+    structure_formats = kwargs.get('structure_formats')
     task_id = kwargs.get('task_id', str(uuid.uuid4()))
     
     task = UserTask.objects.filter(task_id=task_id).first()
@@ -129,6 +132,9 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
             'user_id': user_id,
             'pdf_path': pdf_path,
             'original_filename': original_filename,
+            'export_format': export_format,
+            'conf_formats': conf_formats,
+            'structure_formats': structure_formats,
             'task_id': task_id
         },
         countdown=60 * 5  # Waits 5 minutes to retry.
