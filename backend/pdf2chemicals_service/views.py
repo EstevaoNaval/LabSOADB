@@ -29,9 +29,7 @@ class DownloadPDF2ChemicalsOutputFileView(APIView):
     
     permission_classes = [IsAuthenticated]
     
-    def get(self, request, *args, **kwargs):
-        task_id = request.query_params.get('task_id')
-        
+    def get(self, request, task_id, *args, **kwargs):
         if not task_id:
             return Response(data={"error": "task_id is a required attribute"}, status=status.HTTP_400_BAD_REQUEST)
         
