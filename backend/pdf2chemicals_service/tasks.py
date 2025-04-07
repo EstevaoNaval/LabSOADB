@@ -1,9 +1,10 @@
 import os
 import json
 import subprocess
-from celery import chain, group, shared_task, chord
 import uuid
 import logging
+
+from celery import chain, group, shared_task, chord
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -40,22 +41,13 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         kwargs['task_id'] = str(uuid.uuid4())
     
     task_id = kwargs['task_id']
+    output_dir = 'pdf2chemicals_output'
+    output_filename = str(uuid.uuid4())
 
     try:
         user = User.objects.get(id=kwargs['user_id'])
     except ObjectDoesNotExist:
         raise self.retry(countdown=10, max_retries=5)
-    
-    chemicals_process_group = group(
-        post_chemicals_in_db.s(user_id=kwargs['user_id']),
-        generate_chemicals_zip_download.s()
-    )
-    
-    # Corrigindo a definição do chord - o chord deve ser construído separadamente
-    final_chord = chord(
-        header=chemicals_process_group,
-        body=return_pdf2chemicals_task_final_result.s()
-    )
 
     # Definindo o workflow
     workflow = chain(
@@ -63,12 +55,19 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
             pdf_path=kwargs['pdf_path'], 
             export_format=kwargs['export_format'], 
             conf_formats=kwargs['conf_formats'], 
-            structure_formats=kwargs['structure_formats']
+            structure_formats=kwargs['structure_formats'],
+            output_dir=output_dir,
+            output_filename=output_filename 
         ),
         send_pdf2chemicals_hpc_task.s(),
         monitor_pdf2chemicals_job.s(),
-        load_chemical_from_json.s(),
-        final_chord
+        load_chemical_from_json.s(export_format=kwargs['export_format']),
+        post_chemicals_in_db.s(user_id=kwargs['user_id']),
+        return_pdf2chemicals_task_final_result.s(
+            export_format=kwargs['export_format'],
+            output_dir=output_dir,
+            output_filename=output_filename
+        )
     )
     
     # Aplicando o workflow com link_error
@@ -165,43 +164,6 @@ def post_chemicals_in_db(self, chemical_list, user_id):
     post_chemical_group.apply_async()
 
 @shared_task(
-    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_prepare_chemicals_zip_download', 
-    bind=True,  
-    acks_late=True,
-    queue='pdf2chemicals_tasks',
-    priority=1,
-    autoretry_for=(Exception,),
-    max_retries=5,
-    default_retry_delay=60 * 2, # Waits 2 minutes to execute 
-    retry_backoff=True,
-    task_reject_on_worker_lost=True
-)
-def generate_chemicals_zip_download(self, chemical_list):
-    #TODO implement the chemicals exportation in zip format
-    return {"status": "success", "zip_generated": True}
-
-@shared_task(
-    base=BaseTask,
-    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_return_pdf2chemicals_task_final_result', 
-    bind=True,  
-    acks_late=True,
-    queue='pdf2chemicals_tasks',
-    priority=1,
-    autoretry_for=(Exception,),
-    max_retries=5,
-    default_retry_delay=60 * 2, # Waits 2 minutes to execute 
-    retry_backoff=True,
-    task_reject_on_worker_lost=True
-)
-def return_pdf2chemicals_task_final_result(self, results):
-    download_result = None
-    
-    if len(results) > 1:
-        download_result = results[1]  # Espera-se que prepare_zip_download retorne o JSON relevante
-    
-    return download_result
-
-@shared_task(
     base=ChainedTask,
     name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_create_pbs_script_task',
     bind=True,
@@ -214,10 +176,9 @@ def return_pdf2chemicals_task_final_result(self, results):
     task_reject_on_worker_lost=True
 )
 def create_pbs_script_task(self, *args, **kwargs):
+    output_abs_dir = os.path.join(settings.MEDIA_ROOT, kwargs['output_dir'])
     # Geração do caminho e nome do arquivo JSON
-    pdf2chemicals_output_dir = os.path.join(settings.MEDIA_ROOT, 'pdf2chemicals_output')
-    output_filename = str(uuid.uuid4())
-    json_filepath = os.path.join(pdf2chemicals_output_dir, f'{output_filename}.json')
+    json_filepath = os.path.join(output_abs_dir, f'{kwargs['output_filename']}.json')
 
     # Caminho absoluto do PDF
     absolute_pdf_path = os.path.join(settings.MEDIA_ROOT, kwargs['pdf_path'])
@@ -234,11 +195,11 @@ def create_pbs_script_task(self, *args, **kwargs):
     # Geração do script PBS
     script_path = generate_pbs_script(
         pdf_path=absolute_pdf_path,
-        output_dir=pdf2chemicals_output_dir,
+        output_dir=output_abs_dir,
         export_format=kwargs['export_format'], 
         conf_formats=kwargs['conf_formats'], 
         structure_formats=kwargs['structure_formats'],
-        filename=output_filename,
+        filename=kwargs['output_filename'],
         node_name=node_name
     )
 
@@ -368,6 +329,28 @@ def load_chemical_from_json(self, *args, **kwargs):
     with open(kwargs['json_filepath'], mode='r') as json_file:
         chemical_list = json.load(json_file)
     
-    remove_file(kwargs['json_filepath'])
+    if kwargs['export_format'] != 'json':
+        remove_file(kwargs['json_filepath'])
     
     return chemical_list
+
+@shared_task(
+    base=BaseTask,
+    name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_return_pdf2chemicals_task_final_result', 
+    bind=True,  
+    acks_late=True,
+    queue='pdf2chemicals_tasks',
+    priority=1,
+    autoretry_for=(Exception,),
+    max_retries=5,
+    default_retry_delay=60 * 2, # Waits 2 minutes to execute 
+    retry_backoff=True,
+    task_reject_on_worker_lost=True
+)
+def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
+    output_filepath = os.path.join(kwargs['output_dir'], f'{kwargs['output_filename']}.{kwargs['export_format']}')
+    
+    return {
+        'format': kwargs['export_format'],
+        'output_filepath': output_filepath
+    }
