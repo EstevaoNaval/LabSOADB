@@ -52,13 +52,14 @@ class DownloadPDF2ChemicalsOutputFileView(APIView):
         export_format = user_task.result.get('format')
         output_abs_filepath = os.path.join(settings.MEDIA_ROOT, user_task.result.get('output_filepath'))
         
-        with open(output_abs_filepath, mode='r+') as output_file:
-            return FileResponse(
-                output_file,
-                filename=f'{task_id}.{export_format}',
-                content_type=self.MAP_FORMAT_TO_CONTENT_TYPE[export_format], 
-                as_attachment=True
-            )      
+        print(output_abs_filepath)
+        
+        return FileResponse(
+            open(output_abs_filepath, mode='rb'),
+            filename=f'{task_id}.{export_format}',
+            content_type=self.MAP_FORMAT_TO_CONTENT_TYPE[export_format], 
+            as_attachment=True
+        )      
 
 # Create your views here.
 class PDFUploadView(APIView):
