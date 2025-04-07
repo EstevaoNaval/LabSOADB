@@ -97,26 +97,22 @@ const chemicalsConfsFormats = [
   {
     id: 'confsFormat-1',
     label: 'PDB',
-    value: 'pdb',
-    is_available_on_json_export_format: false
+    value: 'pdb'
   },
   {
     id: 'confsFormat-2',
     label: 'SDF',
-    value: 'sdf',
-    is_available_on_json_export_format: false
+    value: 'sdf'
   },
   {
     id: 'confsFormat-3',
     label: 'MOL2',
-    value: 'mol2',
-    is_available_on_json_export_format: true
+    value: 'mol2'
   },
   {
     id: 'confsFormat-4',
     label: 'SMI',
-    value: 'smi',
-    is_available_on_json_export_format: false
+    value: 'smi'
   },
 ]
 
@@ -124,20 +120,17 @@ const chemicals2DStructureFormats = [
   {
     id: 'chemicals2DStructureFormat-1',
     label: 'PNG',
-    value: 'png',
-    is_available_on_json_export_format: false
+    value: 'png'
   },
   {
     id: 'chemicals2DStructureFormat-3',
     label: 'JPG',
-    value: 'jpg',
-    is_available_on_json_export_format: false
+    value: 'jpg'
   },
   {
     id: 'chemicals2DStructureFormat-2',
     label: 'SVG',
-    value: 'svg',
-    is_available_on_json_export_format: true
+    value: 'svg'
   },
   
 ]
@@ -229,19 +222,15 @@ const setJson2DStructureDefaultFormat = () => {
 
 const toggleConfsFormatCheckboxDisabled = () => {
   for (let i = 0; i < chemicalsConfsFormats.length; i++) {
-    if(!chemicalsConfsFormats[i].is_available_on_json_export_format) {
-      let confsFormatHTMLEntity = document.querySelector(`#${chemicalsConfsFormats[i].id}`)
-      confsFormatHTMLEntity.disabled = !confsFormatHTMLEntity.disabled
-    }
+    let confsFormatHTMLEntity = document.querySelector(`#${chemicalsConfsFormats[i].id}`)
+    confsFormatHTMLEntity.disabled = !confsFormatHTMLEntity.disabled
   }
 }
 
 const toggle2DStructureFormatCheckboxDisabled = () => {
   for (let i = 0; i < chemicals2DStructureFormats.length; i++) {
-    if(!chemicals2DStructureFormats[i].is_available_on_json_export_format) {
-      let chemical2DStructureFormatHTMLEntity = document.querySelector(`#${chemicals2DStructureFormats[i].id}`)
-      chemical2DStructureFormatHTMLEntity.disabled = !chemical2DStructureFormatHTMLEntity.disabled
-    }
+    let chemical2DStructureFormatHTMLEntity = document.querySelector(`#${chemicals2DStructureFormats[i].id}`)
+    chemical2DStructureFormatHTMLEntity.disabled = !chemical2DStructureFormatHTMLEntity.disabled
   }
 }
 

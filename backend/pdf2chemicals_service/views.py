@@ -13,6 +13,12 @@ from .tasks import (
 
 FILE_RANDOM_NAME_SIZE = 10
 
+class DownloadPDF2ChemicalsOutputFileView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        pass
+
 # Create your views here.
 class PDFUploadView(APIView):
     permission_classes = [IsAuthenticated]
