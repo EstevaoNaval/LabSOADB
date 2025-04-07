@@ -1,7 +1,7 @@
 
 from celery import Task
 from tasks.models import UserTask
-from datetime import datetime
+from django.utils import timezone
 
 class BaseTask(Task):
     abstract = True
@@ -11,7 +11,7 @@ class BaseTask(Task):
         UserTask.objects.filter(task_id=task_id).update(
             status='SUCCESS',
             result=retval,
-            concluded_at=datetime.now()
+            concluded_at=timezone.now()
         )
         return super().on_success(retval, task_id, args, kwargs)
 
@@ -20,6 +20,6 @@ class BaseTask(Task):
         UserTask.objects.filter(task_id=task_id).update(
             status='FAILURE',
             result={'error': str(exc)},
-            concluded_at=datetime.now()
+            concluded_at=timezone.now()
         )
         return super().on_failure(exc, task_id, args, kwargs, einfo)
