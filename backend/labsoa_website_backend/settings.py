@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "drf_spectacular",
+    "django_celery_results",
     "django_filters",
     "django_clamd",
     "import_export",
@@ -266,6 +267,7 @@ CLAMD_TCP_ADDR = 'clam-container-01'
 CLAMD_TCP_SOCKET = 3310
 CLAMD_ENABLED = True
 
+CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'default'
 CELERY_TIMEZONE = "America/Sao_Paulo"
 CELERY_TASK_TRACK_STARTED = True
