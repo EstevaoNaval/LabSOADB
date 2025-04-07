@@ -4,5 +4,5 @@ from .models import UserTask
 class UserTaskSerializer(ModelSerializer):
     class Meta:
         model = UserTask
-        read_only_fields=['task_id', 'task_name']
-        fields = '__all__'
+        read_only_fields=['id','task_id', 'task_name']
+        exclude = ['result']

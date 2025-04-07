@@ -62,7 +62,8 @@ export default defineNuxtConfig({
       pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT,
       userTasksEndpoint: process.env.NUXT_USER_TASKS_ENDPOINT,
       userChemicalsEndpoint: process.env.NUXT_USER_CHEMICALS_ENDPOINT,
-      taskRevokeEndpoint: process.env.NUXT_TASK_REVOKE_ENDPOINT
+      taskRevokeEndpoint: process.env.NUXT_TASK_REVOKE_ENDPOINT,
+      downloadPdf2ChemicalsResultFileEndpoint: process.env.NUXT_DOWNLOAD_PDF2CHEMICALS_RESULT_FILE_ENDPOINT
     }
   },
 
