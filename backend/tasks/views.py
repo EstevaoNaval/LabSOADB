@@ -38,11 +38,11 @@ class RevokeTaskAPIView(APIView):
         
         user_task = UserTask.objects.filter(user=user, task_id=task_id)
         
-        if user_task.exists():
-            current_app.control.revoke(task_id, terminate=True, signal='SIGKILL')
-            user_task.update(status='REVOKED')
-        else:
+        if not user_task.exists():
             return Response(data={"message": "Task not found"}, status=404)
+        
+        current_app.control.revoke(task_id, terminate=True, signal='SIGKILL')
+        user_task.update(status='REVOKED')
         
         return Response(status=200)
         
