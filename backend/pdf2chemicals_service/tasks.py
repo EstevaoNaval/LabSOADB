@@ -85,7 +85,7 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
     )
     
     # Melhorando o gerenciamento da task no banco
-    UserTask.objects.update_or_create(
+    user_task, _ = UserTask.objects.update_or_create(
         task_id=task_id,
         defaults={
             "user": user,
@@ -94,6 +94,8 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
             "label": f'PDF2Chemicals: {kwargs['original_filename']}'
         }
     )
+    
+    print(user_task)
     
     return task_id
 
@@ -338,7 +340,7 @@ def load_chemical_from_json(self, *args, **kwargs):
     return chemical_list
 
 @shared_task(
-    base=BaseTask,
+    base=ChainedTask,
     name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_return_pdf2chemicals_task_final_result', 
     bind=True,  
     acks_late=True,
@@ -358,10 +360,12 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
         'output_filepath': output_filepath
     }
     
-    UserTask.objects.update_or_create(
+    user_task, _ = UserTask.objects.update_or_create(
         task_id=kwargs['task_id'],
         defaults={
             "status": 'SUCCESS',
             "result": result
         }
     )
+    
+    print(user_task)
