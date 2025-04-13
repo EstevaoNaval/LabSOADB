@@ -1,5 +1,5 @@
 <template>
-    <table class="ml-auto table table-auto table-zebra table-pin-rows">
+    <table class="ml-auto text-center table table-auto table-zebra table-pin-rows">
         <!-- head -->
         <thead class="text-sm md:text-lg">
             <tr>
@@ -19,7 +19,7 @@
                         <span>{{ utils.truncateString(chemical.identifier.iupac_name) }}</span>
                     </div>
                 </td>
-                <td>{{ chemical.identifier.chem_formula }}</td>
+                <td v-html="utils.replaceStringNumberBySubscript(chemical.identifier.chem_formula)"></td>
                 <td class="md:max-w-xs max-w-full whitespace-normal break-words">
                     <a 
                       href="https://www.doi.org/10.2174/1568026618666181002110116" 
@@ -32,9 +32,16 @@
                 </td>
                 <td>{{ utils.formatTimestamp(chemical.created_at) }}</td>
                 <td>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 mx-auto">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                    </svg>
+                    <NuxtLink :to="`/chemicals/${chemical.api_id}`" class="flex cursor-pointer transition-transform duration-150 hover:scale-110 active:scale-90">
+                        <!--<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 md:size-8 mx-auto">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>-->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 md:size-8 mx-auto">
+                            <title>More details</title>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+
+                    </NuxtLink>
                 </td>
             </tr>
         </tbody>

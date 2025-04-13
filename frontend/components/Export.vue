@@ -32,14 +32,14 @@
     <div class="flex md:hidden">
         <div class="dropdown dropdown-bottom dropdown-end m-auto">
             <div tabindex="0" role="button" class="btn btn-sm btn-ghost btn-primary font-semibold hover:text-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
             </div>
             <ul tabindex="0" class="dropdown-content font-semibold menu bg-base-200 rounded-box z-[1] p-2 shadow w-32">
-                <li @click="handleExport(option.id)" class="hover:text-primary" v-for="option in exportStore.exportFormats" :key="option.id">
-                  <a>{{ option.name }}</a>
-                </li>
+              <li @click="handleExport(option.id)" class="hover:text-primary" v-for="option in exportStore.exportFormats" :key="option.id">
+                <a>{{ option.name }}</a>
+              </li>
             </ul>
         </div>
     </div>

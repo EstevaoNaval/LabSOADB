@@ -74,6 +74,7 @@ import XHRUpload from '@uppy/xhr-upload'
 
 import { useThemeStore } from '~/stores/theme';
 import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
 
 import PDF2ChemicalsLoginPrompt from '~/components/PDF2ChemicalsLoginPrompt.vue';
 
@@ -81,6 +82,8 @@ import '@uppy/core/dist/style.min.css';
 import '@uppy/dashboard/dist/style.min.css';
 
 const config = useRuntimeConfig()
+
+const router = useRouter()
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
@@ -189,9 +192,9 @@ const initializeUppy = () => {
   }
 }
 
-const uploadFiles = () => {
+const uploadFiles = async () => {
   setUppyUploadMeta()
-  uppy.upload()
+  await uppy.upload()
 } 
 
 const setUppyUploadMeta = () => {

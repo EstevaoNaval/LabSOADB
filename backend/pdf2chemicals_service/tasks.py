@@ -4,7 +4,7 @@ import subprocess
 import uuid
 import logging
 
-from celery import chain, group, shared_task, chord
+from celery import chain, group, shared_task
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,7 +13,6 @@ from tasks.models import UserTask
 from tasks.util.tasks import BaseTask
 from user.models import User
 from pdf2chemicals_service.util.tasks import ChainedTask
-from pdf2chemicals_service.util.util import generate_random_alphanumeric_sequence
 from chemicals.tasks import post_chemical
 
 from .util.util import file_exists, remove_file
@@ -66,7 +65,8 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         return_pdf2chemicals_task_final_result.s(
             export_format=kwargs['export_format'],
             output_dir=output_dir,
-            output_filename=output_filename
+            output_filename=output_filename,
+            task_id=task_id
         )
     )
     
@@ -139,8 +139,11 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
         countdown=60 * 5  # Waits 5 minutes to retry.
     )
     
-    UserTask.objects.filter(task_id=task_id).update(
-        status='RETRY'
+    UserTask.objects.update_or_create(
+        task_id=task_id, 
+        defaults = {
+            'status': 'RETRY'
+        }
     )
 
 @shared_task(
@@ -350,7 +353,15 @@ def load_chemical_from_json(self, *args, **kwargs):
 def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
     output_filepath = os.path.join(kwargs['output_dir'], f'{kwargs['output_filename']}.{kwargs['export_format']}')
     
-    return {
+    result = {
         'format': kwargs['export_format'],
         'output_filepath': output_filepath
     }
+    
+    UserTask.objects.update_or_create(
+        task_id=kwargs['task_id'],
+        defaults={
+            "status": 'SUCCESS',
+            "result": result
+        }
+    )
