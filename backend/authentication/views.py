@@ -13,6 +13,8 @@ from allauth.account.utils import send_email_confirmation
 
 from knox.views import LoginView as KnoxLoginView, LogoutAllView as KnoxLogoutAllView
 
+from .serializer import LogoutAllSerializer
+
 class UserConfirmEmailView(VerifyEmailView):
     def get(self, *args, **kwargs):
         self.object = self.get_object()
@@ -44,7 +46,7 @@ class LoginView(KnoxLoginView):
         
         return response
 
-class LogoutAllView(KnoxLogoutAllView):
-    @extend_schema(request=None, responses={204: None})
+class LogoutAllView(KnoxLogoutAllView): 
+    @extend_schema(request=LogoutAllSerializer, responses={204: None})
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
