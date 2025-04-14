@@ -29,3 +29,6 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         
 class LogoutAllSerializer(serializers.Serializer):
     pass
+
+class LogoutSerializer(serializers.Serializer):
+    pass

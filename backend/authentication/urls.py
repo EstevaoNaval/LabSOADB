@@ -1,7 +1,5 @@
 from django.urls import path, include
 
-from knox import views as knox_views
-
 from dj_rest_auth.views import (
     PasswordChangeView, 
     PasswordResetView, 
@@ -12,6 +10,7 @@ from dj_rest_auth.views import (
 from .views import (
     UserConfirmEmailView,
     LoginView,
+    LogoutView,
     LogoutAllView
 )
 
@@ -34,7 +33,7 @@ urlpatterns = [
     ),
     
     path('login/', LoginView.as_view(), name='knox_login'),
-    path('logout/', knox_views.LogoutView.as_view(), name='knox_logout'),
+    path('logout/', LogoutView.as_view(), name='knox_logout'),
     path('logoutall/', LogoutAllView.as_view(), name='knox_logoutall'),
     
     path('user/', UserDetailsView.as_view(), name='user_details')

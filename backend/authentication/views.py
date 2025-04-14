@@ -11,9 +11,9 @@ from rest_framework.response import Response
 from dj_rest_auth.registration.views import VerifyEmailView
 from allauth.account.utils import send_email_confirmation
 
-from knox.views import LoginView as KnoxLoginView, LogoutAllView as KnoxLogoutAllView
+from knox.views import LoginView as KnoxLoginView, LogoutAllView as KnoxLogoutAllView, LogoutView as KnoxLogoutView
 
-from .serializer import LogoutAllSerializer
+from .serializer import LogoutAllSerializer, LogoutSerializer
 
 class UserConfirmEmailView(VerifyEmailView):
     def get(self, *args, **kwargs):
@@ -45,6 +45,13 @@ class LoginView(KnoxLoginView):
                 return Response({"error": f"Email not verified yet. Resending confirmation email to {user.email}."}, status=400)
         
         return response
+
+class LogoutView(KnoxLogoutView):
+    serializer_class = LogoutSerializer
+    
+    @extend_schema(request=LogoutSerializer, responses={204: LogoutSerializer})
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 class LogoutAllView(KnoxLogoutAllView): 
     serializer_class = LogoutAllSerializer
