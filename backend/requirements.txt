@@ -15,7 +15,8 @@ django-filter==25.1
 django-celery-results==2.6.0
 redis[hiredis]==5.2.1
 django-rest-knox==5.0.2
-dj-rest-auth[with_social]
+django-allauth==65.7.0
+dj-rest-auth[with_social]==7.0.1
 email-validator==2.2.0
 bcrypt==4.3.0
 pyfsig==1.1.1
