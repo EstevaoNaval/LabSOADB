@@ -340,7 +340,7 @@ def load_chemical_from_json(self, *args, **kwargs):
     return chemical_list
 
 @shared_task(
-    base=ChainedTask,
+    base=BaseTask,
     name='pdf2chemicals_service.tasks.pdf2chemicals_tasks_return_pdf2chemicals_task_final_result', 
     bind=True,  
     acks_late=True,
@@ -355,17 +355,7 @@ def load_chemical_from_json(self, *args, **kwargs):
 def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
     output_filepath = os.path.join(kwargs['output_dir'], f'{kwargs['output_filename']}.{kwargs['export_format']}')
     
-    result = {
+    return {
         'format': kwargs['export_format'],
         'output_filepath': output_filepath
     }
-    
-    user_task, _ = UserTask.objects.update_or_create(
-        task_id=kwargs['task_id'],
-        defaults={
-            "status": 'SUCCESS',
-            "result": result
-        }
-    )
-    
-    print(user_task)

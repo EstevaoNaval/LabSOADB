@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 from datetime import timedelta
+from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 
@@ -267,7 +268,7 @@ CLAMD_TCP_ADDR = 'clam-container-01'
 CLAMD_TCP_SOCKET = 3310
 CLAMD_ENABLED = True
 
-#CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_BACKEND = quote_plus(f"{os.getenv('CELERY_RESULT_BACKEND_SCHEMA')}://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}")
 CELERY_CACHE_BACKEND = 'default'
 CELERY_TIMEZONE = "America/Sao_Paulo"
 CELERY_TASK_TRACK_STARTED = True
@@ -280,6 +281,8 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_DEFAULT_DELIVERY_MODE = 'persistent'
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1 
+
+print(CELERY_RESULT_BACKEND)
 
 LANGUAGE_CODE = "en-us"
 
