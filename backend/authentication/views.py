@@ -49,6 +49,6 @@ class LoginView(KnoxLoginView):
 class LogoutAllView(KnoxLogoutAllView): 
     serializer_class = LogoutAllSerializer
     
-    @extend_schema(request=LogoutAllSerializer, responses={204: None})
+    @extend_schema(request=LogoutAllSerializer, responses={204: LogoutAllSerializer})
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
