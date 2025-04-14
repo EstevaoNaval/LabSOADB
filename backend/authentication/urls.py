@@ -11,7 +11,8 @@ from dj_rest_auth.views import (
 
 from .views import (
     UserConfirmEmailView,
-    LoginView
+    LoginView,
+    LogoutAllView
 )
 
 urlpatterns = [
@@ -34,7 +35,7 @@ urlpatterns = [
     
     path('login/', LoginView.as_view(), name='knox_login'),
     path('logout/', knox_views.LogoutView.as_view(), name='knox_logout'),
-    path('logoutall/', knox_views.LogoutAllView.as_view(), name='knox_logoutall'),
+    path('logoutall/', LogoutAllView.as_view(), name='knox_logoutall'),
     
     path('user/', UserDetailsView.as_view(), name='user_details')
 ]

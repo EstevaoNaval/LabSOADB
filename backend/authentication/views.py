@@ -2,6 +2,8 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.contrib.auth import login
 
+from drf_spectacular.utils import extend_schema
+
 from rest_framework import permissions
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
@@ -9,7 +11,7 @@ from rest_framework.response import Response
 from dj_rest_auth.registration.views import VerifyEmailView
 from allauth.account.utils import send_email_confirmation
 
-from knox.views import LoginView as KnoxLoginView
+from knox.views import LoginView as KnoxLoginView, LogoutAllView as KnoxLogoutAllView
 
 class UserConfirmEmailView(VerifyEmailView):
     def get(self, *args, **kwargs):
@@ -41,3 +43,8 @@ class LoginView(KnoxLoginView):
                 return Response({"error": f"Email not verified yet. Resending confirmation email to {user.email}."}, status=400)
         
         return response
+
+class LogoutAllView(KnoxLogoutAllView):
+    @extend_schema(request=None, responses={204: None})
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
