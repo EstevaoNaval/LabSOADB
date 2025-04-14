@@ -4,6 +4,8 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.http import FileResponse
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
+
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -21,6 +23,24 @@ from .tasks import (
 
 FILE_RANDOM_NAME_SIZE = 10
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name='task_id',
+            description='Task Id',
+            required=True,
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.PATH,
+        )
+    ],
+    responses={
+        200: OpenApiTypes.BINARY,
+        202: OpenApiTypes.OBJECT,
+        204: None,
+        400: OpenApiTypes.OBJECT,
+        500: OpenApiTypes.OBJECT,
+    },
+)
 class DownloadPDF2ChemicalsOutputFileView(APIView):
     MAP_FORMAT_TO_CONTENT_TYPE = {
         'zip': 'application/zip',
