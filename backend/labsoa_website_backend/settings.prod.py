@@ -179,10 +179,9 @@ SITE_ID = 1
 
 ACCOUNT_ADAPTER = "authentication.adapters.CustomAccountAdapter"
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_SIGNUP_FIELDS = ['first_name*', 'last_name*', 'email*', 'username*', 'password1*', 'password2*']
 SITES_ENABLED = True
 
 REST_AUTH = {
