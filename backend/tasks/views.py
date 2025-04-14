@@ -1,5 +1,7 @@
 from celery import current_app
 
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -11,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from user.models import User
 from .models import UserTask
-from .serializers import UserTaskSerializer
+from .serializers import UserTaskSerializer, RevokeTaskSerializer
 
 class UserTaskReadOnlyViewSet(ReadOnlyModelViewSet):
     queryset = UserTask.objects.all()
@@ -25,8 +27,17 @@ class UserTaskReadOnlyViewSet(ReadOnlyModelViewSet):
         user = get_object_or_404(queryset=User, id=user_id)
         return UserTask.objects.filter(user=user)
 
+@extend_schema(
+    request=RevokeTaskSerializer,
+    responses={
+        200: OpenApiResponse(description="Task revoked with success."), 
+        400: OpenApiResponse(description="task_id is a required attribute."), 
+        404: OpenApiResponse(description="Task not found.")
+    }
+)
 class RevokeTaskAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = RevokeTaskSerializer
     
     def post(self, request, format=None):
         task_id = request.data.get("task_id")

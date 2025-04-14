@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "drf_spectacular",
-#    "django_celery_results",
     "django_filters",
     "django_clamd",
     "import_export",

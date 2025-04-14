@@ -4,7 +4,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.http import FileResponse
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse
 
 from rest_framework.views import APIView
 from rest_framework import status
@@ -34,11 +34,14 @@ FILE_RANDOM_NAME_SIZE = 10
         )
     ],
     responses={
-        200: OpenApiTypes.BINARY,
-        202: OpenApiTypes.OBJECT,
-        204: None,
-        400: OpenApiTypes.OBJECT,
-        500: OpenApiTypes.OBJECT,
+        200: OpenApiResponse(
+            response=OpenApiTypes.BINARY, 
+            description="Returns the pdf2chemicals result file."
+        ),
+        202: OpenApiResponse(description="Task in progress."),
+        204: OpenApiResponse(description="No content, as there is no result for the task."),
+        400: OpenApiResponse(description="Request error or task revoked."),
+        500: OpenApiResponse(description="Task failed."),
     },
 )
 class DownloadPDF2ChemicalsOutputFileView(APIView):
@@ -79,9 +82,15 @@ class DownloadPDF2ChemicalsOutputFileView(APIView):
             as_attachment=True
         )      
 
-# Create your views here.
+@extend_schema(
+    responses={
+        202: OpenApiResponse(description="Files enqueued for processing."),
+        400: OpenApiResponse(description="Error validating the data sent.")
+    }
+)
 class PDFUploadView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = PDFSerializer
     
     def post(self, request, *args, **kwargs):
         serializer = PDFSerializer(data=request.data)
