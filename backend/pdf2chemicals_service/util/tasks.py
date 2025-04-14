@@ -1,5 +1,4 @@
 from celery import Task
-from tasks.models import UserTask
 
 class ChainedTask(Task):
     abstract = True    
