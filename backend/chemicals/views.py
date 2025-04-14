@@ -154,6 +154,8 @@ class UserChemicalsReadOnlyViewSet(ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Chemical.objects.none()
         user_id = self.request.user.id
         user = generics.get_object_or_404(queryset=User, id=user_id)
         return Chemical.objects.filter(user=user)
