@@ -148,6 +148,7 @@ class ChemicalPropListView(generics.ListAPIView):
         return self.get_paginated_response(response_data)
 
 class UserChemicalsReadOnlyViewSet(ReadOnlyModelViewSet):
+    queryset = Chemical.objects.none()
     serializer_class = UserChemicalSerializer
     permission_classes = [permissions.IsAuthenticated]
     ordering = ['-created_at']
