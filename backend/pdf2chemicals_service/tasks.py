@@ -71,7 +71,7 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
     )
     
     # Aplicando o workflow com link_error
-    result = workflow.apply_async(
+    workflow.apply_async(
         link_error=handle_pdf2chemicals_task_error.s(
             pdf_path=kwargs['pdf_path'],
             user_id=kwargs['user_id'],
@@ -85,17 +85,15 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
     )
     
     # Melhorando o gerenciamento da task no banco
-    user_task, _ = UserTask.objects.update_or_create(
+    UserTask.objects.update_or_create(
         task_id=task_id,
         defaults={
             "user": user,
             "task_name": extract_and_save_chemicals_from_pdf.name,
-            "status": result.status,
+            "status": 'PENDING',
             "label": f'PDF2Chemicals: {kwargs['original_filename']}'
         }
     )
-    
-    print(user_task)
     
     return task_id
 
