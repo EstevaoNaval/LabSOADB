@@ -33,7 +33,7 @@
                                 </NuxtLink>
                             </li>
                             <li>
-                                <a class="flex hover:text-primary" href="">
+                                <a class="flex hover:text-primary" @click="openPDF2ChemicalsSubmitModal">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                                     </svg>
@@ -282,7 +282,7 @@
                                             </NuxtLink>
                                         </li>
                                         <li>
-                                            <a class="flex" href="">
+                                            <a class="flex" @click="openPDF2ChemicalsSubmitModal">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                                                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
                                                 </svg>
@@ -311,78 +311,6 @@
                         </ul>
                     </div>
                 </div>
-            
-                <!--<details v-close-details class="dropdown md:hidden group/details closed:text-current">
-                    <summary ref="menuSummary" @click="toggleDetailsSwapCheckbox()" tabindex="0" role="button" class="btn btn-ghost swap swap-rotate duration-200 group-open/details:text-primary">
-                        <input type="checkbox" ref="menuDetailsSwapCheckbox" />
-                    
-                        <svg class="swap-on fill-current h-6 w-6" xmlns="http://www.w3.org/2000/svg" stroke-width="2.5" viewBox="0 0 512 512">
-                            <polygon points="400 145.49 366.51 112 256 222.51 145.49 112 112 145.49 222.51 256 112 366.51 145.49 400 256 289.49 366.51 400 400 366.51 289.49 256 400 145.49"/>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="swap-off fill-current h-6 w-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                        </svg>    
-                    </summary>                    
-                
-                    <ul tabindex="0" class="menu menu-md dropdown-content mt-3 z-[2] p-2 shadow bg-base-100 rounded-box w-44 text-lg font-bold">
-                        <li>
-                            <NuxtLink to='/about' class="flex">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                About
-                            </NuxtLink>
-                        </li>
-                        <li>
-                            <details v-close-details class="my-auto">
-                                <summary>PDF2Chemicals</summary>
-                                <ul class="p-2">
-                                    <li>
-                                        <NuxtLink to="/pdf2chemicals/about">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            <p>About</p>
-                                        </NuxtLink>
-                                    </li>
-                                    <li>
-                                        <NuxtLink  to="/pdf2chemicals/features">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                              <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
-                                            </svg>
-                                        
-                                            <p>Features</p>
-                                        </NuxtLink>
-                                    </li>
-                                    <li>
-                                        <a class="flex" href="">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
-                                              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-                                            </svg>
-                                            <p>Submit</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </details>
-                        </li>
-                        <li>
-                            <NuxtLink class="flex" to='/'>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                </svg>
-                                Download
-                            </NuxtLink>
-                        </li>
-                        <li>
-                            <a class="flex" :href="docsAPIUrl" rel="noopener noreferrer">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
-                                </svg>
-                                Web API
-                            </a>
-                        </li>
-                    </ul>
-                </details>-->
             
                 <NuxtLink to="/home" class="btn btn-ghost text-2xl text-primary hidden md:flex">
                     <img src="~/assets/labsodb_logo_dark.webp" v-if="themeStore.isDarkMode" class="my-auto w-52 lg:w-64" />
@@ -461,6 +389,9 @@
         <modal ref="ketcherModalRef">
             <ketcher-component></ketcher-component>
         </modal>
+        <modal ref="pdf2ChemicalsSubmitRef">
+            <PDF2ChemicalsSubmitComponent></PDF2ChemicalsSubmitComponent>
+        </modal>
     </main>
 </template>
 
@@ -477,6 +408,10 @@ const KetcherComponent = defineAsyncComponent({
     loader: () => import('~/components/KetcherComponent.vue')
 });
 
+const PDF2ChemicalsSubmitComponent = defineAsyncComponent({
+    loader: () => import('~/components/PDF2ChemicalsSubmitComponent.vue')
+})
+
 const config = useRuntimeConfig()
 
 const { $enter, $afterEnter, $leave, $afterLeave } = useNuxtApp()
@@ -492,6 +427,7 @@ const userStore = useUserStore()
 var searchBarToggleButton = ref(null)
 
 var ketcherModalRef =  ref(null)
+var pdf2ChemicalsSubmitRef = ref(null)
 
 var isSearchBarVisible = ref(false)
 var menuSummary = ref(null)
@@ -511,6 +447,12 @@ const getUserName = () => {
 const openKetcherModal = () => {
     if(ketcherModalRef.value) {
         ketcherModalRef.value.toggleComponentModal()
+    }
+}
+
+const openPDF2ChemicalsSubmitModal = () => {
+    if(pdf2ChemicalsSubmitRef.value) {
+        pdf2ChemicalsSubmitRef.value.toggleComponentModal()
     }
 }
 
