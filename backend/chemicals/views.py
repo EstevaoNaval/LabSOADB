@@ -16,6 +16,8 @@ from import_export_extensions.api import views as import_export_views
 
 from user.models import User
 
+from exports.models import ExportJob
+
 from .resources import ChemicalResource
 from .serializers import (
     ChemicalAutocompleteSerializer, 
@@ -85,6 +87,7 @@ class DownloadChemicalConformationZipView(generics.RetrieveAPIView):
         )
         
 class ChemicalExportViewSet(import_export_views.ExportJobViewSet):
+    queryset = ExportJob.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     resource_class = ChemicalResource
     

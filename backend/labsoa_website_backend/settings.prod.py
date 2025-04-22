@@ -73,7 +73,8 @@ INSTALLED_APPS = [
     "chemicals.apps.ChemicalsConfig",
     "pdf2chemicals_service.apps.Pdf2ChemicalsServiceConfig",
     "email_service.apps.EmailServiceConfig",
-    "tasks.apps.TasksConfig"
+    "tasks.apps.TasksConfig",
+    "exports.apps.ExportsConfig"
 ]
 
 PASSWORD_HASHERS = [

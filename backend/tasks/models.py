@@ -1,5 +1,6 @@
 from django.db import models
 from user.models import User
+from import_export_extensions.models import ExportJob
 
 class UserTask(models.Model):
     STATUS_CHOICES = [
@@ -20,6 +21,14 @@ class UserTask(models.Model):
     concluded_at = models.DateTimeField(null=True)
     created_at = models.DateTimeField(editable=False, auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
+
+    export_task = models.OneToOneField(
+        ExportJob,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="user_tasks"
+    )
 
     def __str__(self):
         return f"{self.task_name} ({self.task_id}) - {self.status}"
