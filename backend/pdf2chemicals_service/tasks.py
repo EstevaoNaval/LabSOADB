@@ -90,7 +90,7 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         defaults={
             "user": user,
             "task_name": extract_and_save_chemicals_from_pdf.name,
-            "status": 'PENDING',
+            "status": UserTask.TaskStatus.PENDING,
             "label": f'PDF2Chemicals: {kwargs['original_filename']}'
         }
     )
@@ -120,7 +120,7 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
         logger.error(f"Task {task_id} not found.")
         return
     
-    if task.status in ["REVOKED", "RETRY", "SUCCESS"]:
+    if task.status in [UserTask.TaskStatus.REVOKED, UserTask.TaskStatus.RETRY, UserTask.TaskStatus.SUCCESS]:
         logger.info(f"Skipping retry for task {task_id} as it has status {task.status}.")
         return
     
@@ -142,7 +142,7 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     UserTask.objects.update_or_create(
         task_id=task_id, 
         defaults = {
-            'status': 'RETRY'
+            'status':  UserTask.TaskStatus.RETRY
         }
     )
 
@@ -354,6 +354,8 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
     output_filepath = os.path.join(kwargs['output_dir'], f'{kwargs['output_filename']}.{kwargs['export_format']}')
     
     return {
-        'format': kwargs['export_format'],
-        'output_filepath': output_filepath
+        'result': {
+            'file_format': kwargs['export_format']
+        },
+        'data_file': output_filepath
     }

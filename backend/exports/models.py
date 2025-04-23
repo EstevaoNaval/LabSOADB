@@ -11,35 +11,45 @@ class ExportJob(BaseExportJob):
         
         # Mapear status do ExportJob para o UserTask
         status_map = {
-            'CREATED': 'STARTED',
-            'EXPORTING': 'PENDING',
-            'EXPORT_ERROR': 'FAILURE',
-            'EXPORTED': 'SUCCESS',
-            'CANCELLED': 'REVOKED'
+            self.ExportStatus.CREATED:   UserTask.TaskStatus.STARTED,
+            self.ExportStatus.EXPORTING: UserTask.TaskStatus.PENDING,
+            self.ExportStatus.EXPORTED:  UserTask.TaskStatus.SUCCESS,
+            self.ExportStatus.EXPORT_ERROR: UserTask.TaskStatus.FAILURE,
+            self.ExportStatus.CANCELLED: UserTask.TaskStatus.REVOKED,
         }
+        
+        mapped = status_map.get(self.export_status, UserTask.STATUS_PENDING)
 
         # Criar ou atualizar o UserTask
         ut, created_ut = UserTask.objects.get_or_create(
-            task_id=self.task_id,
+            task_id=self.export_task_id,
             defaults={
-                'user':      self.created_by,
+                'user': self.created_by,
                 'task_name': self.task_name,
-                'label':     f"Exportação de {self.resource_name}",
-                'status':    status_map.get(self.status, 'PENDING'),
+                'label': f"Export: {self.file_format.get_extension()}",
+                'status': mapped,
                 'created_at': timezone.now(),
             }
         )
+        
         # Atualiza status e resultado quando mudarem
-        new_status = status_map.get(self.status, ut.status)
-        if ut.status != new_status or (self.status == 'EXPORTED' and ut.result is None):
-            ut.status = new_status
-            # Quando concluído com sucesso, preenche o arquivo de resultado
-            if self.status == 'EXPORTED' and hasattr(self, 'data_file'):
-                ut.result = {'file': self.data_file.name}
-                ut.concluded_at = timezone.now()
-            # Em erro, também marca conclusão
-            if self.status == 'EXPORT_ERROR':
-                ut.concluded_at = timezone.now()
-            ut.save(update_fields=['status', 'result', 'concluded_at'])
+        changed = False
+        if ut.status != mapped:
+            ut.status = mapped
+            changed = True
+
+        # Se chegou em SUCCESS (EXPORTED), popule resultado
+        if self.export_status == self.ExportStatus.EXPORTED and not ut.result:
+            ut.data_file = self.data_file.name
+            ut.concluded_at = timezone.now()
+            changed = True
+
+        # Se erro, também marca conclusão
+        if self.export_status == self.ExportStatus.EXPORT_ERROR and not ut.concluded_at:
+            ut.concluded_at = timezone.now()
+            changed = True
+
+        if changed:
+            ut.save(update_fields=['status', 'data_file', 'concluded_at'])
 
         
