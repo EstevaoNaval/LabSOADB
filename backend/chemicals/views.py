@@ -12,26 +12,24 @@ from rest_framework import generics
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from import_export_extensions.api import views as import_export_views
+from exports.views import ExportJobViewSet
 
 from user.models import User
 
-from exports.models import ExportJob
-
-from .resources import ChemicalResource
-from .serializers import (
+from chemicals.resources import ChemicalResource
+from chemicals.serializers import (
     ChemicalAutocompleteSerializer, 
     ChemicalSerializer, 
     ChemicalSummarySerializer, 
     ChemicalPropListSerializer,
     UserChemicalSerializer
 )
-from .models import (
+from chemicals.models import (
     Chemical,
     Conformation                    
 )
-from .pagination import PropListPagination
-from .filters import (
+from chemicals.pagination import PropListPagination
+from chemicals.filters import (
     ChemicalAdvancedSearchFilter,
     ChemicalAutocompleteSearchFilter,
 )
@@ -86,8 +84,7 @@ class DownloadChemicalConformationZipView(generics.RetrieveAPIView):
             as_attachment=True
         )
         
-class ChemicalExportViewSet(import_export_views.ExportJobViewSet):
-    queryset = ExportJob.objects.all()
+class ChemicalExportViewSet(ExportJobViewSet):
     permission_classes = [permissions.IsAuthenticated]
     resource_class = ChemicalResource
     

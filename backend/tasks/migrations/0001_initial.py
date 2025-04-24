@@ -52,16 +52,6 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("update_at", models.DateTimeField(auto_now=True)),
                 (
-                    "export_task",
-                    models.OneToOneField(
-                        blank=True,
-                        null=True,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="user_tasks",
-                        to="import_export_extensions.exportjob",
-                    ),
-                ),
-                (
                     "user",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,

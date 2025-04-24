@@ -66,15 +66,13 @@ INSTALLED_APPS = [
     "django_filters",
     "django_clamd",
     "import_export",
+    "exports.apps.ExportsConfig",
     "import_export_extensions",
     "chemicals.apps.ChemicalsConfig",
     "pdf2chemicals_service.apps.Pdf2ChemicalsServiceConfig",
     "email_service.apps.EmailServiceConfig",
-    "tasks.apps.TasksConfig",
-    "exports.apps.ExportsConfig"
+    "tasks.apps.TasksConfig"
 ]
-
-
 
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
