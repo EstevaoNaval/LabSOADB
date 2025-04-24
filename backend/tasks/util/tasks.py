@@ -19,19 +19,19 @@ class BaseTask(Task):
     
     def _file_field_from_path(self, path):
         data_filename = os.path.basename(path)
-            
-        with open(path) as f:
-            return File(f, name=data_filename)
+        f = open(path, 'rb')
+        return File(f, name=data_filename)
     
     def on_success(self, retval, task_id, args, kwargs):
         result = retval.get('result', {})
         data_filepath = retval.get('data_file', None)
+        data_file = self._file_field_from_path(data_filepath) if data_filepath else None
         
         user_task_defaults = {
             'status': UserTask.TaskStatus.SUCCESS,
             'concluded_at': timezone.now(),
             'result': result,
-            'data_file': self._file_field_from_path(data_filepath) if data_filepath else None
+            'data_file': data_file
         }
                 
         # Atualiza o registro do UserTask com status SUCCESS e o resultado retornado
@@ -39,6 +39,9 @@ class BaseTask(Task):
             task_id=task_id,
             defaults=user_task_defaults
         )
+        
+        if data_file:
+            data_file.close()
         
         return super().on_success(retval, task_id, args, kwargs)
 
