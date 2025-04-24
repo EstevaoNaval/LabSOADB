@@ -12,6 +12,7 @@ class UserTaskSerializer(serializers.ModelSerializer):
             'created_at', 
             'update_at'
         ]
+        fields = '__all__'
 
 class RevokeTaskSerializer(serializers.Serializer):
     task_id = serializers.CharField()
