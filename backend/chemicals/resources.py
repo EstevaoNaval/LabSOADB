@@ -11,6 +11,7 @@ class ChemicalResource(CeleryModelResource):
     filterset_class = ChemicalAdvancedSearchFilter
     
     def __init__(self, filter_kwargs = None, **kwargs):
+        self.created_by = kwargs.pop("created_by", None)
         super().__init__(filter_kwargs, **kwargs)
         self._add_reverse_related_fields()
         self._add_many_to_many_fields()
