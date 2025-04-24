@@ -1,7 +1,6 @@
 from django.urls import path
 from .views import (
-    PDFUploadView,
-    DownloadPDF2ChemicalsOutputFileView
+    PDFUploadView
 )
 
 urlpatterns = [

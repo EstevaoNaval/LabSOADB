@@ -1,19 +1,13 @@
 import os
 
 from django.core.files.storage import default_storage
-from django.conf import settings
-from django.http import FileResponse
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import get_object_or_404
-
-from user.models import User
-from tasks.models import UserTask
 
 from .util.util import generate_random_alphanumeric_sequence
 from .serializers import PDFSerializer
