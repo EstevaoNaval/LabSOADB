@@ -6,7 +6,6 @@ from tasks.models import UserTask
 
 class ExportJob(BaseExportJob):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        creating = self._state.adding
         super().save(force_insert, force_update, using, update_fields)
         
         # Mapear status do ExportJob para o UserTask
@@ -20,6 +19,8 @@ class ExportJob(BaseExportJob):
         
         mapped = status_map.get(self.export_status, UserTask.STATUS_PENDING)
 
+        print("Cheguei até aqui.")
+        
         # Criar ou atualizar o UserTask
         ut, created_ut = UserTask.objects.get_or_create(
             task_id=self.export_task_id,

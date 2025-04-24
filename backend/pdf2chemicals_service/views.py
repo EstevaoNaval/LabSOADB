@@ -24,65 +24,6 @@ from .tasks import (
 FILE_RANDOM_NAME_SIZE = 10
 
 @extend_schema(
-    parameters=[
-        OpenApiParameter(
-            name='task_id',
-            description='Task Id',
-            required=True,
-            type=OpenApiTypes.STR,
-            location=OpenApiParameter.PATH,
-        )
-    ],
-    responses={
-        200: OpenApiResponse(
-            response=OpenApiTypes.BINARY, 
-            description="Returns the pdf2chemicals result file."
-        ),
-        202: OpenApiResponse(description="Task in progress."),
-        204: OpenApiResponse(description="No content, as there is no result for the task."),
-        400: OpenApiResponse(description="Request error or task revoked."),
-        500: OpenApiResponse(description="Task failed."),
-    },
-)
-class DownloadPDF2ChemicalsOutputFileView(APIView):
-    MAP_FORMAT_TO_CONTENT_TYPE = {
-        'zip': 'application/zip',
-        'json': 'application/json'
-    }
-    
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request, task_id, *args, **kwargs):
-        if not task_id:
-            return Response(data={"error": "task_id is a required attribute"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user = get_object_or_404(queryset=User, id=request.user.id)
-        
-        user_task = get_object_or_404(queryset=UserTask, task_id=task_id, user=user)
-        
-        if user_task.status in ('PENDING', 'RETRY'):
-            return Response(data={"status": user_task.status}, status=status.HTTP_202_ACCEPTED)
-        
-        if user_task.status == 'REVOKED':
-            return Response(data={"status": user_task.status}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if user_task.status == 'FAILURE':
-            return Response(data={"status": user_task.status}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        if not user_task.result:
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        
-        export_format = user_task.result.get('format')
-        output_abs_filepath = os.path.join(settings.MEDIA_ROOT, user_task.result.get('output_filepath'))
-        
-        return FileResponse(
-            open(output_abs_filepath, mode='rb'),
-            filename=f'{task_id}.{export_format}',
-            content_type=self.MAP_FORMAT_TO_CONTENT_TYPE[export_format], 
-            as_attachment=True
-        )      
-
-@extend_schema(
     responses={
         202: OpenApiResponse(description="Files enqueued for processing."),
         400: OpenApiResponse(description="Error validating the data sent.")

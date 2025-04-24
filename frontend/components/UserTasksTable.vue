@@ -31,8 +31,8 @@
                             <ul tabindex="0" class="dropdown-content menu bg-base-200 rounded-box z-[1] w-44 p-2 shadow">
                                 <li class="flex">
                                     <a 
+                                        :href="task.data_file"
                                         class="mr-auto cursor-pointer transition-transform duration-150 hover:scale-100 active:scale-90"
-                                        @click="userTasksStore.downloadPDF2ChemicalsResultFile(task.task_id)" 
                                         v-if="isTaskSuccessful(task.status)" 
                                     >
                                         <svg 
@@ -111,58 +111,77 @@
                         
                     </td>
                     <td class="hidden xl:grid xl:grid-cols-2">
-                        <svg 
-                            @click="userTasksStore.downloadPDF2ChemicalsResultFile(task.task_id)" 
-                            v-if="isTaskSuccessful(task.status)" 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            role="button" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke-width="1.5" 
-                            stroke="currentColor" 
-                            class="cursor-pointer transition-transform duration-150 hover:scale-110 active:scale-90 size-6 xl:size-8 m-auto"
+                        <a 
+                            :href="task.data_file"
+                            class="cursor-pointer transition-transform duration-150 hover:scale-110 active:scale-90"
+                            v-if="isTaskSuccessful(task.status)"
                         >
-                            <title>Download output file</title>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                        </svg>
-                        <svg 
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg" 
+                                role="button" 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke-width="1.5" 
+                                stroke="currentColor"
+                                class="size-6 xl:size-8 m-auto"
+                            >
+                                <title>Download output file</title>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                            </svg>
+                        </a>
+                        
+                        <a
+                            :class="themeStore.isDarkMode ? 'text-slate-500 cursor-pointer' : 'text-gray-300 cursor-pointer'"
                             v-if="!isTaskSuccessful(task.status)" 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            role="button" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke-width="1.5"
-                            stroke="currentColor" 
-                            :class="themeStore.isDarkMode ? 'text-slate-500 cursor-pointer size-6 xl:size-8 m-auto' : 'text-gray-300 cursor-pointer size-6 xl:size-8 m-auto'"
                         >
-                            <title>Download output file</title>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                        </svg>
-                        <svg 
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                role="button" 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="size-6 xl:size-8 m-auto"
+                            >
+                                <title>Download output file</title>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                            </svg>
+                        </a>
+                        <a 
                             v-if="isTaskBeingProcessed(task.status)" 
-                            @click="revokeTask(task.task_id)" 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke-width="1.5" 
-                            stroke="currentColor" 
-                            class="cursor-pointer transition-transform duration-150 hover:scale-110 active:scale-90 size-6 xl:size-8 m-auto"
+                            @click="revokeTask(task.task_id)"
+                            class="cursor-pointer transition-transform duration-150 hover:scale-110 active:scale-90"
                         >
-                            <title>Revoke task</title>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
-                        <svg 
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg" 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke-width="1.5" 
+                                stroke="currentColor"
+                                class="size-6 xl:size-8 m-auto"
+                            >
+                                <title>Revoke task</title>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </a>
+                        
+                        <a
                             v-if="!isTaskBeingProcessed(task.status)"
-                            xmlns="http://www.w3.org/2000/svg" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke-width="1.5" 
-                            stroke="currentColor" 
-                            :class="themeStore.isDarkMode ? 'text-slate-500 cursor-pointer size-6 xl:size-8 m-auto' : 'text-gray-300 cursor-pointer size-6 xl:size-8 m-auto'"
+                            :class="themeStore.isDarkMode ? 'text-slate-500 cursor-pointer' : 'text-gray-300 cursor-pointer'"
                         >
-                            <title>Task already concluded</title>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke-width="1.5" 
+                                stroke="currentColor"
+                                class="size-6 xl:size-8 m-auto"
+                            >
+                                <title>Task already concluded</title>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </a>
+                        
                     </td>
                 </tr>
             </tbody>
