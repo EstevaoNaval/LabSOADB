@@ -89,7 +89,6 @@ def extract_and_save_chemicals_from_pdf(self, *args, **kwargs):
         task_id=task_id,
         defaults={
             "user": user,
-            "task_name": extract_and_save_chemicals_from_pdf.name,
             "status": UserTask.TaskStatus.PENDING,
             "label": f'PDF2Chemicals: {kwargs['original_filename']}'
         }

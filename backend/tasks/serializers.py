@@ -6,8 +6,7 @@ class UserTaskSerializer(serializers.ModelSerializer):
         model = UserTask
         read_only_fields=[
             'id',
-            'task_id', 
-            'task_name', 
+            'task_id',
             'concluded_at', 
             'created_at', 
             'update_at'

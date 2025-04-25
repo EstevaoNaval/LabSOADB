@@ -29,13 +29,11 @@ def sync_usertask_with_exportjob(sender, instance: ExportJob, created, **kwargs)
     
     mapped_status = map_export_job_status_to_user_task_status(instance.export_status)
     file_format = pathlib.Path(instance.file_format_path).suffix.lstrip(".")
-    task = get_task_from_task_id(instance.export_task_id)
     
     ut, created_ut = UserTask.objects.get_or_create(
         task_id=instance.export_task_id,
         defaults={
             'user':       instance.created_by,
-            'task_name':  task.name,
             'label':      f"Export: {file_format}",
             'status':     mapped_status,
             'created_at': timezone.now(),

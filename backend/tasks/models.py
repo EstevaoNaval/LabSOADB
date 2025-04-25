@@ -39,7 +39,6 @@ class UserTask(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
     task_id = models.CharField(max_length=255, unique=True)
-    task_name = models.CharField(max_length=255)
     label = models.TextField()
     status = models.CharField(max_length=50, choices=TaskStatus.choices, default=TaskStatus.PENDING)
     result = models.JSONField(blank=True, null=True)
@@ -75,4 +74,4 @@ class UserTask(models.Model):
     )
 
     def __str__(self):
-        return f"{self.task_name} ({self.task_id}) - {self.status}"
+        return f"({self.task_id}) - {self.status}"
