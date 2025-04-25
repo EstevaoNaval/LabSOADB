@@ -22,6 +22,9 @@ def map_export_job_status_to_user_task_status(export_job_status: ExportJob.Expor
 
 @receiver(post_save, sender=ExportJob)
 def sync_usertask_with_exportjob(sender, instance: ExportJob, created, **kwargs):
+    if not instance.export_task_id:
+        return
+    
     changed = False
     
     mapped_status = map_export_job_status_to_user_task_status(instance.export_status)
