@@ -5,6 +5,15 @@ from import_export_extensions.models import ExportJob as BaseExportJob
 from tasks.models import UserTask
 
 class ExportJob(BaseExportJob):
+    def _start_export_data_task(self):
+        """Start export data task."""
+        from exports.tasks import export_data_task
+
+        export_data_task.apply_async(
+            kwargs=dict(job_id=self.pk),
+            task_id=self.export_task_id,
+        )
+    
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super().save(force_insert, force_update, using, update_fields)
         
