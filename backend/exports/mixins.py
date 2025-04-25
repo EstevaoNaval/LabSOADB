@@ -1,6 +1,0 @@
-from import_export_extensions.api.mixins import ExportStartActionMixin as BaseExportStartActionMixin
-
-from exports.serializers import ExportJobSerializer
-
-class ExportStartActionMixin(BaseExportStartActionMixin):
-    export_detail_serializer_class = ExportJobSerializer

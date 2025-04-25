@@ -351,11 +351,13 @@ def load_chemical_from_json(self, *args, **kwargs):
     task_reject_on_worker_lost=True
 )
 def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
-    output_filepath = os.path.join(settings.MEDIA_ROOT, kwargs['output_dir'], f'{kwargs['output_filename']}.{kwargs['export_format']}')
+    output_relative_filepath = os.path.join(kwargs['output_dir'], f'{kwargs['output_filename']}.{kwargs['export_format']}')
+    output_abs_filepath = os.path.join(settings.MEDIA_ROOT, output_relative_filepath)
     
     return {
         'result': {
-            'file_format': kwargs['export_format']
+            'file': output_relative_filepath,
+            'format': kwargs['export_format']
         },
-        'data_file': output_filepath
+        'data_file': output_abs_filepath
     }

@@ -12,7 +12,7 @@ from rest_framework import generics
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from exports.views import ExportJobViewSet
+from import_export_extensions.api.views import ExportJobViewSet
 
 from user.models import User
 

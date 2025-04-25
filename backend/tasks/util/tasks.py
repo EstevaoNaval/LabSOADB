@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.core.files import File
 
 from celery import Task
+from celery import current_app
+from celery.result import AsyncResult
 
 from tasks.models import UserTask
 
@@ -52,8 +54,13 @@ class BaseTask(Task):
             defaults={
                 'status': UserTask.TaskStatus.FAILURE,
                 'result': { 'error': str(exc) },
+                'error_message': str(exec),
+                'traceback': exec,
                 'concluded_at': timezone.now()
             }
         )
         
         return super().on_failure(exc, task_id, args, kwargs, einfo)
+    
+def get_task_from_task_id(task_id):
+    return AsyncResult(task_id, app=current_app)
