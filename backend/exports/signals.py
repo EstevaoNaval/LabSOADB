@@ -34,7 +34,7 @@ def sync_usertask_with_exportjob(sender, instance: ExportJob, created, **kwargs)
         task_id=instance.export_task_id,
         defaults={
             'user':       instance.created_by,
-            'label':      f"Export: {file_format}",
+            'label':      f"Chemicals Export: {file_format}",
             'status':     mapped_status,
             'created_at': timezone.now(),
             'export_job': instance,

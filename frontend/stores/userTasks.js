@@ -42,6 +42,15 @@ export const useUserTasksStore = defineStore('userTasksStore', {
                     }
                 )
             }
+        },
+        getTotalSuccessfulTasks() {
+            return
+        },
+        getTotalPendingTasks() {
+            return
+        },
+        getTotalFailedTasks() {
+            return
         }
     },
     persist: true

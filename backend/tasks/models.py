@@ -38,7 +38,7 @@ class UserTask(models.Model):
         RETRY = "RETRY", _("Retry")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
-    task_id = models.CharField(max_length=255, unique=True)
+    task_id = models.UUIDField(default=uuid.uuid4, unique=True)
     label = models.TextField()
     status = models.CharField(max_length=50, choices=TaskStatus.choices, default=TaskStatus.PENDING)
     result = models.JSONField(blank=True, null=True)

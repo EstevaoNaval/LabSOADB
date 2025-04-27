@@ -12,8 +12,10 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from user.models import User
-from .models import UserTask
-from .serializers import UserTaskSerializer, RevokeTaskSerializer
+
+from tasks.models import UserTask
+from tasks.serializers import UserTaskSerializer, RevokeTaskSerializer
+from tasks.filters import UserTaskFilter
 
 class UserTaskReadOnlyViewSet(ReadOnlyModelViewSet):
     queryset = UserTask.objects.all()
@@ -21,6 +23,7 @@ class UserTaskReadOnlyViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     ordering = ['-created_at']
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filterset_class = UserTaskFilter
     
     def get_queryset(self):
         user_id = self.request.user.id

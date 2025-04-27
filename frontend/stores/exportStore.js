@@ -47,24 +47,6 @@ export const useExportStore = defineStore('export', {
             return this.exportFormats[this.currExportFormatId]['value']
         },
 
-        async fetchChemicalsExportDataFileUrl(exportTaskId) {
-            const config = useRuntimeConfig()
-            const { $axios } = useNuxtApp()
-
-            const authStore = useAuthStore()
-
-            let dataFileUrl = null
-
-            while (dataFileUrl == null) {
-                let response = await $axios.get(`${config.public.retrieveExportChemicalEndpoint}${exportTaskId}/`, {
-                    headers: { Authorization: `Bearer ${authStore.token}` },
-                })
-
-                dataFileUrl = response.data.data_file
-            }
-
-            return dataFileUrl
-        },
         async startChemicalsExportTask() {
             const config = useRuntimeConfig()
             const { $axios } = useNuxtApp()
@@ -84,32 +66,18 @@ export const useExportStore = defineStore('export', {
                 },
                 {
                     params: params,
-                    headers: { Authorization: `Bearer ${authStore.token}` },
+                    headers: {
+                        Authorization: `Bearer ${authStore.token}`
+                    },
                 }
             )
 
             return response.data.id
         },
-        async downloadChemicalsExport() {
+        async startChemicalsExport() {
             const exportTaskId = await this.startChemicalsExportTask()
 
-            const dataFileUrl = await this.fetchChemicalsExportDataFileUrl(exportTaskId)
-
-            const filename = this.getFilenameFromDataFileUrl(dataFileUrl)
-
-            // create "a" HTML element with href to file & click
-            const link = document.createElement('a');
-            link.href = dataFileUrl;
-
-            link.setAttribute('download', filename); //or any other extension
-            document.body.appendChild(link);
-            link.click();
-
-            // clean up "a" element & remove ObjectURL
-            document.body.removeChild(link);
-        },
-        getFilenameFromDataFileUrl(dataFileUrl) {
-            return dataFileUrl.split('/').at(-1);
+            return exportTaskId
         }
     },
     persist: true
