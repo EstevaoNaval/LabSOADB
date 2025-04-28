@@ -29,7 +29,7 @@
                   </svg>
                 </div>
                 <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">Successful Tasks</div>
-                <div :class="themeStore.isDarkMode ? 'stat-value text-success' : 'stat-value text-white'">89,400</div>
+                <div :class="themeStore.isDarkMode ? 'stat-value text-success' : 'stat-value text-white'">{{ totalSuccessfulTasks }}</div>
               </div>
             </div>
             <div 
@@ -58,7 +58,7 @@
                   </svg>
                 </div>
                 <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">Pending Tasks</div>
-                <div :class="themeStore.isDarkMode ? 'stat-value text-warning' : 'stat-value text-white'">89,400</div>
+                <div :class="themeStore.isDarkMode ? 'stat-value text-warning' : 'stat-value text-white'">{{ totalPendingTasks }}</div>
               </div>
             </div>
             
@@ -87,7 +87,7 @@
                     
                   </div>
                   <div :class="themeStore.isDarkMode ? 'stat-title' : 'stat-title text-white'">Failed Tasks</div>
-                  <div :class="themeStore.isDarkMode ? 'stat-value text-error' : 'stat-value text-white'">89,400</div>
+                  <div :class="themeStore.isDarkMode ? 'stat-value text-error' : 'stat-value text-white'">{{ totalFailedTasks }}</div>
               </div>
             </div>
             <div 
@@ -277,10 +277,14 @@
   const filterStore = useFilterStore()
   const histogramRangeSliderStore = useHistogramRangeSliderStore() 
 
-
   // composables
   const userTaskPagination = usePagination()
   const userChemicalsPagination = usePagination()
+
+  // variables
+  let totalSuccessfulTasks = await userTasksStore.getTotalSuccessfulTasks()
+  let totalPendingTasks = await userTasksStore.getTotalPendingTasks()
+  let totalFailedTasks = await userTasksStore.getTotalFailedTasks()
 
   // refs
   var ketcherModalRef =  ref(null)
