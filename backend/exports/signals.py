@@ -7,7 +7,6 @@ from django.utils import timezone
 from import_export_extensions.models import ExportJob
 
 from tasks.models import UserTask
-from tasks.util.tasks import get_task_from_task_id
 
 def map_export_job_status_to_user_task_status(export_job_status: ExportJob.ExportStatus):
     status_map = {
@@ -73,4 +72,14 @@ def sync_usertask_with_exportjob(sender, instance: ExportJob, created, **kwargs)
 
     if changed:
         # atualiza somente campos que mudaram
-        ut.save(update_fields=['status', 'result', 'data_file', 'concluded_at', 'export_job', 'error_message', 'traceback'])
+        ut.save(
+            update_fields=[
+                'status', 
+                'result', 
+                'data_file', 
+                'concluded_at', 
+                'export_job', 
+                'error_message', 
+                'traceback'
+            ]
+        )
