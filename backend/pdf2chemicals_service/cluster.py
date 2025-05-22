@@ -73,7 +73,7 @@ class ClusterNodeManager:
         key = f"cluster:node:{node_name}"
         self.redis_client.delete(key)
 
-    def _get_reservation_id_from_node_name(self, node_name: str) -> str:
+    def get_reservation_id_from_node_name(self, node_name: str) -> str:
         return self.redis_client.hget(f"cluster:node:{node_name}", "reservation_id")
 
     def get_available_gpu_node(self) -> str:
@@ -89,7 +89,7 @@ class ClusterNodeManager:
         return choice(available_nodes) if available_nodes else ""
 
     def is_node_reservation_valid(self, node_name: str, reservation_id: str):
-        return True if self._get_reservation_id_from_node_name(node_name) == reservation_id else False
+        return True if self.get_reservation_id_from_node_name(node_name) == reservation_id else False
 
     def reserve_available_gpu_node(self) -> str:
         available_gpu_node = self.get_available_gpu_node()
