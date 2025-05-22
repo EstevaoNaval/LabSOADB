@@ -42,7 +42,7 @@ class ClusterNodeManager:
             
             return nodes
         except subprocess.CalledProcessError as e:
-            print(f"Erro ao executar pbsnodes: {e}")
+            print(f"Failed to execute pbsnodes: {e}")
             return []
 
     def _parse_pbsnodes_output(self, output: str) -> List[str]:
@@ -55,7 +55,7 @@ class ClusterNodeManager:
         
         return nodes
 
-    def mark_node_as_busy(self, node_name: str):
+    def _mark_node_as_busy(self, node_name: str):
         """Marca um nó como ocupado por um job específico"""
         key = f"cluster:node:{node_name}"
         
@@ -68,36 +68,36 @@ class ClusterNodeManager:
         
         return reservation_id
 
-    def mark_node_as_free(self, node_name: str):
+    def mark_node_as_available(self, node_name: str):
         """Marca um nó como livre"""
         key = f"cluster:node:{node_name}"
         self.redis_client.delete(key)
 
-    def get_reservation_id_from_node_name(self, node_name: str) -> str:
+    def _get_reservation_id_from_node_name(self, node_name: str) -> str:
         return self.redis_client.hget(f"cluster:node:{node_name}", "reservation_id")
 
-    def get_free_gpu_node(self) -> str:
+    def get_available_gpu_node(self) -> str:
         """Obtém um nó livre com GPU, considerando os nós já em uso por outros workers"""
         available_nodes = self.get_available_nodes()
         
         # Filtra nós que já estão em uso por outros workers
-        free_nodes = [
+        available_nodes = [
             node for node in available_nodes
             if not self.redis_client.exists(f"cluster:node:{node}")
         ]
         
-        return choice(free_nodes) if free_nodes else ""
+        return choice(available_nodes) if available_nodes else ""
 
     def is_node_reservation_valid(self, node_name: str, reservation_id: str):
-        return True if self.redis_client.hget(f"cluster:node:{node_name}", "reservation_id") == reservation_id else False
+        return True if self._get_reservation_id_from_node_name(node_name) == reservation_id else False
 
-    def reserve_free_gpu_node(self) -> str:
-        free_gpu_node = self.get_free_gpu_node()
+    def reserve_available_gpu_node(self) -> str:
+        available_gpu_node = self.get_available_gpu_node()
         
-        if free_gpu_node != "":
-            self.mark_node_as_busy(node_name=free_gpu_node)
+        if available_gpu_node != "":
+            self._mark_node_as_busy(node_name=available_gpu_node)
             
-        return free_gpu_node
+        return available_gpu_node
     
     def cleanup_stale_nodes(self, max_age_hours: int = 2):
         """Limpa registros antigos de nós ocupados"""

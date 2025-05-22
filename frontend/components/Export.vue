@@ -20,9 +20,23 @@
               <span class="loading loading-lg"></span>
             </div>
 
-            <li @click="startExport(option.id)" class="hover:text-primary" v-for="option in exportStore.exportFormats" :key="option.id">
-              <a>{{ option.name }}</a>
+            <li
+              @click="authStore.isAuthenticated ? startExport(option.id) : showLoginRequiredModal()"
+              :class="{ 'cursor-not-allowed text-gray-400': !authStore.isAuthenticated, 'hover:text-primary': authStore.isAuthenticated }"
+              class="transition-all"
+              v-for="option in exportStore.exportFormats"
+              :key="option.id"
+              title="Login required"
+            >
+              <a class="flex items-center gap-1">
+                <svg v-if="!authStore.isAuthenticated" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-400">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+
+                {{ option.name }}
+              </a>
             </li>
+
           </ul>
         </div>
     </div>
@@ -45,8 +59,20 @@
             <span class="loading loading-md"></span>
           </div>
           
-          <li @click="startExport(option.id)" class="hover:text-primary" v-for="option in exportStore.exportFormats" :key="option.id">
-            <a>{{ option.name }}</a>
+          <li 
+            @click="authStore.isAuthenticated ? startExport(option.id) : showLoginRequiredModal()" 
+            :class="{ 'cursor-not-allowed text-gray-400': !authStore.isAuthenticated, 'hover:text-primary': authStore.isAuthenticated }"
+            class="transition-all"
+            v-for="option in exportStore.exportFormats" 
+            :key="option.id"
+            title="Login required"
+          >
+            <a class="flex items-center gap-1">
+              <svg v-if="!authStore.isAuthenticated" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+              {{ option.name }}
+            </a>
           </li>
         </ul>
       </div>
@@ -66,27 +92,50 @@
             <span class="loading loading-sm"></span>
           </div>
           
-          <li @click="startExport(option.id)" class="hover:text-primary" v-for="option in exportStore.exportFormats" :key="option.id">
-            <a>{{ option.name }}</a>
+          <li 
+            @click="authStore.isAuthenticated ? startExport(option.id) : showLoginRequiredModal()" 
+            :class="{ 'cursor-not-allowed text-gray-400': !authStore.isAuthenticated, 'hover:text-primary': authStore.isAuthenticated }"
+            class="transition-all"
+            v-for="option in exportStore.exportFormats" 
+            :key="option.id"
+            title="Login required"
+          >
+            <a class="flex items-center gap-1">
+              <svg v-if="!authStore.isAuthenticated" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-slate-400">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+              {{ option.name }}
+            </a>
           </li>
         </ul>
       </div>
     </div>
+    <modal ref="exportLoginRequiredPromptRef">
+      <ExportLoginRequiredPrompt></ExportLoginRequiredPrompt>
+    </modal>
   </main> 
 </template>
   
 <script setup>
   import StartExportSuccessToast from '~/components/StartExportSuccessToast.vue'
   import StartExportErrorToast from '~/components/StartExportErrorToast.vue'
+  import Modal from '~/components/Modal.vue'
 
   import { useExportStore } from '~/stores/exportStore.js'
   import { useAuthStore } from '~/stores/auth.js'
   import { useToast } from 'vue-toastification';
 
+  const ExportLoginRequiredPrompt = defineAsyncComponent({
+    loader: () => import('~/components/ExportLoginRequiredPrompt.vue')
+  });
+
+  // stores
   const authStore = useAuthStore()
   const exportStore = useExportStore()
   
+  // refs
   const loading = ref(false)
+  const exportLoginRequiredPromptRef = ref(null)
 
   async function startExport(export_format_id) {
     if (loading.value) return;
@@ -126,6 +175,12 @@
       icon: false,
       timeout: 8000,
     });
+  }
+
+  function showLoginRequiredModal() {
+    if(exportLoginRequiredPromptRef.value) {
+      exportLoginRequiredPromptRef.value.toggleComponentModal();
+    }
   }
 
 </script>

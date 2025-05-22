@@ -187,7 +187,7 @@ def create_pbs_script_task(self, *args, **kwargs):
 
     # Reserva de um nó no cluster
     cluster_node_manager = ClusterNodeManager()
-    node_name = cluster_node_manager.reserve_free_gpu_node()
+    node_name = cluster_node_manager.reserve_available_gpu_node()
 
     if node_name == '':
         raise ResourceUnavailable("No pbs node is available at the moment.")
@@ -207,7 +207,7 @@ def create_pbs_script_task(self, *args, **kwargs):
 
     # Verificação da existência do script
     if not file_exists(script_path):
-        cluster_node_manager.mark_node_as_free(node_name)
+        cluster_node_manager.mark_node_as_available(node_name)
         raise FileExistsError(f"PBS/TORQUE script file {script_path} not found.")
 
     # Verificação da validade da reserva
@@ -267,7 +267,7 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
     # Tratamento de falhas na submissão
     if result.returncode != 0:
         remove_file(pbs_script_path)
-        cluster_node_manager.mark_node_as_free(node_name)
+        cluster_node_manager.mark_node_as_available(node_name)
         raise subprocess.CalledProcessError('Job was not received in the HPC cluster.')
 
     job_id = result.stdout.strip()
@@ -302,7 +302,7 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
     
     cluster_node_manager = ClusterNodeManager()
     
-    cluster_node_manager.mark_node_as_free(kwargs['node_name'])
+    cluster_node_manager.mark_node_as_available(kwargs['node_name'])
     
     remove_file(kwargs['pbs_script_path'])
     

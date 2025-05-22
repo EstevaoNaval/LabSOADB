@@ -13,7 +13,11 @@
         </thead>
         <tbody class="text-sm md:text-lg font-normal">
             <tr v-for="chemical in userChemicalsStore.chemicals" :key="chemical.api_id" class="hover">
-                <td>{{ chemical.api_id }}</td>
+                <td>
+                    <NuxtLink :to="`/chemicals/${chemical.api_id}`" title="More details" class="link-lg link-sm">
+                        {{ chemical.api_id }}
+                    </NuxtLink>
+                </td>
                 <td>
                     <div class="md:max-w-xs max-w-full whitespace-normal break-words lg:tooltip lg:tooltip-up" :data-tip="iupac">
                         <span>{{ utils.truncateString(chemical.identifier.iupac_name) }}</span>
@@ -33,9 +37,6 @@
                 <td>{{ utils.formatTimestamp(chemical.created_at) }}</td>
                 <td>
                     <NuxtLink :to="`/chemicals/${chemical.api_id}`" class="flex cursor-pointer transition-transform duration-150 hover:scale-110 active:scale-90">
-                        <!--<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 md:size-8 mx-auto">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>-->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 md:size-8 mx-auto">
                             <title>More details</title>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

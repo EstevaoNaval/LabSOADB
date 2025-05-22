@@ -1,6 +1,13 @@
 <template>
   <main>
-    <div v-if="showMainModal" class="container mx-auto p-6 ">
+    <div v-if="showMainModal" class="container mx-auto p-6 relative overflow-hidden">
+      <div
+        v-if="loading"
+        class="absolute inset-0 bg-base-200 bg-opacity-85 flex items-center justify-center rounded-box z-10"
+      >
+        <span class="loading loading-lg"></span>
+      </div>
+      
       <h2 class="text-center text-2xl font-bold mb-6">PDF2Chemicals: Submission Form</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6">
@@ -61,9 +68,8 @@
         <button @click="uploadFiles" class="btn btn-primary text-lg ml-auto">Upload</button>
       </div>
       
+      <PDF2ChemicalsLoginPrompt v-if="showLoginPrompt" @close="showLoginPrompt = false"></PDF2ChemicalsLoginPrompt>
     </div>
-  
-    <PDF2ChemicalsLoginPrompt v-if="showLoginPrompt" @close="showLoginPrompt = false"></PDF2ChemicalsLoginPrompt>
   </main>
 </template>
 
@@ -74,7 +80,6 @@ import XHRUpload from '@uppy/xhr-upload'
 
 import { useThemeStore } from '~/stores/theme';
 import { useAuthStore } from '~/stores/auth'
-import { useRouter } from 'vue-router'
 
 import PDF2ChemicalsLoginPrompt from '~/components/PDF2ChemicalsLoginPrompt.vue';
 
@@ -83,12 +88,12 @@ import '@uppy/dashboard/dist/style.min.css';
 
 const config = useRuntimeConfig()
 
-const router = useRouter()
-
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
 
 const dashboardContainer = ref(null)
+
+const loading = ref(false)
 
 const showLoginPrompt = ref(false);
 const showMainModal = ref(false);
@@ -193,8 +198,15 @@ const initializeUppy = () => {
 }
 
 const uploadFiles = async () => {
-  setUppyUploadMeta()
-  await uppy.upload()
+  if (loading.value) return;
+  loading.value = true;
+
+  try {
+    setUppyUploadMeta()
+    await uppy.upload()
+  } finally {
+    loading.value = false
+  }
 } 
 
 const setUppyUploadMeta = () => {
