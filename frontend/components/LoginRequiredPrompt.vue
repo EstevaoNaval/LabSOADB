@@ -8,7 +8,7 @@
             <h2 class="text-4xl font-semibold">Login Required</h2>
             <div class="text-xl">
               <p>
-                You need to be logged in to export the chemicals.
+                You need to be logged in to use {{ props.loginRequiredTo }}.
               </p>
               <p>
                 Please, click on the button below to be redirected to the login page.
@@ -24,41 +24,46 @@
             <h2 class="text-3xl font-semibold">Login Required</h2>
             <div class="text-lg space-y-4">
                 <p>
-                  You need to be logged in to export the chemicals.
-                </p>
-                <p>
-                  Please, click on the button below to be redirected to the login page.
+                  You need to be logged in to use {{ props.loginRequiredTo }}.
                 </p>
             </div>
             <div class="divider w-5/6 mx-auto"></div>
         </div>
         <div class="modal-action">
-          <form method="dialog" class="flex gap-2">
-            <button class="btn btn-ghost text-lg">Cancelar</button>
-            <NuxtLink to="/auth/login" class="btn btn-primary text-lg">Fazer login</NuxtLink>
+          <form method="dialog" class="flex flex-col sm:flex-row gap-3 w-full max-w-sm mx-auto">
+            <button class="btn btn-ghost order-2 text-lg md:text-xl sm:order-1 flex-1 transition-all duration-200">
+              Cancel
+            </button>
+            <NuxtLink 
+              to="/auth/login"
+              @click="goToLogin" 
+              class="btn btn-primary order-1 text-lg md:text-xl sm:order-2  flex-1 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 md:size-8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+              </svg>
+
+              Log In
+            </NuxtLink>
           </form>
         </div>
     </main>
 </template>
 
 <script setup>
-const isLocked = ref(true)
-
-function handleLockAnimation() {
-  // Simulate login success (e.g., after valid credentials)
-  isLocked.value = false;
-  // Reset to locked after 2s for demo purposes
-  setTimeout(() => {
-    isLocked.value = true;
-  }, 2000);
-}
-
-onMounted(() => {
-  // Simula a transição automática após abrir o modal
-  handleLockAnimation()
+const props = defineProps({
+    loginRequiredTo:  {
+      type: String,
+      required: true
+    },
 })
+
+const emit = defineEmits(['close']);
+
+const goToLogin = () => {
+  emit('close');
+  navigateTo('/auth/login');
+};
 </script>
 
-<style>
 
-</style>

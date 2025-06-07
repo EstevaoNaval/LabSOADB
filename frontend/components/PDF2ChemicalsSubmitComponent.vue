@@ -67,9 +67,9 @@
         <h2 class="text-left text-slate-500 text-sm md:text-md font-bold my-auto">* Limit of 10 PDF files per upload.</h2>
         <button @click="uploadFiles" class="btn btn-primary text-lg ml-auto">Upload</button>
       </div>
-      
-      <PDF2ChemicalsLoginPrompt v-if="showLoginPrompt" @close="showLoginPrompt = false"></PDF2ChemicalsLoginPrompt>
     </div>
+
+    <LoginRequiredPrompt loginRequiredTo="PDF2Chemicals" v-if="showLoginPrompt" @close="showLoginPrompt = false"></LoginRequiredPrompt>
   </main>
 </template>
 
@@ -81,7 +81,7 @@ import XHRUpload from '@uppy/xhr-upload'
 import { useThemeStore } from '~/stores/theme';
 import { useAuthStore } from '~/stores/auth'
 
-import PDF2ChemicalsLoginPrompt from '~/components/PDF2ChemicalsLoginPrompt.vue';
+import LoginRequiredPrompt from '~/components/LoginRequiredPrompt.vue';
 
 import '@uppy/core/dist/style.min.css';
 import '@uppy/dashboard/dist/style.min.css';

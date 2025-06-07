@@ -60,6 +60,9 @@
             </div>
             <div class="flex flex-col items-center justify-between gap-6 mb-8">
                 <button class="btn btn-primary font-bold text-xl py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline w-full" type="input">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 md:size-8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                    </svg>
                     Log In
                 </button>
                 <a class="link text-lg align-baseline font-semibold duration-200 hover:link-secondary hover:underline" href="#">

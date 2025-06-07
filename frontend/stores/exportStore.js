@@ -60,19 +60,23 @@ export const useExportStore = defineStore('export', {
                 ...filters,
             }
 
-            let response = await $axios.post(config.public.startExportChemicalEndpoint,
-                {
-                    file_format: this.getCurrExportFormatValue(),
-                },
-                {
-                    params: params,
-                    headers: {
-                        Authorization: `Bearer ${authStore.token}`
+            try {
+                let response = await $axios.post(config.public.startExportChemicalEndpoint,
+                    {
+                        file_format: this.getCurrExportFormatValue(),
                     },
-                }
-            )
+                    {
+                        params: params,
+                        headers: {
+                            Authorization: `Bearer ${authStore.token}`
+                        },
+                    }
+                )
 
-            return response.data.id
+                return response.data.id
+            } catch (err) {
+                return null
+            }
         },
         async startChemicalsExport() {
             const exportTaskId = await this.startChemicalsExportTask()

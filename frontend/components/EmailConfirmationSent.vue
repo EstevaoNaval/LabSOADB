@@ -22,12 +22,12 @@
                 <p>
                     We have sent an email to <a class="text-primary">{{ props.confirmationEmail }}</a> in order to verify your provided email address.
                 </p>
-                <p>
-                    Please, <b>check your email</b> and <b>click in the sent link</b> to activate your account.
+                <p class="flex gap-1">
+                    Please, <p class="font-semibold">check your email</p> and <p class="font-semibold">click in the sent link</p> to activate your account.
                 </p>
             </div>
             <div class="divider w-3/4 mx-auto"></div>
-            <p class="font-normal text-lg text-gray-400">If you not got any mail, <a @click="resendConfirmationEmail" class="text-primary cursor-pointer font-bold duration-200 hover:text-secondary">Resend Confirmation Email</a></p>
+            <p class="font-normal text-lg text-gray-400">If you not got any mail, <a @click="resendConfirmationEmail" class="text-primary cursor-pointer font-semibold duration-200 hover:text-secondary">Resend Confirmation Email</a></p>
         </div>
 
         <div class="space-y-6 text-center p-4 flex flex-col md:hidden">
@@ -59,7 +59,7 @@
             <div class="divider w-5/6 mx-auto"></div>
             <div>
                 <p class="font-normal text-gray-400">If you not got any mail</p> 
-                <a @click="resendConfirmationEmail" class="text-primary cursor-pointer font-bold duration-200 hover:text-secondary">Resend Confirmation Email</a>
+                <a @click="resendConfirmationEmail" class="text-primary cursor-pointer font-semibold duration-200 hover:text-secondary">Resend Confirmation Email</a>
             </div>
 
         </div>

@@ -111,7 +111,7 @@
       </div>
     </div>
     <modal ref="exportLoginRequiredPromptRef">
-      <ExportLoginRequiredPrompt></ExportLoginRequiredPrompt>
+      <LoginRequiredPrompt loginRequiredTo="Export Chemicals"></LoginRequiredPrompt>
     </modal>
   </main> 
 </template>
@@ -125,8 +125,8 @@
   import { useAuthStore } from '~/stores/auth.js'
   import { useToast } from 'vue-toastification';
 
-  const ExportLoginRequiredPrompt = defineAsyncComponent({
-    loader: () => import('~/components/ExportLoginRequiredPrompt.vue')
+  const LoginRequiredPrompt = defineAsyncComponent({
+    loader: () => import('~/components/LoginRequiredPrompt.vue')
   });
 
   // stores
