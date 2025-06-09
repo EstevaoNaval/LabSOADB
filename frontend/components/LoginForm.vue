@@ -4,19 +4,15 @@
             @submit.prevent="handleLogin"
             autocomplete="on"
         >
-            <p 
-                :class="themeStore.isDarkMode ? 'p-2 text-lg mx-auto text-error font-semibold text-center' : 'p-2 text-lg mx-auto text-red-700 font-semibold text-center'" 
-                v-if="authStore.error && authStore.error.connection"
-            >
-                {{ authStore.error.connection }}
-            </p>
-
-            <p 
-                :class="themeStore.isDarkMode ? 'p-2 text-lg mx-auto text-warning font-semibold text-center' : 'p-2 text-lg mx-auto text-yellow-700 font-semibold text-center'" 
-                v-if="authStore.error && authStore.error.error"
-            >
-                {{ authStore.error.error }}
-            </p>
+            <template v-if="authStore.error">
+                <p 
+                    :class="themeStore.isDarkMode ? 'p-2 text-lg mx-auto text-error font-semibold text-center' : 'p-2 text-lg mx-auto text-red-700 font-semibold text-center'" 
+                    v-for="[idx, err] in authStore.error.entries()"
+                    :key="idx"
+                >
+                    {{ err }}
+                </p>
+            </template>
 
             <div class="mb-6">
                 <div class="text-md font-bold mb-2" for="email">
@@ -98,11 +94,9 @@ const email = ref(null)
 const password = ref(null)
 
 async function handleLogin() {
-    console.log(`${email.value} ${password.value}`)
-    
     await authStore.login(email.value, password.value)
 
-    if(authStore.error) {
+    if(authStore.error.length > 0) {
         return;
     }
     

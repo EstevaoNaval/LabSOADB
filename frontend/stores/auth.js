@@ -5,7 +5,7 @@ export const useAuthStore = defineStore('auth', {
     state: () => ({
         token: null,
         isAuthenticated: false,
-        error: null
+        error: []
     }),
     actions: {
         async login(email, password) {
@@ -22,14 +22,14 @@ export const useAuthStore = defineStore('auth', {
                 (response) => {
                     this.token = response.data.token;
                     this.isAuthenticated = true;
-                    this.error = null
+                    this.error = []
                 }
             ).catch(
                 (err) => {
                     if (err.response) {
-                        this.error = err.response.data
+                        this.error = Object.values(err.response.data).flat(1)
                     } else if (err.request) {
-                        this.error = { 'connection': 'Connection failed' }
+                        this.error = ['Connection failed']
                     }
                 }
             );
@@ -47,12 +47,12 @@ export const useAuthStore = defineStore('auth', {
             ).then((response) => {
                 this.token = null;
                 this.isAuthenticated = false;
-                this.error = null;
+                this.error = [];
             }).catch((err) => {
                 if (err.response) {
-                    this.error = err.response.data
+                    this.error = Object.values(err.response.data).flat(1)
                 } else if (err.request) {
-                    this.error = { 'connection': 'Connection failed' }
+                    this.error = ['Connection failed']
                 }
             });
         },
@@ -72,12 +72,12 @@ export const useAuthStore = defineStore('auth', {
             ).then((response) => {
                 this.token = null;
                 this.isAuthenticated = false;
-                this.error = null;
+                this.error = [];
             }).catch((err) => {
                 if (err.response) {
-                    this.error = err.response.data
+                    this.error = Object.values(err.response.data).flat(1)
                 } else if (err.request) {
-                    this.error = { 'connection': 'Connection failed' }
+                    this.error = ['Connection failed']
                 }
             });
         },
@@ -95,18 +95,18 @@ export const useAuthStore = defineStore('auth', {
             ).then((response) => {
                 this.token = null;
                 this.isAuthenticated = false;
-                this.error = null;
+                this.error = [];
             }).catch((err) => {
                 if (err.response) {
-                    this.error = err.response.data
+                    this.error = Object.values(err.response.data).flat(1)
                 } else if (err.request) {
-                    this.error = { 'connection': 'Connection failed' }
+                    this.error = ['Connection failed']
                 }
             });
         },
 
         clearError() {
-            this.error = null
+            this.error = []
         }
     },
     persist: true
