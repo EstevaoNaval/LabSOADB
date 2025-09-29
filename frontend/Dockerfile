@@ -20,7 +20,7 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 
 # Copy the build output from the builder stage
-COPY --from=build /app/.output /app/.output
+COPY --from=builder /app/.output /app/.output
 
 # Set environment variables
 ENV HOST=0.0.0.0
