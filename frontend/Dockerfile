@@ -19,10 +19,6 @@ FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# Copy production dependencies if needed
-COPY package*.json ./
-RUN npm install --production
-
 # Copy the build output from the builder stage
 COPY --from=build /app/.output /app/.output
 
