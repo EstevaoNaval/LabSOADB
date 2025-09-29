@@ -9,7 +9,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 
 from dj_rest_auth.registration.views import VerifyEmailView
-from allauth.account.utils import send_email_confirmation
+from allauth.account.models import EmailAddress
 
 from knox.views import LoginView as KnoxLoginView, LogoutAllView as KnoxLogoutAllView, LogoutView as KnoxLogoutView
 
@@ -40,7 +40,21 @@ class LoginView(KnoxLoginView):
             user = request.user
             
             if not user.emailaddress_set.filter(verified=True).exists():
-                send_email_confirmation(user=user, request=request)
+                email = user.email
+                if not email:
+                    return Response({"error": "No email address associated with the user."}, status=400)
+                
+                try:
+                    email_address = EmailAddress.objects.get(user=user, email=email, verified=False)
+                except EmailAddress.DoesNotExist:
+                    email_address = EmailAddress.objects.create(
+                        user=user,
+                        email=email,
+                        verified=False,
+                        primary=True
+                    )
+                
+                email_address.send_confirmation(request, signup=False)
                 
                 return Response({"error": f"Email not verified yet. Resending confirmation email to {user.email}."}, status=400)
         

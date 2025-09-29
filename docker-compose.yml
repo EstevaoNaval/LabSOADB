@@ -1,4 +1,12 @@
 services:
+  web:
+    build:
+    context: frontend
+    dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
   # Serviço do Django (web)
   django-api:
     deploy:
