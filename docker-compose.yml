@@ -1,11 +1,15 @@
 services:
   web:
     build:
-    context: frontend
-    dockerfile: Dockerfile
+      context: frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     restart: unless-stopped
+    env_file:
+      - frontend/.env
+    networks:
+      - bridge-network
 
   # Serviço do Django (web)
   django-api:
