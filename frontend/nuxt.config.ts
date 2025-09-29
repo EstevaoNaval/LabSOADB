@@ -5,6 +5,10 @@ export default defineNuxtConfig({
   ssr: true,
   target: 'server',
 
+  build: {
+    transpile: ['vue-toastification']
+  },
+
   generate: {
     routes: [
       '/about',

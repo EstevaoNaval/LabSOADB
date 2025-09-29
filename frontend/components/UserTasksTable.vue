@@ -194,9 +194,7 @@
     import { onBeforeMount, onUnmounted } from 'vue';
     import { useThemeStore } from '~/stores/theme';
     import { useUserTasksStore } from '~/stores/userTasks';
-    import pkg from 'vue-toastification';
-    
-    const { useToast } = pkg;
+    import { useToast } from 'vue-toastification';
 
     const themeStore = useThemeStore()
     const userTasksStore = useUserTasksStore()

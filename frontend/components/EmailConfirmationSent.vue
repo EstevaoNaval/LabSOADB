@@ -68,9 +68,7 @@
 
 <script setup>
     import { useUserStore } from '~/stores/user';
-    import pkg from 'vue-toastification';
-
-    const { useToast } = pkg;
+    import { useToast } from 'vue-toastification';
 
     const userStore = useUserStore()
 
