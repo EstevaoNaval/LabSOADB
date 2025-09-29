@@ -123,7 +123,9 @@
 
   import { useExportStore } from '~/stores/exportStore.js'
   import { useAuthStore } from '~/stores/auth.js'
-  import { useToast } from 'vue-toastification';
+  import pkg from 'vue-toastification'
+
+  const { useToast } = pkg;
 
   const LoginRequiredPrompt = defineAsyncComponent({
     loader: () => import('~/components/LoginRequiredPrompt.vue')

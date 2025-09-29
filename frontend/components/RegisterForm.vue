@@ -242,9 +242,10 @@
 <script setup>
 import { useUserStore } from '~/stores/user';
 import { useThemeStore } from '~/stores/theme';
-import { useToast } from 'vue-toastification';
-
+import pkg from 'vue-toastification';
 import Modal from '~/components/Modal.vue';
+
+const { useToast } = pkg;
 
 const EmailConfirmationSentComponent = defineAsyncComponent({
     loader: () => import('~/components/EmailConfirmationSent.vue')

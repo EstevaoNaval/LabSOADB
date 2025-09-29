@@ -80,7 +80,9 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '~/stores/auth';
 import { useThemeStore } from '~/stores/theme';
 import { useUserStore } from '~/stores/user';
-import { useToast } from 'vue-toastification';
+import pkg from 'vue-toastification';
+
+const { useToast } = pkg;
 
 const router = useRouter()
 
