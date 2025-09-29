@@ -26,6 +26,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'localhost',
     'django-api',
+    'web',
     HOST_IP
 ]
 
