@@ -24,18 +24,19 @@ COPY package*.json ./
 RUN npm install --production
 
 # Copy the build output from the builder stage
-COPY --from=builder /app/.output ./.output
+COPY --from=build /app/.output /app/.output
+
+# Set environment variables
+ENV HOST=0.0.0.0
+ENV NODE_ENV=production
+ENV PORT=3000
 
 # Expose the port on which Nuxt listens (default is 3000)
 EXPOSE 3000
-
-# Set environment variables for production
-ENV NODE_ENV=production
 
 # Healthcheck (optional but recommended)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s \
   CMD wget --quiet --tries=1 --spider http://localhost:3000 || exit 1
 
 # Start the Nuxt server
-#CMD ["node", ".output/server/index.mjs"]
-CMD ["npm", "run", "dev"]
+CMD ["node", ".output/server/index.mjs"]
