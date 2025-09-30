@@ -9,13 +9,13 @@ export default defineNuxtConfig({
     transpile: ['vue-toastification']
   },
 
-  //generate: {
-  //  routes: [
-  //    '/about',
-  //    '/pdf2chemicals/about',
-  //    '/pdf2chemicals/features'
-  //  ]
-  //},
+  generate: {
+    routes: [
+      '/about',
+      '/pdf2chemicals/about',
+      '/pdf2chemicals/features'
+    ]
+  },
 
   vite: {
     server: {
