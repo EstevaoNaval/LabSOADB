@@ -24,13 +24,10 @@ export default defineNuxtConfig({
   nitro: {
     routeRules: {
       '/api/**': { 
-        proxy: process.env.NUXT_API_URL_HOST 
-          ? `${process.env.NUXT_API_URL_HOST}/**`
-          : 'http://localhost:8000/**'  // Fallback para tunnel local
+        proxy: process.env.NUXT_API_URL_HOST ? `${process.env.NUXT_API_URL_HOST}/**` : 'http://localhost:8000/**'
       }
     }
   },
-
 
   generate: {
     routes: [
