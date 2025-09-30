@@ -20,13 +20,11 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 
 # Copy the build output from the builder stage
-#COPY --from=builder /app/.output /app/.output
-COPY --from=builder /app /app
-
+COPY --from=builder /app/.output /app/.output
 
 # Set environment variables
 ENV HOST=0.0.0.0
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 ENV PORT=3000
 
 # Expose the port on which Nuxt listens (default is 3000)
@@ -37,5 +35,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s \
   CMD wget --quiet --tries=1 --spider http://localhost:3000 || exit 1
 
 # Start the Nuxt server
-#CMD ["node", ".output/server/index.mjs"]
-CMD ["npm","run","dev"]
+CMD ["node", ".output/server/index.mjs"]
