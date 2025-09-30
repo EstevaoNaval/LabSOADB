@@ -9,6 +9,14 @@ export default defineNuxtConfig({
     transpile: ['vue-toastification']
   },
 
+  //generate: {
+  //  routes: [
+  //    '/about',
+  //    '/pdf2chemicals/about',
+  //    '/pdf2chemicals/features'
+  //  ]
+  //},
+
   vite: {
     server: {
       proxy: {
@@ -27,14 +35,6 @@ export default defineNuxtConfig({
         proxy: process.env.NUXT_API_URL_HOST ? `${process.env.NUXT_API_URL_HOST}/**` : 'http://localhost:8000/**'
       }
     }
-  },
-
-  generate: {
-    routes: [
-      '/about',
-      '/pdf2chemicals/about',
-      '/pdf2chemicals/features'
-    ]
   },
 
   devtools: { enabled: true },
