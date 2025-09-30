@@ -7,9 +7,7 @@ import os
 from django.db import models
 from django.utils.text import slugify
 
-
 from user.models import User
-from common.fields import RelativePathFileField, RelativePathImageField
 
 from .util.util import generate_random_sequence, validate_hex_color
 
@@ -55,7 +53,7 @@ class Literature(HashAPIIdBaseModel):
     publication_name = models.TextField()
 
 class Chemical(BaseModel):
-    chem_depiction_image = RelativePathImageField(upload_to='depictions/', null=True)
+    chem_depiction_image = models.ImageField(upload_to='depictions/', null=True)
     literature = models.ManyToManyField(to=Literature, related_name='chemicals')
     api_id = models.CharField(max_length=14, unique=True)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='chemicals')
@@ -171,7 +169,7 @@ class Synonym(HashAPIIdBaseModel):
     chemical = models.ForeignKey(to=Chemical, on_delete=models.CASCADE, related_name='synonyms')
 
 class Conformation(HashAPIIdBaseModel):
-    conf_file = RelativePathFileField(upload_to='confs/')
+    conf_file = models.FileField(upload_to='confs/')
     chemical = models.ForeignKey(to=Chemical, on_delete=models.CASCADE, related_name='conformations')
 
 

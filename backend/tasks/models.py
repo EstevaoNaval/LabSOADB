@@ -4,7 +4,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from user.models import User
-from common.fields import RelativePathFileField
 from import_export_extensions.models import ExportJob
 
 class UserTask(models.Model):
@@ -43,7 +42,7 @@ class UserTask(models.Model):
     label = models.TextField()
     status = models.CharField(max_length=50, choices=TaskStatus.choices, default=TaskStatus.PENDING)
     result = models.JSONField(blank=True, null=True)
-    data_file = RelativePathFileField(
+    data_file = models.FileField(
         upload_to=_user_directory_path,
         null=True,
         blank=True,

@@ -2,10 +2,8 @@ from django.core.validators import RegexValidator, MinLengthValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from common.fields import RelativePathImageField
-
 class User(AbstractUser):
-    profile_image = RelativePathImageField(upload_to='profile_images/', blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     email = models.EmailField(unique=True)
     username = models.CharField(
         max_length=50,

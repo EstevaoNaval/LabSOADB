@@ -4,6 +4,8 @@ from django.db import IntegrityError
 
 from rest_framework import serializers
 
+from common.fields import RelativePathImageField
+
 from .models import *
 from .util.util import ManuscriptMetadata
 
@@ -89,6 +91,7 @@ class ConformationSerializer(serializers.ModelSerializer):
         
 class ChemicalSerializer(serializers.ModelSerializer):
     api_id = serializers.CharField(required=False)
+    chem_depiction_image = RelativePathImageField()
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
     literature = LiteratureSerializer(required=False, many=True)
     identifier = IdentifierSerializer(source='identifiers', required=False)
@@ -384,6 +387,7 @@ class PhysicalPropertySummarySerializer(serializers.ModelSerializer):
         fields = ['molecular_weight', 'state_of_matter', 'mp_lower_bound', 'mp_upper_bound']
 
 class ChemicalSummarySerializer(serializers.ModelSerializer):
+    chem_depiction_image = RelativePathImageField()
     identifier = IdentifierSummarySerializer(read_only=True, source='identifiers')
     physical_property = PhysicalPropertySummarySerializer(read_only=True, source='physical_properties')
     
