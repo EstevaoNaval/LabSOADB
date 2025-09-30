@@ -36,11 +36,6 @@ export default defineNuxtConfig({
         proxy: {
           to: `${process.env.NUXT_API_URL_HOST || 'http://django-api:8000'}/api/**`
         }
-      },
-      '/auth/**': { 
-        proxy: {
-          to: `${process.env.NUXT_API_URL_HOST || 'http://django-api:8000'}/auth/**`
-        }
       }
     }
   },
