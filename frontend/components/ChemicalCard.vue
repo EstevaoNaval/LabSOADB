@@ -2,7 +2,7 @@
     <main>
         <div class="card bg-base-300">
             <figure>
-                <NuxtImg
+                <img
                     v-if="props.chemical.chem_depiction_image"
                     :src="props.chemical.chem_depiction_image"
                     alt="Molecular Structure"
