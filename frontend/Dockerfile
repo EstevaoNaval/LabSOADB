@@ -35,4 +35,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s \
   CMD wget --quiet --tries=1 --spider http://localhost:3000 || exit 1
 
 # Start the Nuxt server
-CMD ["node", ".output/server/index.mjs"]
+#CMD ["node", ".output/server/index.mjs"]
+["npm","run","dev"]
