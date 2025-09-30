@@ -68,9 +68,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiHost: process.env.NODE_ENV === 'development' 
-        ? ''  // Relative in dev → uses Vite proxy
-        : process.env.NUXT_API_URL_HOST, // Full internal in prod → uses Nitro proxy
+      apiHost: '',
+      apiHostServer: process.env.NUXT_API_URL_HOST || 'http://django-api:8000',
       docsAPIEndpoint: process.env.NUXT_DOCS_API_ENDPOINT,
       loginAPIEndpoint: process.env.NUXT_LOGIN_API_ENDPOINT,
       logoutAPIEndpoint: process.env.NUXT_LOGOUT_API_ENDPOINT,
