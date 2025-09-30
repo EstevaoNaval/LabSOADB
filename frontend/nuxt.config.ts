@@ -9,6 +9,22 @@ export default defineNuxtConfig({
     transpile: ['vue-toastification']
   },
 
+  nitro: {
+    routeRules: {
+      '/api/**': {
+        proxy: `${process.env.NUXT_API_URL_HOST}/**`  // Assumindo que é isso; ajuste se for diferente
+      }
+    },
+    // Adicione isso para log (apenas dev/prod debug)
+    hooks: {
+      'render:response': (response, { event }) => {
+        if (event.path.startsWith('/api/')) {
+          console.log('Proxy target for', event.path, ':', process.env.NUXT_API_URL_HOST);
+        }
+      }
+    }
+  }
+
   generate: {
     routes: [
       '/about',
