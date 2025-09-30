@@ -31,10 +31,14 @@ export default defineNuxtConfig({
 
   nitro: {
     routeRules: {
-      // IMPORTANTE: Remova o /** no final
       '/api/**': { 
         proxy: {
           to: `${process.env.NUXT_API_URL_HOST || 'http://django-api:8000'}/api/**`
+        }
+      },
+      '/files/**': { 
+        proxy: {
+          to: `${process.env.NUXT_API_URL_HOST || 'http://django-api:8000'}/files/**`
         }
       }
     }
