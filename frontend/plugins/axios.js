@@ -1,16 +1,15 @@
-import qs from 'qs';
-import axios from 'axios';
-
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
 
-  // Detectar se está no servidor (SSR) ou no cliente (browser)
   const isServer = process.server;
 
-  // No servidor usa URL interna do Docker, no cliente usa proxy relativo
-  const baseURL = isServer
-    ? config.public.apiHostServer  // http://django-api:8000
-    : config.public.apiHost;        // '' (vazio = usa proxy)
+  // Se tiver apiHost definido, usa ele (para client-side via proxy)
+  // Se não, e estiver no servidor, usa apiHostServer (SSR interno)
+  const baseURL = !isServer && config.public.apiHost
+    ? config.public.apiHost
+    : isServer
+      ? config.public.apiHostServer
+      : '';
 
   const instance = axios.create({
     baseURL: baseURL,
@@ -19,13 +18,21 @@ export default defineNuxtPlugin(() => {
     },
   });
 
+  // Log para debug
+  console.log('[Axios Plugin]', {
+    isServer,
+    baseURL,
+    apiHost: config.public.apiHost,
+    apiHostServer: config.public.apiHostServer
+  });
+
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
       console.error('Axios error:', error.message, {
         url: error.config?.url,
         baseURL: error.config?.baseURL,
-        isServer
+        fullURL: error.config?.baseURL + error.config?.url
       });
       return Promise.reject(error);
     }

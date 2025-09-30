@@ -22,10 +22,14 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    routeRules: {
-      '/api/**': { proxy: `${process.env.NUXT_API_URL_HOST}/**` }
+  routeRules: {
+    '/api/**': { 
+      proxy: process.env.NUXT_API_URL_HOST 
+        ? `${process.env.NUXT_API_URL_HOST}/**`
+        : 'http://localhost:8000/**'  // Fallback para tunnel local
     }
   },
+
 
   generate: {
     routes: [
@@ -68,7 +72,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiHost: '',
+      apiHost: process.env.NODE_ENV === 'production' 
+      ? '/api'  // Usa proxy Nitro quando em produção no servidor
+      : '',     // Usa proxy Vite em desenvolvimento
       apiHostServer: process.env.NUXT_API_URL_HOST || 'http://django-api:8000',
       docsAPIEndpoint: process.env.NUXT_DOCS_API_ENDPOINT,
       loginAPIEndpoint: process.env.NUXT_LOGIN_API_ENDPOINT,
