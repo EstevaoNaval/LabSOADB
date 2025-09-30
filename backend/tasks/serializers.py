@@ -1,7 +1,12 @@
 from rest_framework import serializers
+
+from common.fields import RelativePathFileField
+
 from .models import UserTask
 
 class UserTaskSerializer(serializers.ModelSerializer):
+    data_file = RelativePathFileField()
+    
     class Meta:
         model = UserTask
         read_only_fields=[

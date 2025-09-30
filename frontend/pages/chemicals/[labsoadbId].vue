@@ -82,7 +82,7 @@
                   </div>
 
                   <figure class="pb-8">
-                    <NuxtImg
+                    <img
                       :src="selectedChemicalStore.selectedChemical.chem_depiction_image"
                       alt="Molecular Structure"
                       class="rounded-box shadow-md duration-200 hover:shadow-xl"

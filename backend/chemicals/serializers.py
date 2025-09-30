@@ -4,7 +4,7 @@ from django.db import IntegrityError
 
 from rest_framework import serializers
 
-from common.fields import RelativePathImageField
+from common.fields import RelativePathImageField, RelativePathFileField
 
 from .models import *
 from .util.util import ManuscriptMetadata
@@ -84,6 +84,8 @@ class SynonymSerializer(serializers.ModelSerializer):
         read_only_fields=['api_id']
         
 class ConformationSerializer(serializers.ModelSerializer):
+    conf_file = RelativePathFileField()
+    
     class Meta:
         model = Conformation
         exclude=['id','created_at','update_at', 'chemical']
