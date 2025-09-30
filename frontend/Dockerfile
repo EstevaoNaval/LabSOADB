@@ -26,7 +26,7 @@ COPY --from=builder /app /app
 
 # Set environment variables
 ENV HOST=0.0.0.0
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 ENV PORT=3000
 
 # Expose the port on which Nuxt listens (default is 3000)
