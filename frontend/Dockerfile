@@ -36,4 +36,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s \
 
 # Start the Nuxt server
 #CMD ["node", ".output/server/index.mjs"]
-["npm","run","dev"]
+CMD ["npm","run","dev"]
