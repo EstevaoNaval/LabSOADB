@@ -9,19 +9,21 @@ export default defineNuxtConfig({
     transpile: ['vue-toastification']
   },
 
-  nitro: {
-    routeRules: {
-      '/api/**': {
-        proxy: `${process.env.NUXT_API_URL_HOST}/**`  // Assumindo que é isso; ajuste se for diferente
-      }
-    },
-    // Adicione isso para log (apenas dev/prod debug)
-    hooks: {
-      'render:response': (response, { event }) => {
-        if (event.path.startsWith('/api/')) {
-          console.log('Proxy target for', event.path, ':', process.env.NUXT_API_URL_HOST);
+  vite: {
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8000',  // Host-exposed Django port
+          changeOrigin: true,
+          rewrite: (path) => path,  // Keep /api prefix
         }
       }
+    }
+  },
+
+  nitro: {
+    routeRules: {
+      '/api/**': { proxy: `${process.env.NUXT_API_URL_HOST}/**` }
     }
   },
 
@@ -66,7 +68,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiHost: process.env.NUXT_API_URL_HOST,
+      apiHost: process.env.NODE_ENV === 'development' 
+        ? ''  // Relative in dev → uses Vite proxy
+        : process.env.NUXT_API_URL_HOST, // Full internal in prod → uses Nitro proxy
       docsAPIEndpoint: process.env.NUXT_DOCS_API_ENDPOINT,
       loginAPIEndpoint: process.env.NUXT_LOGIN_API_ENDPOINT,
       logoutAPIEndpoint: process.env.NUXT_LOGOUT_API_ENDPOINT,
