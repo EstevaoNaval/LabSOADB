@@ -21,9 +21,9 @@ export default defineNuxtConfig({
     server: {
       proxy: {
         '/api': {
-          target: 'http://localhost:8000',  // Host-exposed Django port
+          target: 'http://localhost:8000',
           changeOrigin: true,
-          rewrite: (path) => path,  // Keep /api prefix
+          rewrite: (path) => path,
         }
       }
     }
@@ -31,8 +31,16 @@ export default defineNuxtConfig({
 
   nitro: {
     routeRules: {
+      // IMPORTANTE: Remova o /** no final
       '/api/**': { 
-        proxy: process.env.NUXT_API_URL_HOST ? `${process.env.NUXT_API_URL_HOST}/**` : 'http://localhost:8000/**'
+        proxy: {
+          to: `${process.env.NUXT_API_URL_HOST || 'http://django-api:8000'}/api/**`
+        }
+      },
+      '/auth/**': { 
+        proxy: {
+          to: `${process.env.NUXT_API_URL_HOST || 'http://django-api:8000'}/auth/**`
+        }
       }
     }
   },
@@ -70,10 +78,12 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiHost: process.env.NODE_ENV === 'production' 
-      ? '/api'  // Usa proxy Nitro quando em produção no servidor
-      : '',     // Usa proxy Vite em desenvolvimento
+      // CRÍTICO: Deixe vazio para client-side usar paths relativos
+      apiHost: '',
+      
+      // Para SSR (server-side dentro do container)
       apiHostServer: process.env.NUXT_API_URL_HOST || 'http://django-api:8000',
+
       docsAPIEndpoint: process.env.NUXT_DOCS_API_ENDPOINT,
       loginAPIEndpoint: process.env.NUXT_LOGIN_API_ENDPOINT,
       logoutAPIEndpoint: process.env.NUXT_LOGOUT_API_ENDPOINT,
