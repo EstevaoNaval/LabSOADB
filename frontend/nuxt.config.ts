@@ -77,30 +77,29 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      // CRÍTICO: Deixe vazio para client-side usar paths relativos
-      apiHost: '',
+    // CRÍTICO: Deixe vazio para client-side usar paths relativos
+    apiHost: '',
       
-      // Para SSR (server-side dentro do container)
-      apiHostServer: process.env.NUXT_API_URL_HOST || 'http://django-api:8000',
-
-      docsAPIEndpoint: process.env.NUXT_DOCS_API_ENDPOINT,
-      loginAPIEndpoint: process.env.NUXT_LOGIN_API_ENDPOINT,
-      logoutAPIEndpoint: process.env.NUXT_LOGOUT_API_ENDPOINT,
-      resetPasswordAPIEndpoint: process.env.NUXT_RESET_PASSWORD_API_ENDPOINT,
-      confirmResetPasswordAPIEndpoint: process.env.NUXT_CONFIRM_RESET_PASSWORD_API_ENDPOINT,
-      userProfileAPIEndpoint: process.env.NUXT_USER_PROFILE_API_ENDPOINT,
-      userRegisterAPIEndpoint: process.env.NUXT_USER_REGISTER_API_ENDPOINT,
-      downloadChemicalConformationsEndpoint: process.env.NUXT_DOWNLOAD_CHEMICAL_CONFORMATIONS_ENPOINT,
-      startExportChemicalEndpoint: process.env.NUXT_START_EXPORT_CHEMICAL_ENDPOINT,
-      retrieveExportChemicalEndpoint: process.env.NUXT_RETRIEVE_EXPORT_CHEMICAL_ENDPOINT,
-      verifyEmailAPIEndpoint: process.env.NUXT_VERIFY_EMAIL_API_ENDPOINT,
-      resendEmailConfirmationAPIEndpoint: process.env.NUXT_RESEND_EMAIL_CONFIRMATION_API_ENDPOINT,
-      pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT,
-      userTasksEndpoint: process.env.NUXT_USER_TASKS_ENDPOINT,
-      userChemicalsEndpoint: process.env.NUXT_USER_CHEMICALS_ENDPOINT,
-      taskRevokeEndpoint: process.env.NUXT_TASK_REVOKE_ENDPOINT,
-      downloadPdf2ChemicalsResultFileEndpoint: process.env.NUXT_DOWNLOAD_PDF2CHEMICALS_RESULT_FILE_ENDPOINT
-    }
+    // Para SSR (server-side dentro do container)
+    apiHostServer: process.env.NUXT_PUBLIC_API_URL_HOST || 'http://django-api:8000',
+      
+    docsAPIEndpoint: process.env.NUXT_PUBLIC_DOCS_API_ENDPOINT,
+    loginAPIEndpoint: process.env.NUXT_PUBLIC_LOGIN_API_ENDPOINT,
+    logoutAPIEndpoint: process.env.NUXT_PUBLIC_LOGOUT_API_ENDPOINT,
+    resetPasswordAPIEndpoint: process.env.NUXT_PUBLIC_RESET_PASSWORD_API_ENDPOINT,
+    confirmResetPasswordAPIEndpoint: process.env.NUXT_PUBLIC_CONFIRM_RESET_PASSWORD_API_ENDPOINT,
+    userProfileAPIEndpoint: process.env.NUXT_PUBLIC_USER_PROFILE_API_ENDPOINT,
+    userRegisterAPIEndpoint: process.env.NUXT_PUBLIC_USER_REGISTER_API_ENDPOINT,
+    downloadChemicalConformationsEndpoint: process.env.NUXT_PUBLIC_DOWNLOAD_CHEMICAL_CONFORMATIONS_ENPOINT,
+    startExportChemicalEndpoint: process.env.NUXT_PUBLIC_START_EXPORT_CHEMICAL_ENDPOINT,
+    retrieveExportChemicalEndpoint: process.env.NUXT_PUBLIC_RETRIEVE_EXPORT_CHEMICAL_ENDPOINT,
+    verifyEmailAPIEndpoint: process.env.NUXT_PUBLIC_VERIFY_EMAIL_API_ENDPOINT,
+    resendEmailConfirmationAPIEndpoint: process.env.NUXT_PUBLIC_RESEND_EMAIL_CONFIRMATION_API_ENDPOINT,
+    pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PUBLIC_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT,
+    userTasksEndpoint: process.env.NUXT_PUBLIC_USER_TASKS_ENDPOINT,
+    userChemicalsEndpoint: process.env.NUXT_PUBLIC_USER_CHEMICALS_ENDPOINT,
+    taskRevokeEndpoint: process.env.NUXT_PUBLIC_TASK_REVOKE_ENDPOINT,
+    downloadPdf2ChemicalsResultFileEndpoint: process.env.NUXT_PUBLIC_DOWNLOAD_PDF2CHEMICALS_RESULT_FILE_ENDPOINT
   },
 
   compatibilityDate: '2025-02-16'
