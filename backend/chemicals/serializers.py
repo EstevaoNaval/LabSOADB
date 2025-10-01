@@ -93,7 +93,7 @@ class ConformationSerializer(serializers.ModelSerializer):
         
 class ChemicalSerializer(serializers.ModelSerializer):
     api_id = serializers.CharField(required=False)
-    chem_depiction_image = RelativePathImageField()
+    chem_depiction_image = RelativePathImageField(required=False)
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
     literature = LiteratureSerializer(required=False, many=True)
     identifier = IdentifierSerializer(source='identifiers', required=False)
@@ -389,7 +389,7 @@ class PhysicalPropertySummarySerializer(serializers.ModelSerializer):
         fields = ['molecular_weight', 'state_of_matter', 'mp_lower_bound', 'mp_upper_bound']
 
 class ChemicalSummarySerializer(serializers.ModelSerializer):
-    chem_depiction_image = RelativePathImageField()
+    chem_depiction_image = RelativePathImageField(required=False)
     identifier = IdentifierSummarySerializer(read_only=True, source='identifiers')
     physical_property = PhysicalPropertySummarySerializer(read_only=True, source='physical_properties')
     
