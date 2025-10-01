@@ -88,6 +88,10 @@ def post_chemical(self, chemical: dict, user_id: int):
         }
     )
     
+    print(settings.API_BASE_URL+"/api/chemicals/admin/")
+    print(chemical)
+    print('Bearer {}'.format(settings.CELERY_AUTH_TOKEN))
+    
     r.raise_for_status()
     
     chemical_id = r.json().get("api_id")
