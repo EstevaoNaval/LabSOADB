@@ -159,7 +159,10 @@ const uppy = new Uppy({
   autoProceed: false, // Para só iniciar o upload quando o botão for clicado
 })
 
-const uploadEndpoint = `${config.public.pdf2ChemicalsPDFSubmitEndpoint}`
+const uploadEndpoint = `localhost:3000${config.public.pdf2ChemicalsPDFSubmitEndpoint}`
+
+console.log(config.public.pdf2ChemicalsPDFSubmitEndpoint)
+console.log(uploadEndpoint)
 
 const uppyHeaders = {
   Authorization: `Bearer ${authStore.token}`,
