@@ -79,10 +79,10 @@ export default defineNuxtConfig({
     public: {
       // CRÍTICO: Deixe vazio para client-side usar paths relativos
       apiHost: '',
-        
+
       // Para SSR (server-side dentro do container)
       apiHostServer: process.env.NUXT_PUBLIC_API_URL_HOST || 'http://django-api:8000',
-      
+
       docsAPIEndpoint: process.env.NUXT_PUBLIC_DOCS_API_ENDPOINT,
       loginAPIEndpoint: process.env.NUXT_PUBLIC_LOGIN_API_ENDPOINT,
       logoutAPIEndpoint: process.env.NUXT_PUBLIC_LOGOUT_API_ENDPOINT,
@@ -95,7 +95,7 @@ export default defineNuxtConfig({
       retrieveExportChemicalEndpoint: process.env.NUXT_PUBLIC_RETRIEVE_EXPORT_CHEMICAL_ENDPOINT,
       verifyEmailAPIEndpoint: process.env.NUXT_PUBLIC_VERIFY_EMAIL_API_ENDPOINT,
       resendEmailConfirmationAPIEndpoint: process.env.NUXT_PUBLIC_RESEND_EMAIL_CONFIRMATION_API_ENDPOINT,
-      pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PUBLIC_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT,
+      pdf2ChemicalsPDFSubmitEndpoint: process.env.NUXT_PUBLIC_PDF2CHEMICALS_PDF_SUBMIT_ENDPOINT || '/api/pdf2chemicals/submit/',
       userTasksEndpoint: process.env.NUXT_PUBLIC_USER_TASKS_ENDPOINT,
       userChemicalsEndpoint: process.env.NUXT_PUBLIC_USER_CHEMICALS_ENDPOINT,
       taskRevokeEndpoint: process.env.NUXT_PUBLIC_TASK_REVOKE_ENDPOINT,
