@@ -1,6 +1,6 @@
 <template>
     <form
-        :action="registerAPIUrl" 
+        :action="config.public.registerAPIEndpoint" 
         @submit.prevent="handlePasswordReset"
     >
         <div class="mb-6">

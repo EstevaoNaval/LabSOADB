@@ -12,6 +12,8 @@ export const useAuthStore = defineStore('auth', {
             const { $axios } = useNuxtApp()
             const config = useRuntimeConfig()
 
+            console.log(config.public.loginAPIEndpoint)
+
             await $axios.post(
                 config.public.loginAPIEndpoint,
                 {

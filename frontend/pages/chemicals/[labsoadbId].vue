@@ -926,7 +926,7 @@ var isTableOfContentsOpened = ref(false)
 const doiRedirectionSiteHost = "https://www.doi.org/"
 
 const getAllConformationsDownloadLink = () => {
-  return `${config.public.apiHost}${config.public.downloadChemicalConformationsEndpoint}${selectedChemicalStore.selectedChemical.api_id}/`
+  return `${config.public.downloadChemicalConformationsEndpoint}${selectedChemicalStore.selectedChemical.api_id}/`
 }
 
 const toggleTableOfContents = () => {

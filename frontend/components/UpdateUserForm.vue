@@ -1,6 +1,6 @@
 <template>
     <form
-        :action="registerAPIUrl" 
+        :action="config.public.registerAPIEndpoint" 
         @submit.prevent="handleUserRegistration"
     >
         <div class="mb-6 grid grid-cols-2 gap-4">
@@ -99,8 +99,6 @@
     
     const userStore = useUserStore()
     const authStore = useAuthStore()
-    
-    const registerAPIUrl = config.public.apiHost + config.public.registerAPIEndpoint
     
     let isPasswordVisible = ref(false)
     let passwordType = ref("password")
