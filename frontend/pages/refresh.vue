@@ -13,6 +13,7 @@
         const redirectPage = route.query.redirect
 
         console.log(redirectPage)
+        console.log(route.query)
 
         router.push({
             path: redirectPage

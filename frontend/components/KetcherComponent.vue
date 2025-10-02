@@ -107,9 +107,7 @@ const handleSearchByDrawnStructure = async () => {
 
       //closeModal()
 
-      router.push({
-        path: `/refresh?redirect=${encodeURIComponent('/chemicals/search')}`
-      })
+      router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
     }
 
     
