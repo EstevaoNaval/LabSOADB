@@ -58,10 +58,10 @@ const props = defineProps({
     },
 })
 
-const emit = defineEmits(['close']);
+const closeModal = inject('closeModal')
 
 const goToLogin = () => {
-  emit('close');
+  closeModal();
   navigateTo('/auth/login');
 };
 </script>

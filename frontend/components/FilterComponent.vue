@@ -60,15 +60,11 @@ const histogramRangeSliderDiv = ref(1)
 
 var histogramDataArr = ref([])
 
-const emit = defineEmits(['closeModal'])
+const closeModal = inject('closeModal')
 
 async function reloadHistogramRangeSliderDiv() {
     await loadChemPropsList()
     histogramRangeSliderDiv.value *= -1 
-}
-
-function closeModal() {
-    emit('closeModal')
 }
 
 const loadChemPropsList = async () => {
