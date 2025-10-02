@@ -108,7 +108,7 @@ const handleSearchByDrawnStructure = async () => {
       closeModal()
 
       router.push({
-        path: `${route.fullPath}/chemicals/search`
+        path: '/chemicals/search'
       })
     }
 
