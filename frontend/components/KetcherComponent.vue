@@ -43,12 +43,9 @@
 import { ref, onMounted } from 'vue';
 import { useFilterStore } from '~/stores/filterStore';
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
-import { useRouter, useRoute } from 'vue-router'
-
-const emit = defineEmits(['closeModal'])
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const route = useRoute()
 
 const inputSimilarityPercent = defineModel("similarityPercent")
 inputSimilarityPercent.value = 90
@@ -105,7 +102,7 @@ const handleSearchByDrawnStructure = async () => {
       fetchChemicalStore.setType('search')
       fetchChemicalStore.fetchChemicals()
 
-      //closeModal()
+      closeModal()
 
       router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
     }
@@ -117,8 +114,10 @@ const handleSearchByDrawnStructure = async () => {
 };
 
 function closeModal() {
-  emit('closeModal')
+  $emit('closeModal')
 }
+
+defineEmits(['closeModal'])
 </script>
 
 <style scoped>
