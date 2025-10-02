@@ -43,11 +43,12 @@
 import { ref, onMounted } from 'vue';
 import { useFilterStore } from '~/stores/filterStore';
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const emit = defineEmits(['closeModal'])
 
 const router = useRouter()
+const route = useRoute()
 
 const inputSimilarityPercent = defineModel("similarityPercent")
 inputSimilarityPercent.value = 90
@@ -107,7 +108,7 @@ const handleSearchByDrawnStructure = async () => {
       closeModal()
 
       router.push({
-        path: '/chemicals/search'
+        path: `${route.fullPath}/chemicals/search`
       })
     }
 
