@@ -45,6 +45,8 @@ import { useFilterStore } from '~/stores/filterStore';
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
 import { useRouter } from 'vue-router'
 
+const emit = defineEmits(['closeModal'])
+
 const router = useRouter()
 
 const inputSimilarityPercent = defineModel("similarityPercent")
@@ -82,6 +84,7 @@ const getSmiles = () => {
 const handleSearchByDrawnStructure = async () => {
   try {
     var smiles = await getSmiles()
+    
     const fetchChemicalStore = useFetchChemicalStore()
     const filterStore = useFilterStore()
 
@@ -114,10 +117,10 @@ const handleSearchByDrawnStructure = async () => {
 };
 
 function closeModal() {
-  $emit('closeModal')
+  emit('closeModal')
 }
 
-defineEmits(['closeModal'])
+
 </script>
 
 <style scoped>
