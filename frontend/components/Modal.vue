@@ -25,7 +25,6 @@ const toggleComponentModal = () => {
 }
 
 const closeModal = () => {
-    isOpen.value = false
     drawStructureModal.value.close()
 }
 
