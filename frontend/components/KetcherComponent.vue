@@ -45,9 +45,8 @@ import { useFilterStore } from '~/stores/filterStore';
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
 import { useRouter } from 'vue-router'
 
-const emit = defineEmits(['closeModal'])
-
 const router = useRouter()
+const closeModal = inject('closeModal')
 
 const inputSimilarityPercent = defineModel("similarityPercent")
 inputSimilarityPercent.value = 90
@@ -115,12 +114,6 @@ const handleSearchByDrawnStructure = async () => {
     console.error('Error sending data:', error);
   }
 };
-
-function closeModal() {
-  emit('closeModal')
-}
-
-
 </script>
 
 <style scoped>

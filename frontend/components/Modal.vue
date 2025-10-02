@@ -1,7 +1,7 @@
 <template>
     <dialog v-if="isOpen" ref="drawStructureModal" class="modal">
         <div class="modal-box p-4 rounded-3xl m-auto max-w-3xl">
-            <slot @closeModal="closeModal" v-if="isComponentModelOpened"></slot>
+            <slot v-if="isComponentModelOpened"></slot>
         </div>
         <form method="dialog" class="modal-backdrop">
             <button @click="toggleComponentModal()">close</button>
@@ -28,6 +28,8 @@ const closeModal = () => {
     isOpen.value = false
     drawStructureModal.value.close()
 }
+
+provide('closeModal', closeModal)
 
 defineExpose({
     toggleComponentModal
