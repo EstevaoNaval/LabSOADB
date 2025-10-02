@@ -31,7 +31,7 @@
         </div>
         <div class="modal-action">
           <form method="dialog" class="flex flex-col sm:flex-row gap-3 w-full max-w-sm mx-auto">
-            <button class="btn btn-ghost order-2 text-lg md:text-xl sm:order-1 flex-1 transition-all duration-200">
+            <button @click="closeModal" class="btn btn-ghost order-2 text-lg md:text-xl sm:order-1 flex-1 transition-all duration-200">
               Cancel
             </button>
             <NuxtLink 
