@@ -4,7 +4,7 @@
             <slot v-if="isComponentModelOpened"></slot>
         </div>
         <form method="dialog" class="modal-backdrop">
-            <button @click="toggleComponentModal()">close</button>
+            <button @click="closeModal()">close</button>
         </form>
     </dialog>
 </template>
@@ -17,14 +17,14 @@ var isComponentModelOpened = ref(false)
 var drawStructureModal = ref(null)
 
 const toggleComponentModal = () => {
-    isComponentModelOpened.value = !isComponentModelOpened.value
-
-    if (isComponentModelOpened.value) {
+    if (!isComponentModelOpened.value) {
+        isComponentModelOpened.value = true
         drawStructureModal.value.showModal()
     } 
 }
 
 const closeModal = () => {
+    isComponentModelOpened.value = false
     drawStructureModal.value.close()
 }
 
