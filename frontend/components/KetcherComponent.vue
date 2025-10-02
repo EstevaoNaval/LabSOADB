@@ -105,7 +105,7 @@ const handleSearchByDrawnStructure = async () => {
       fetchChemicalStore.setType('search')
       fetchChemicalStore.fetchChemicals()
 
-      closeModal()
+      //closeModal()
 
       router.push({
         path: `/refresh?redirect=${encodeURIComponent('/chemicals/search')}`

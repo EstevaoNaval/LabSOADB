@@ -2,7 +2,7 @@
 </template>
 
 <script setup>
-    import { onBeforeMount } from 'vue';
+    import { onMounted } from 'vue';
     import { useRouter, useRoute } from 'vue-router'
     
     
@@ -19,7 +19,7 @@
         })
     }
 
-    onBeforeMount(() => {
+    onMounted(() => {
         console.log("Cheguei aqui")
         refresh()
     })
