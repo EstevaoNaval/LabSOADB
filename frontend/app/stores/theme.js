@@ -11,17 +11,17 @@ export const useThemeStore = defineStore('theme', {
         const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         this.setDarkMode(userPrefersDark);
       }
-    },  
+    },
     setDarkMode(value) {
       this.darkMode = value;
       this.setTheme(value ? 'night' : 'winter');
     },
     toggleDarkMode() {
       this.darkMode = !this.darkMode;
-      
-      if(this.darkMode) {
+
+      if (this.darkMode) {
         this.setTheme('night')
-      }else{
+      } else {
         this.setTheme('winter')
       }
     },

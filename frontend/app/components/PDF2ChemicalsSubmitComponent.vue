@@ -78,13 +78,13 @@ import Uppy from '@uppy/core'
 import Dashboard from '@uppy/dashboard'
 import XHRUpload from '@uppy/xhr-upload'
 
+import '@uppy/core/css/style.min.css';
+import '@uppy/dashboard/css/style.min.css';
+
 import { useThemeStore } from '~/stores/theme';
 import { useAuthStore } from '~/stores/auth'
 
 import LoginRequiredPrompt from '~/components/LoginRequiredPrompt.vue';
-
-import '@uppy/core/dist/style.min.css';
-import '@uppy/dashboard/dist/style.min.css';
 
 const config = useRuntimeConfig()
 
