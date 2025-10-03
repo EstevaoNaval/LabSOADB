@@ -29,7 +29,7 @@
     "lodash": "^4.17.21",
     "lodashnpm": "^1.0.4",
     "ngl": "^2.4.0",
-    "nuxt": "3.17.4",
+    "nuxt": "^4.1.2",
     "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.3.0",
     "qs": "^6.14.0",

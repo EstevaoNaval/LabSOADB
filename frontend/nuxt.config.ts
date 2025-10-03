@@ -53,7 +53,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
   ],
 
-  srcDir: './',
+  srcDir: 'app/',
 
   plugins: [
     '~/plugins/axios.js',
