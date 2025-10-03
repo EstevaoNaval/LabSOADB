@@ -326,16 +326,7 @@
             <div class="navbar-end">
                 <div class="hidden md:flex">
                     <div class="flex flex-col">
-                        <div class="join">
-                            <input class="input input-bordered join-item text-lg w-72" type="text" placeholder="Search Chemical" required>
-                            <div class="indicator">
-                              <button type="submit" class="btn btn-primary join-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-6 m-auto">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                                </svg>
-                              </button>
-                            </div>
-                        </div>
+                        <header-quick-search-field></header-quick-search-field>
                         <div class="flex text-md font-semibold">
                             <div class="flex gap-2">
                                 <a class="link link-secondary lg:link-primary duration-200 lg:hover:text-secondary" @click="openKetcherModal()">Draw Structure</a>
@@ -364,18 +355,9 @@
                 @after-leave="$afterLeave"
                 >   
                     <div v-show="isSearchBarVisible" class="collapsible">
-                        <ul class="flex w-[90%] menu menu-horizontal mx-auto">
-                            <div class="m-auto flex flex-col w-full">
-                                <div class="join">
-                                    <input class="input input-bordered join-item text-md w-full" type="text" placeholder="Search Chemical" required>
-                                    <div class="indicator">
-                                        <button type="submit" class="btn btn-primary join-item">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-6 w-6 m-auto">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
+                        <ul class="flex menu menu-horizontal mx-auto">
+                            <div class="m-auto flex flex-col">
+                                <header-quick-search-field></header-quick-search-field>
                                 <div class="flex text-sm font-semibold gap-2">
                                     <NuxtLink to="/chemicals/advanced" class="link link-secondary">Advanced Search</NuxtLink>
                                 </div>
@@ -403,6 +385,7 @@ import { useUserStore } from '~/stores/user'
 import { useNuxtApp } from 'nuxt/app';
 import { useRouter } from 'nuxt/app';
 import Modal from '~/components/Modal.vue';
+import HeaderQuickSearchField from '~/components/HeaderQuickSearchField.vue'
 
 const KetcherComponent = defineAsyncComponent({
     loader: () => import('~/components/KetcherComponent.vue')
