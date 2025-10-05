@@ -174,7 +174,7 @@ class ChemicalSearchView(generics.ListAPIView):
         filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
-        print(request)
+        print(self.request)
         print(ordering)
         
         for order in ordering:
@@ -199,7 +199,7 @@ class ChemicalSearchSummaryView(generics.ListAPIView):
         filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
-        print(request)
+        print(self.request)
         print(ordering)
         
         for order in ordering:
@@ -253,6 +253,24 @@ class ChemicalSummaryReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     @method_decorator(cache_page(CACHE_TTL))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        filters = {}
+        ordering = self.request.query_params.get('ordering', '')
+        
+        print(self.request)
+        print(ordering)
+        
+        for order in ordering:
+            filters[f'{order}__isnull'] = False
+        
+        print(filters)
+        
+        queryset = queryset.filter(**filters) if filters else queryset
+        
+        return queryset
 
 class ChemicalAdminViewSet(viewsets.ModelViewSet):
     queryset = Chemical.objects.all()
