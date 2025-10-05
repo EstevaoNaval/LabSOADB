@@ -110,7 +110,7 @@ const handleSearchByDrawnStructure = async () => {
       console.log(fetchChemicalStore.$state)
       console.log(filterStore.$state)
 
-      router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
+      router.push('/chemicals/search')
     }
 
     

@@ -52,7 +52,7 @@
             fetchChemicalStore.setMode('summary')
             fetchChemicalStore.fetchChemicals()
             
-            router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
+            router.push('/chemicals/search')
         }
     }
 </script>

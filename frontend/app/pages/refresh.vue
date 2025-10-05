@@ -5,7 +5,6 @@
     import { onMounted } from 'vue';
     import { useRouter, useRoute } from 'vue-router'
     
-    
     function refresh() {
         const route = useRoute();
         const router = useRouter()
@@ -15,7 +14,7 @@
         console.log(redirectPage)
         console.log(route.query)
 
-        router.replace({
+        router.push({
             path: redirectPage
         })
     }

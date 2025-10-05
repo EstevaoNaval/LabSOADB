@@ -961,7 +961,7 @@ const similaritySearch = () => {
   fetchChemicalStore.setType('search')
   fetchChemicalStore.fetchChemicals()
 
-  router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
+  router.push('/chemicals/search')
 }
 
 const substructureSearch = () => {
@@ -978,7 +978,7 @@ const substructureSearch = () => {
   fetchChemicalStore.setType('search')
   fetchChemicalStore.fetchChemicals()
 
-  router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
+  router.push('/chemicals/search')
 }
 
 onMounted(() => {
