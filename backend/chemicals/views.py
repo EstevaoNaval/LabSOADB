@@ -174,11 +174,9 @@ class ChemicalSearchView(generics.ListAPIView):
         filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
-        print(self.request)
         print(ordering)
         
-        for order in ordering:
-            filters[f'{order}__isnull'] = False
+        filters[f'{ordering}__isnull'] = False
         
         print(filters)
         
@@ -199,11 +197,9 @@ class ChemicalSearchSummaryView(generics.ListAPIView):
         filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
-        print(self.request)
         print(ordering)
         
-        for order in ordering:
-            filters[f'{order}__isnull'] = False
+        filters[f'{ordering}__isnull'] = False
         
         print(filters)
         
@@ -260,11 +256,9 @@ class ChemicalSummaryReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
         filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
-        print(self.request)
         print(ordering)
         
-        for order in ordering:
-            filters[f'{order}__isnull'] = False
+        filters[f'{ordering}__isnull'] = False
         
         print(filters)
         
