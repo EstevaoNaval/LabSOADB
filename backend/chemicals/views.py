@@ -174,10 +174,15 @@ class ChemicalSearchView(generics.ListAPIView):
         filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
+        print(request)
+        print(ordering)
+        
         for order in ordering:
             filters[f'{order}__isnull'] = False
-            
-        queryset = queryset.filter(**filters)
+        
+        print(filters)
+        
+        queryset = queryset.filter(**filters) if filters else queryset
         
         return queryset
 
