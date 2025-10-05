@@ -15,13 +15,12 @@
         console.log(redirectPage)
         console.log(route.query)
 
-        router.push({
+        router.replace({
             path: redirectPage
         })
     }
 
     onMounted(() => {
-        console.log("Cheguei aqui")
         refresh()
     })
     

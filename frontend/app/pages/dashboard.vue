@@ -304,16 +304,16 @@
   }
 
   const handleSearchAllChemicals = () => {
-    filterStore.$reset();
     histogramRangeSliderStore.$reset()
+
+    filterStore.$reset()
+    fetchChemicalStore.$reset()
 
     fetchChemicalStore.setType('all')
     fetchChemicalStore.setMode('summary')
     fetchChemicalStore.fetchChemicals()
 
-    router.push({
-      path: '/chemicals/search'
-    })
+    router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
   }
 
   async function fetchUserTasks(page) {

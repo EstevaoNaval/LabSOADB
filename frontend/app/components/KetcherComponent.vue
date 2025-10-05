@@ -88,7 +88,8 @@ const handleSearchByDrawnStructure = async () => {
     const filterStore = useFilterStore()
 
     if (smiles !== '') {
-      filterStore.$reset();
+      filterStore.$reset()
+      fetchChemicalStore.$reset()
 
       if (searchSelected.value === 'similarity') {
         const similarity_threshold = inputSimilarityPercent.value * 0.01
@@ -105,6 +106,9 @@ const handleSearchByDrawnStructure = async () => {
       fetchChemicalStore.fetchChemicals()
 
       closeModal()
+
+      console.log(fetchChemicalStore.$state)
+      console.log(filterStore.$state)
 
       router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
     }

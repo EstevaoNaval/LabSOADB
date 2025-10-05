@@ -935,6 +935,7 @@ const toggleTableOfContents = () => {
 
 const fetchSelectedChemicalDetail = async () => {
   selectedChemicalStore.$reset()
+  console.log(route.params.labsoadbId)
   await selectedChemicalStore.fetchSelectedChemical(route.params.labsoadbId)
 }
 
@@ -946,7 +947,9 @@ const similaritySearch = () => {
   const similarity_threshold = .85
 
   confsPagination.setPage(1);
-  //filterStore.$reset();
+
+  filterStore.$reset()
+  fetchChemicalStore.$reset()
 
   filterStore.setExactFilter('similarity_threshold', similarity_threshold)
 
@@ -958,14 +961,14 @@ const similaritySearch = () => {
   fetchChemicalStore.setType('search')
   fetchChemicalStore.fetchChemicals()
 
-  router.push({
-    path: '/chemicals/search'
-  })
+  router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
 }
 
 const substructureSearch = () => {
   confsPagination.setPage(1);
-  //filterStore.$reset();
+  
+  filterStore.$reset()
+  fetchChemicalStore.$reset()
 
   filterStore.setExactFilter('query', selectedChemicalStore.selectedChemical.identifier.smiles)
   filterStore.setExactFilter('representation_type', 'smiles')
@@ -975,9 +978,7 @@ const substructureSearch = () => {
   fetchChemicalStore.setType('search')
   fetchChemicalStore.fetchChemicals()
 
-  router.push({
-    path: '/chemicals/search'
-  })
+  router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
 }
 
 onMounted(() => {
@@ -989,10 +990,6 @@ onMounted(() => {
     confsPagination.setPageSize(1);
     confsPagination.setPage(1);
   })
-})
-
-onUnmounted(() => {
-  selectedChemicalStore.$reset()
 })
 
 const sectionsRef = ref([

@@ -1,8 +1,8 @@
 <template>
-  <header>
-    <Title>Home | LabSOADB</Title>
-  </header>
   <main>
+    <header>
+      <Title>Home | LabSOADB</Title>
+    </header>
     <section class="search_bar_background bg-scroll bg-cover bg-center">
       <div class="bg-opacity-70 h-full flex flex-col justify-center bg-base-300 py-8 gap-4">
         <div class="gap-4 w-3/4 mx-auto hidden xl:flex xl:flex-col">
@@ -92,16 +92,16 @@
   const filterStore = useFilterStore()
 
   const handleSearchAllChemicals = () => {
-    filterStore.$reset();
     histogramRangeSliderStore.$reset()
+
+    filterStore.$reset()
+    fetchChemicalStore.$reset()
 
     fetchChemicalStore.setType('all')
     fetchChemicalStore.setMode('summary')
     fetchChemicalStore.fetchChemicals()
 
-    router.push({
-      path: '/chemicals/search'
-    })
+    router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
   }
 
   var ketcherModalRef =  ref(null)

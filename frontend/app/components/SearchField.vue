@@ -110,17 +110,17 @@
   const handleSearchByRepresentation = () => {
     if (querySearchByRepr.value !== '') {
       histogramRangeSliderStore.$reset()
-
+      
       filterStore.$reset()
+      fetchChemicalStore.$reset()
+
       filterStore.setExactFilter('query', querySearchByRepr.value)
 
       fetchChemicalStore.setType('search')
       fetchChemicalStore.setMode('summary')
       fetchChemicalStore.fetchChemicals()
 
-      router.push({
-        path: '/chemicals/search'
-      })
+      router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
     }
   }
 
@@ -129,15 +129,15 @@
       histogramRangeSliderStore.$reset()
 
       filterStore.$reset()
+      fetchChemicalStore.$reset()
+
       filterStore.setExactFilter('citation', querySearchByCitation.value)
 
       fetchChemicalStore.setType('search')
       fetchChemicalStore.setMode('summary')
       fetchChemicalStore.fetchChemicals()
 
-      router.push({
-        path: '/chemicals/search'
-      })
+      router.replace(`/refresh?redirect=${encodeURIComponent('/chemicals/search')}`)
     }
   }
   

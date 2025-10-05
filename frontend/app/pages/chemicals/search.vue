@@ -1,8 +1,8 @@
 <template>
-    <header>
-        <Title>Search | LabSOADB</Title>
-    </header>
     <main>
+        <header>
+            <Title>Search | LabSOADB</Title>
+        </header>
         <div class="h-full flex flex-col items-center justify-center">
             <div class="w-full flex flex-col gap-8" :key="searchResultsDiv">
                 <section class="search_bar_background bg-scroll bg-cover bg-center">
@@ -138,12 +138,13 @@
         <modal ref="filterModalRef">
             <filter-component></filter-component>
         </modal>
+        <footer></footer>
     </main>
-    <footer></footer>
+    
 </template>
 
 <script setup>
-import { provide, ref, defineAsyncComponent, onUnmounted, onBeforeMount, watch, onMounted} from 'vue';
+import { provide, ref, defineAsyncComponent, onUnmounted, onBeforeMount, watch } from 'vue';
 import { useThemeStore } from '~/stores/theme';
 import { useSortStore } from '~/stores/sortingStore'
 import { useRouter } from 'vue-router'
@@ -204,18 +205,13 @@ onBeforeMount(() => {
     fetchChemicals(1);
 })
 
-onUnmounted(() => {
-    fetchChemicalStore.$reset();
-    sortStore.$reset();
-    filterStore.$reset();
-})
-
 watch(() => fetchChemicalStore.totalChemicals, () => {
     pagination.setPage(1)
     pagination.setTotalItems(fetchChemicalStore.totalChemicals)
 })
 
 watch(() => pagination.state.page, () => {
+    console.log(pagination.state)
     fetchChemicals(pagination.state.page)
 });
 

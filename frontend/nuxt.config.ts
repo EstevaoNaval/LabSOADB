@@ -24,6 +24,11 @@ export default defineNuxtConfig({
           target: 'http://localhost:8000',
           changeOrigin: true,
           rewrite: (path) => path,
+        },
+        '/files': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+          rewrite: (path) => path,
         }
       }
     }
