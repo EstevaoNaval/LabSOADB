@@ -167,6 +167,19 @@ class ChemicalSearchView(generics.ListAPIView):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     ordering_fields = ORDERING_FIELDS_LIST
     filterset_class = ChemicalAdvancedSearchFilter
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        filters = {}
+        ordering = self.request.query_params.get('ordering', '')
+        
+        for order in ordering:
+            filters[f'{order}__isnull'] = False
+            
+        queryset = queryset.filter(**filters)
+        
+        return queryset
 
 class ChemicalSearchSummaryView(generics.ListAPIView):
     queryset = Chemical.objects.all()
@@ -174,6 +187,20 @@ class ChemicalSearchSummaryView(generics.ListAPIView):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     ordering_fields = ORDERING_FIELDS_LIST
     filterset_class = ChemicalAdvancedSearchFilter
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        filters = {}
+        ordering = self.request.query_params.get('ordering', '')
+        
+        for order in ordering:
+            filters[f'{order}__isnull'] = False
+            
+        queryset = queryset.filter(**filters)
+        
+        return queryset
+    
 
 class AutocompleteSearchView(generics.ListAPIView):
     queryset = Chemical.objects.all()
