@@ -168,19 +168,28 @@ class ChemicalSearchView(generics.ListAPIView):
     ordering_fields = ORDERING_FIELDS_LIST
     filterset_class = ChemicalAdvancedSearchFilter
     
+    def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
+        if ordering == '':
+            return queryset
+        
+        ordering = ordering[1:] if ordering.startswith('-') else ordering
+        
+        filters = {}
+        filters[f'{ordering}__isnull'] = False
+        
+        print(ordering)
+        print(filters)
+        
+        queryset = queryset.filter(**filters)
+        
+        return queryset
+    
     def get_queryset(self):
         queryset = super().get_queryset()
         
-        filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
-        print(ordering)
-        
-        filters[f'{ordering}__isnull'] = False
-        
-        print(filters)
-        
-        queryset = queryset.filter(**filters) if filters else queryset
+        queryset = self._exclude_null_entries_from_ordering(ordering, queryset)
         
         return queryset
 
@@ -191,19 +200,28 @@ class ChemicalSearchSummaryView(generics.ListAPIView):
     ordering_fields = ORDERING_FIELDS_LIST
     filterset_class = ChemicalAdvancedSearchFilter
     
+    def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
+        if ordering == '':
+            return queryset
+        
+        ordering = ordering[1:] if ordering.startswith('-') else ordering
+        
+        filters = {}
+        filters[f'{ordering}__isnull'] = False
+        
+        print(ordering)
+        print(filters)
+        
+        queryset = queryset.filter(**filters)
+        
+        return queryset
+    
     def get_queryset(self):
         queryset = super().get_queryset()
         
-        filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
-        print(ordering)
-        
-        filters[f'{ordering}__isnull'] = False
-        
-        print(filters)
-        
-        queryset = queryset.filter(**filters) if filters else queryset
+        queryset = self._exclude_null_entries_from_ordering(ordering, queryset)
         
         return queryset
     
@@ -250,19 +268,28 @@ class ChemicalSummaryReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
     
+    def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
+        if ordering == '':
+            return queryset
+        
+        ordering = ordering[1:] if ordering.startswith('-') else ordering
+        
+        filters = {}
+        filters[f'{ordering}__isnull'] = False
+        
+        print(ordering)
+        print(filters)
+        
+        queryset = queryset.filter(**filters)
+        
+        return queryset
+    
     def get_queryset(self):
         queryset = super().get_queryset()
         
-        filters = {}
         ordering = self.request.query_params.get('ordering', '')
         
-        print(ordering)
-        
-        filters[f'{ordering}__isnull'] = False
-        
-        print(filters)
-        
-        queryset = queryset.filter(**filters) if filters else queryset
+        queryset = self._exclude_null_entries_from_ordering(ordering, queryset)
         
         return queryset
 
