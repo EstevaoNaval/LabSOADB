@@ -43,6 +43,7 @@
 import { ref, onMounted } from 'vue';
 import { useFilterStore } from '~/stores/filterStore';
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
+import { useSortStore } from '~/stores/sortingStore';
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -86,11 +87,13 @@ const handleSearchByDrawnStructure = async () => {
     
     const fetchChemicalStore = useFetchChemicalStore()
     const filterStore = useFilterStore()
+    const sortStore = useSortStore()
 
     if (smiles !== '') {
       filterStore.$reset()
       fetchChemicalStore.$reset()
-
+      sortStore.$reset()
+      
       if (searchSelected.value === 'similarity') {
         const similarity_threshold = inputSimilarityPercent.value * 0.01
 

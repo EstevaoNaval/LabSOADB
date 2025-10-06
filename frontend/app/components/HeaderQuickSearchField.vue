@@ -26,17 +26,19 @@
     import { useFilterStore } from '~/stores/filterStore'
     import { useFetchChemicalStore } from '~/stores/fetchChemicalStore'
     import { useHistogramRangeSliderStore } from '~/stores/histogramRangeSliderStore';
+    import { useSortStore } from '~/stores/sortingStore';
 
     const filterStore = useFilterStore() 
     const fetchChemicalStore = useFetchChemicalStore()
     const histogramRangeSliderStore = useHistogramRangeSliderStore()
+    const sortStore = useSortStore()
 
     const router = useRouter()
   
     const querySearchByRepr = ref('')
 
     function clearInput() {
-        querySearchByRepr.value = '';
+      querySearchByRepr.value = '';
     }
 
     const handleSearchByRepresentation = () => {
@@ -45,6 +47,7 @@
             
             filterStore.$reset()
             fetchChemicalStore.$reset()
+            sortStore.$reset()
 
             filterStore.setExactFilter('query', querySearchByRepr.value)
             

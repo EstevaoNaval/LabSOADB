@@ -258,6 +258,7 @@
   import { usePagination } from '~/composables/usePagination'
   import { useFilterStore } from '~/stores/filterStore';
   import { useHistogramRangeSliderStore } from '~/stores/histogramRangeSliderStore';
+  import { useSortStore } from '~/stores/sortingStore';
 
   const KetcherComponent = defineAsyncComponent({
     loader: () => import('~/components/KetcherComponent.vue')
@@ -275,7 +276,8 @@
   const userTasksStore = useUserTasksStore()
   const fetchChemicalStore = useFetchChemicalStore()
   const filterStore = useFilterStore()
-  const histogramRangeSliderStore = useHistogramRangeSliderStore() 
+  const histogramRangeSliderStore = useHistogramRangeSliderStore()
+  const sortStore = useSortStore() 
 
   // composables
   const userTaskPagination = usePagination()
@@ -308,6 +310,7 @@
 
     filterStore.$reset()
     fetchChemicalStore.$reset()
+    sortStore.$reset()
 
     fetchChemicalStore.setType('all')
     fetchChemicalStore.setMode('summary')

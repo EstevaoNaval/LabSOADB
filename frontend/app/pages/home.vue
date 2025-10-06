@@ -74,6 +74,7 @@
   import { useFilterStore } from '~/stores/filterStore';
   import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
   import { useHistogramRangeSliderStore } from '~/stores/histogramRangeSliderStore';
+  import { useSortStore } from '~/stores/sortingStore';
   import Modal from '~/components/Modal.vue';
   import SearchField from '~/components/SearchField.vue';
 
@@ -90,12 +91,14 @@
   const fetchChemicalStore = useFetchChemicalStore()
   const histogramRangeSliderStore = useHistogramRangeSliderStore()
   const filterStore = useFilterStore()
+  const sortStore = useSortStore()
 
   const handleSearchAllChemicals = () => {
     histogramRangeSliderStore.$reset()
 
     filterStore.$reset()
     fetchChemicalStore.$reset()
+    sortStore.$reset()
 
     fetchChemicalStore.setType('all')
     fetchChemicalStore.setMode('summary')

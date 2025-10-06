@@ -92,10 +92,12 @@
   import { useFilterStore } from '~/stores/filterStore'
   import { useFetchChemicalStore } from '~/stores/fetchChemicalStore'
   import { useHistogramRangeSliderStore } from '~/stores/histogramRangeSliderStore';
+  import { useSortStore } from '~/stores/sortingStore';
   
   const filterStore = useFilterStore() 
   const fetchChemicalStore = useFetchChemicalStore()
   const histogramRangeSliderStore = useHistogramRangeSliderStore()
+  const sortStore = useSortStore()
 
   const router = useRouter()
   
@@ -113,6 +115,8 @@
       
       filterStore.$reset()
       fetchChemicalStore.$reset()
+      sortStore.$reset()
+
 
       filterStore.setExactFilter('query', querySearchByRepr.value)
 
@@ -130,6 +134,7 @@
 
       filterStore.$reset()
       fetchChemicalStore.$reset()
+      sortStore.$reset()
 
       filterStore.setExactFilter('citation', querySearchByCitation.value)
 

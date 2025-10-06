@@ -901,6 +901,7 @@ import { useRouter } from 'vue-router'
 import { useThemeStore } from '~/stores/theme'
 import { useFilterStore } from '~/stores/filterStore';
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore';
+import { useSortStore } from '~/stores/sortingStore';
 import { usePagination } from '~/composables/usePagination'
 
 import NglViewer from '~/components/NglViewer.vue';
@@ -917,6 +918,7 @@ const selectedChemicalStore = useSelectedChemicalStore()
 const themeStore = useThemeStore()
 const filterStore = useFilterStore()
 const fetchChemicalStore = useFetchChemicalStore()
+const sortStore = useSortStore()
 
 // composables
 const confsPagination = usePagination()
@@ -950,6 +952,7 @@ const similaritySearch = () => {
 
   filterStore.$reset()
   fetchChemicalStore.$reset()
+  sortStore.$reset()
 
   filterStore.setExactFilter('similarity_threshold', similarity_threshold)
 
@@ -969,6 +972,7 @@ const substructureSearch = () => {
   
   filterStore.$reset()
   fetchChemicalStore.$reset()
+  sortStore.$reset()
 
   filterStore.setExactFilter('query', selectedChemicalStore.selectedChemical.identifier.smiles)
   filterStore.setExactFilter('representation_type', 'smiles')
