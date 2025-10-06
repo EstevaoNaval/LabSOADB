@@ -33,7 +33,7 @@ export const useSortStore = defineStore('sort', {
             {
                 id: 5,
                 name: 'PAINS Alert Count',
-                value: 'count_pains_alert'
+                value: 'undesirable_substructure_alerts__count_pains_alert'
             },
             {
                 id: 6,

@@ -41,6 +41,8 @@ ORDERING_FIELDS_LIST = [
     'physical_properties__count_h_bond_acceptor',
     'physical_properties__count_h_bond_donor',
     'physical_properties__count_heavy_atom',
+    'druglike_rules__count_lipinski_violation',
+    'undesirable_substructure_alerts__count_pains_alert',
     'physical_properties__molecular_weight',
     'physicochemical_properties__tpsa',
     'physical_properties__count_rotatable_bond',
@@ -169,6 +171,8 @@ class ChemicalSearchView(generics.ListAPIView):
     filterset_class = ChemicalAdvancedSearchFilter
     
     def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
+        print(ordering)
+        
         if ordering == '':
             return queryset
         
@@ -201,6 +205,8 @@ class ChemicalSearchSummaryView(generics.ListAPIView):
     filterset_class = ChemicalAdvancedSearchFilter
     
     def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
+        print(ordering)
+        
         if ordering == '':
             return queryset
         
@@ -269,6 +275,8 @@ class ChemicalSummaryReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
         return super().retrieve(request, *args, **kwargs)
     
     def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
+        print(ordering)
+        
         if ordering == '':
             return queryset
         
