@@ -171,18 +171,13 @@ class ChemicalSearchView(generics.ListAPIView):
     filterset_class = ChemicalAdvancedSearchFilter
     
     def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
-        print(ordering)
+        ordering = ordering[1:] if ordering.startswith('-') else ordering
         
         if ordering == '':
             return queryset
         
-        ordering = ordering[1:] if ordering.startswith('-') else ordering
-        
         filters = {}
         filters[f'{ordering}__isnull'] = False
-        
-        print(ordering)
-        print(filters)
         
         queryset = queryset.filter(**filters)
         
@@ -205,18 +200,13 @@ class ChemicalSearchSummaryView(generics.ListAPIView):
     filterset_class = ChemicalAdvancedSearchFilter
     
     def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
-        print(ordering)
+        ordering = ordering[1:] if ordering.startswith('-') else ordering
         
         if ordering == '':
             return queryset
         
-        ordering = ordering[1:] if ordering.startswith('-') else ordering
-        
         filters = {}
         filters[f'{ordering}__isnull'] = False
-        
-        print(ordering)
-        print(filters)
         
         queryset = queryset.filter(**filters)
         
@@ -275,18 +265,13 @@ class ChemicalSummaryReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
         return super().retrieve(request, *args, **kwargs)
     
     def _exclude_null_entries_from_ordering(self, ordering: str, queryset):
-        print(ordering)
+        ordering = ordering[1:] if ordering.startswith('-') else ordering
         
         if ordering == '':
             return queryset
         
-        ordering = ordering[1:] if ordering.startswith('-') else ordering
-        
         filters = {}
         filters[f'{ordering}__isnull'] = False
-        
-        print(ordering)
-        print(filters)
         
         queryset = queryset.filter(**filters)
         
