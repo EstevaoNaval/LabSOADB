@@ -10,7 +10,16 @@
             >
                 {{ userStore.error.connection }}
             </p>
-        
+
+            <template v-if="userStore.error && userStore.error.non_field_errors" >
+                <p 
+                    :class="themeStore.isDarkMode ? 'p-2 text-lg mx-auto text-error font-semibold text-center' : 'p-2 text-lg mx-auto text-red-700 font-semibold text-center'" 
+                    v-for="[index, error] of userStore.error.non_field_errors.entries()" :key="index"
+                >
+                    {{ error }}
+                </p>
+            </template>
+            
             <div class="mb-6 grid grid-cols-2 gap-4">
                 <div class="flex flex-col">
                     <div class="text-md font-bold mb-2" for="first_name">
@@ -143,10 +152,10 @@
                         </svg>
                     </button>
                 </div>
-                <template v-if="userStore.error && userStore.error.password" >
+                <template v-if="userStore.error && userStore.error.password1" >
                     <p 
                         :class="themeStore.isDarkMode ? 'text-error font-semibold mt-1' : 'text-red-700 font-semibold mt-1'" 
-                        v-for="[index, passwordError] of userStore.error.password.entries()" :key="index"
+                        v-for="[index, passwordError] of userStore.error.password1.entries()" :key="index"
                     >
                         {{ passwordError }}
                     </p>
@@ -178,10 +187,10 @@
                         </svg>
                     </button>
                 </div>
-                <template v-if="userStore.error && userStore.error.password_confirmation" >
+                <template v-if="userStore.error && userStore.error.password2" >
                     <p 
                         :class="themeStore.isDarkMode ? 'text-error font-semibold mt-1' : 'text-red-700 font-semibold mt-1'" 
-                        v-for="[index, passwordConfirmationError] of userStore.error.password_confirmation.entries()" :key="index"
+                        v-for="[index, passwordConfirmationError] of userStore.error.password2.entries()" :key="index"
                     >
                         {{ passwordConfirmationError }}
                     </p>

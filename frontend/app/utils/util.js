@@ -50,10 +50,33 @@ export function decodeHtml(html) {
     return txt.value;
 }
 
+function extractPrimitiveValues(obj) {
+    const primitives = [];
+
+    function recurse(value) {
+        if (
+            value === null ||
+            ["string", "number", "boolean", "undefined", "symbol", "bigint"].includes(typeof value)
+        ) {
+            primitives.push(value);
+        } else if (Array.isArray(value)) {
+            for (const item of value) recurse(item);
+        } else if (typeof value === "object") {
+            for (const key in value) {
+                if (Object.hasOwn(value, key)) recurse(value[key]);
+            }
+        }
+    }
+
+    recurse(obj);
+    return primitives;
+}
+
 export default {
     roundValue,
     formatTimestamp,
     truncateString,
     replaceStringNumberBySubscript,
-    decodeHtml
+    decodeHtml,
+    extractPrimitiveValues
 }
