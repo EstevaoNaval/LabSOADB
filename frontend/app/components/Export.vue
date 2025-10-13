@@ -1,194 +1,282 @@
 <template>
   <main>
+    <!-- Desktop View -->
     <div class="hidden lg:flex">
-        <div class="dropdown dropdown-bottom dropdown-end m-auto">
-          <div 
-            tabindex="0" 
-            role="button" 
-            class="btn btn-ghost btn-primary text-xl font-semibold hover:text-primary"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
-            <h1 class="text-xl">Export</h1> 
-          </div>
-          <ul tabindex="0" class="dropdown-content text-lg font-semibold menu bg-base-200 rounded-box z-[1] p-2 shadow w-32 relative overflow-hidden">
-            <div
-              v-if="loading"
-              class="absolute inset-0 bg-base-200 bg-opacity-75 flex items-center justify-center rounded-box z-10"
-            >
-              <span class="loading loading-lg"></span>
-            </div>
-
-            <li
-              @click="authStore.isAuthenticated ? startExport(option.id) : showLoginRequiredModal()"
-              :class="{ 'cursor-not-allowed text-gray-400': !authStore.isAuthenticated, 'hover:text-primary': authStore.isAuthenticated }"
-              class="transition-all"
-              v-for="option in exportStore.exportFormats"
-              :key="option.id"
-              title="Login required"
-            >
-              <a class="flex items-center gap-1">
-                <svg v-if="!authStore.isAuthenticated" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-400">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
-                </svg>
-
-                {{ option.name }}
-              </a>
-            </li>
-
-          </ul>
-        </div>
-    </div>
-    <div class="hidden md:flex lg:hidden">
-      <div class="dropdown dropdown-bottom dropdown-end m-auto">
-        <div 
+      <div class="dropdown dropdown-bottom dropdown-end">
+        <div
+          ref="exportButtonDesktop" 
           tabindex="0" 
           role="button" 
-          class="btn btn-ghost btn-primary font-semibold hover:text-primary"
+          class="btn btn-outline btn-primary gap-2"
+          :aria-label="loading ? 'Exporting...' : 'Export data'"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
           </svg>
+          <span>Export</span>
+          <span v-if="loading" class="loading loading-spinner loading-xs"></span>
         </div>
-        <ul tabindex="0" class="dropdown-content text-lg font-semibold menu bg-base-200 rounded-box z-[1] p-2 shadow w-32 relative overflow-hidden">
-          <div
-            v-if="loading"
-            class="absolute inset-0 bg-base-200 bg-opacity-75 flex items-center justify-center rounded-box z-10"
-          >
-            <span class="loading loading-md"></span>
+
+        <ul 
+          tabindex="0" 
+          class="dropdown-content menu bg-base-100 rounded-box z-10 mt-2 p-2 shadow-xl border border-base-300 w-52"
+        >
+          <!-- Header -->
+          <div class="px-3 py-2 border-b border-base-300 mb-1">
+            <p class="font-semibold text-sm">Export Format</p>
           </div>
-          
-          <li 
-            @click="authStore.isAuthenticated ? startExport(option.id) : showLoginRequiredModal()" 
-            :class="{ 'cursor-not-allowed text-gray-400': !authStore.isAuthenticated, 'hover:text-primary': authStore.isAuthenticated }"
-            class="transition-all"
-            v-for="option in exportStore.exportFormats" 
-            :key="option.id"
-            title="Login required"
-          >
-            <a class="flex items-center gap-1">
-              <svg v-if="!authStore.isAuthenticated" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-slate-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+
+          <!-- Export Options -->
+          <li v-for="option in exportStore.exportFormats" :key="option.id">
+            <button
+              @click="handleExport(option.id, 'desktop')"
+              :disabled="!authStore.isAuthenticated || loading"
+              class="flex items-center justify-between group"
+              :class="{
+                'opacity-60': !authStore.isAuthenticated || loading
+              }"
+            >
+              <span class="font-medium">{{ option.name }}</span>
+
+              <div 
+                v-if="!authStore.isAuthenticated"
+                class="tooltip tooltip-left" 
+                data-tip="Login required"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke-width="1.5" 
+                  stroke="currentColor" 
+                  class="w-4 h-4 text-warning"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+              </div>
+
+              <svg 
+                v-else-if="loading && loadingFormat === option.id"
+                class="w-4 h-4 animate-spin text-primary"
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {{ option.name }}
-            </a>
+            </button>
           </li>
+
+          <!-- Footer Message -->
+          <div v-if="!authStore.isAuthenticated" class="px-3 py-2 mt-1 border-t border-base-300 bg-base-200 rounded-lg">
+            <div class="flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mt-0.5 text-info flex-shrink-0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+              </svg>
+              <div>
+                <p class="text-xs font-medium text-base-content/90">Login Required</p>
+                <p class="text-xs text-base-content/70 mt-0.5">
+                  Please 
+                  <NuxtLink to="/auth/login" class="link link-primary">login</NuxtLink>
+                  to export chemicals
+                </p>
+              </div>
+            </div>
+          </div>
         </ul>
       </div>
     </div>
-    <div class="flex md:hidden">
-      <div class="dropdown dropdown-bottom dropdown-end m-auto">
-        <div tabindex="0" role="button" class="btn btn-sm btn-ghost btn-primary font-semibold hover:text-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+
+    <!-- Mobile/Tablet View -->
+    <div class="flex lg:hidden">
+      <div class="dropdown dropdown-bottom dropdown-start">
+        <div
+          ref="exportButtonMobile" 
+          tabindex="0" 
+          role="button" 
+          class="btn btn-sm btn-outline btn-primary gap-2"
+          :aria-label="loading ? 'Exporting...' : 'Export data'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
           </svg>
+          <span class="hidden md:inline">Export</span>
+          <span v-if="loading" class="loading loading-spinner loading-xs"></span>
         </div>
-        <ul tabindex="0" class="dropdown-content font-semibold menu bg-base-200 rounded-box z-[1] p-2 shadow w-32 relative overflow-hidden">
-          <div
-            v-if="loading"
-            class="absolute inset-0 bg-base-200 bg-opacity-75 flex items-center justify-center rounded-box z-10"
-          >
-            <span class="loading loading-sm"></span>
+
+        <ul 
+          tabindex="0" 
+          class="dropdown-content menu bg-base-100 rounded-box z-10 mt-2 p-2 shadow-xl border border-base-300 w-52"
+        >
+          <!-- Header -->
+          <div class="px-3 py-2 border-b border-base-300 mb-1">
+            <p class="font-semibold text-sm">Export Format</p>
           </div>
-          
-          <li 
-            @click="authStore.isAuthenticated ? startExport(option.id) : showLoginRequiredModal()" 
-            :class="{ 'cursor-not-allowed text-gray-400': !authStore.isAuthenticated, 'hover:text-primary': authStore.isAuthenticated }"
-            class="transition-all"
-            v-for="option in exportStore.exportFormats" 
-            :key="option.id"
-            title="Login required"
-          >
-            <a class="flex items-center gap-1">
-              <svg v-if="!authStore.isAuthenticated" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-slate-400">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+
+          <!-- Export Options -->
+          <li v-for="option in exportStore.exportFormats" :key="option.id">
+            <button
+              @click="handleExport(option.id, 'mobile')"
+              :disabled="!authStore.isAuthenticated || loading"
+              class="flex items-center justify-between group"
+              :class="{
+                'opacity-60': !authStore.isAuthenticated || loading
+              }"
+            >
+              <span class="font-medium">{{ option.name }}</span>
+
+              <div 
+                v-if="!authStore.isAuthenticated"
+                class="tooltip tooltip-left" 
+                data-tip="Login required"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke-width="1.5" 
+                  stroke="currentColor" 
+                  class="w-4 h-4 text-warning"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+              </div>
+
+              <svg 
+                v-else-if="loading && loadingFormat === option.id"
+                class="w-4 h-4 animate-spin text-primary"
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {{ option.name }}
-            </a>
+            </button>
           </li>
+
+          <!-- Footer Message -->
+          <div v-if="!authStore.isAuthenticated" class="px-3 py-2 mt-1 border-t border-base-300 bg-base-200 rounded-lg">
+            <div class="flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mt-0.5 text-info flex-shrink-0">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+              </svg>
+              <div>
+                <p class="text-xs font-medium text-base-content/90">Login Required</p>
+                <p class="text-xs text-base-content/70 mt-0.5">
+                  Please 
+                  <NuxtLink to="/auth/login" class="link link-primary">login</NuxtLink>
+                  to export
+                </p>
+              </div>
+            </div>
+          </div>
         </ul>
       </div>
     </div>
-    <modal ref="exportLoginRequiredPromptRef">
-      <LoginRequiredPrompt loginRequiredTo="Export Chemicals"></LoginRequiredPrompt>
-    </modal>
-  </main> 
+
+    <!-- Login Required Modal (fallback) -->
+    <Modal ref="exportLoginRequiredPromptRef">
+      <LoginRequiredPrompt loginRequiredTo="Export Chemicals" />
+    </Modal>
+  </main>
 </template>
-  
+
 <script setup>
-  import StartExportSuccessToast from '~/components/StartExportSuccessToast.vue'
-  import StartExportErrorToast from '~/components/StartExportErrorToast.vue'
-  import Modal from '~/components/Modal.vue'
+import { ref, defineAsyncComponent } from 'vue'
+import { useExportStore } from '~/stores/exportStore'
+import { useAuthStore } from '~/stores/auth'
+import { useToast } from 'vue-toastification'
+import Modal from '~/components/Modal.vue'
 
-  import { useExportStore } from '~/stores/exportStore.js'
-  import { useAuthStore } from '~/stores/auth.js'
-  import { useToast } from 'vue-toastification';
+import StartExportSuccessToast from '~/components/StartExportSuccessToast.vue'
+import StartExportErrorToast from '~/components/StartExportErrorToast.vue'
 
-  const LoginRequiredPrompt = defineAsyncComponent({
-    loader: () => import('~/components/LoginRequiredPrompt.vue')
-  });
+const LoginRequiredPrompt = defineAsyncComponent({
+  loader: () => import('~/components/LoginRequiredPrompt.vue')
+})
 
-  // stores
-  const authStore = useAuthStore()
-  const exportStore = useExportStore()
+// Stores
+const authStore = useAuthStore()
+const exportStore = useExportStore()
+const toast = useToast()
+
+// Refs
+const loading = ref(false)
+const loadingFormat = ref(null)
+const exportLoginRequiredPromptRef = ref(null)
+const exportButtonDesktop = ref(null)
+const exportButtonMobile = ref(null)
+
+// Functions
+function toggleExportButtonDisableAttr(view) {
+  const button = view === 'desktop' ? exportButtonDesktop.value : exportButtonMobile.value
   
-  // refs
-  const loading = ref(false)
-  const exportLoginRequiredPromptRef = ref(null)
+  if (!button) return
+  
+  if (loading.value) {
+    button.setAttribute('disabled', true)
+  } else {
+    button.removeAttribute('disabled')
+  }
+}
 
-  async function startExport(export_format_id) {
-    if (loading.value) return;
-    loading.value = true;
+async function handleExport(exportFormatId, view) {
+  if (!authStore.isAuthenticated) {
+    showLoginRequiredModal()
+    return
+  }
 
-    try {
-      if (!authStore.isAuthenticated) return;
+  if (loading.value) return
 
-      exportStore.setCurrExportFormatId(export_format_id);
+  loading.value = true
+  loadingFormat.value = exportFormatId
+  toggleExportButtonDisableAttr(view)
 
-      const exportTaskId = await exportStore.startChemicalsExport();
+  try {
+    exportStore.setCurrExportFormatId(exportFormatId)
+    const exportTaskId = await exportStore.startChemicalsExport()
 
-      if (!exportTaskId) {
-        showErrorToast();
-        return;
-      }
-
-      showSuccessToast();
-    } finally {
-      loading.value = false;
+    if (!exportTaskId) {
+      showErrorToast()
+      return
     }
-  }
 
-  function showErrorToast() {
-    let toast = useToast();
-
-    toast.error(StartExportErrorToast, {
-      icon: false,
-      timeout: 8000,
-    });
-  }
-
-  function showSuccessToast() {
-    let toast = useToast();
-
-    toast.success(StartExportSuccessToast, {
-      icon: false,
-      timeout: 8000,
-    });
-  }
-
-  function showLoginRequiredModal() {
-    if(exportLoginRequiredPromptRef.value) {
-      exportLoginRequiredPromptRef.value.toggleComponentModal();
+    showSuccessToast()
+    
+    // Close dropdown after successful export
+    const button = view === 'desktop' ? exportButtonDesktop.value : exportButtonMobile.value
+    if (button) {
+      button.blur()
     }
+  } catch (error) {
+    console.error('Export error:', error)
+    showErrorToast()
+  } finally {
+    loading.value = false
+    loadingFormat.value = null
+    toggleExportButtonDisableAttr(view)
   }
+}
 
+function showErrorToast() {
+  toast.error(StartExportErrorToast, {
+    icon: false,
+    timeout: 8000
+  })
+}
+
+function showSuccessToast() {
+  toast.success(StartExportSuccessToast, {
+    icon: false,
+    timeout: 8000
+  })
+}
+
+function showLoginRequiredModal() {
+  if (exportLoginRequiredPromptRef.value) {
+    exportLoginRequiredPromptRef.value.toggleComponentModal()
+  }
+}
 </script>
-<style scoped>
-    details > summary {
-      list-style: none;
-    }
-    details > summary::-webkit-details-marker {
-      display: none;
-    }
-</style>

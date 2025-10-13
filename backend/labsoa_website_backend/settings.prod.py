@@ -191,6 +191,9 @@ REST_AUTH = {
     'TOKEN_MODEL': None,
     'USE_JWT': False,
     'REGISTER_SERIALIZER': 'authentication.serializer.CustomRegisterSerializer',
+    
+    'LOGOUT_ON_PASSWORD_CHANGE': True,
+    'OLD_PASSWORD_FIELD_ENABLED': True
 }
 
 REST_KNOX = {

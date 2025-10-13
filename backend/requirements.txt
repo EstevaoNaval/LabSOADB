@@ -17,7 +17,7 @@ redis[hiredis]==5.3.0
 django-rest-knox==5.0.2
 dj-rest-auth[with_social]==7.0.1
 email-validator==2.2.0
-bcrypt==4.3.0
+bcrypt==5.0.0
 pyfsig==1.1.1
 django-clamd==1.0.0
 django-import-export[all]==4.3.8

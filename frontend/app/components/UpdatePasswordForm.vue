@@ -1,180 +1,316 @@
 <template>
-    <form
-        :action="config.public.registerAPIEndpoint" 
-        @submit.prevent="handleUserRegistration"
-    >
-        <div class="mb-6">
-            <div class="text-md font-bold mb-2" for="password">
-                Current Password
-            </div>
+    <form @submit.prevent="handlePasswordUpdate" class="space-y-6">
+        <!-- Current Password -->
+        <div class="form-control">
+            <label for="current_password" class="label">
+                <span class="label-text font-medium">Current Password</span>
+            </label>
             <div class="relative">
                 <input 
-                    class="shadow appearance-none input outline outline-1 outline-slate-400 rounded-lg w-full py-2 px-3 leading-tight focus:outline-slate-400" 
-                    name="password" 
-                    id="password" 
-                    :type="passwordType" 
-                    placeholder="******************"
-                    :minlength="passwordMinLength"
-                    :maxlength="passwordMaxLength"
-                    v-model="password"
+                    id="current_password"
+                    v-model="currentPassword"
+                    :type="showCurrentPassword ? 'text' : 'password'"
+                    name="current_password"
+                    placeholder="Enter current password"
+                    class="input input-bordered w-full pr-12 focus:input-primary"
+                    :class="{ 'input-error': errors.currentPassword }"
                     required
                 >
-                <button type="button" class="absolute inset-y-0 right-0 flex items-center px-2 btn btn-ghost m-auto mr-2" @click="togglePasswordVisibility">
-                    <svg xmlns="http://www.w3.org/2000/svg" v-if="isPasswordVisible" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <button 
+                    type="button" 
+                    class="absolute inset-y-0 right-0 flex items-center pr-3 hover:text-primary transition-colors"
+                    @click="showCurrentPassword = !showCurrentPassword"
+                    tabindex="-1"
+                >
+                    <svg v-if="showCurrentPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" v-else fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
                     </svg>
                 </button>
             </div>
+            <label v-if="errors.currentPassword" class="label">
+                <span class="label-text-alt text-error">{{ errors.currentPassword }}</span>
+            </label>
         </div>
-        <div class="mb-6">
-            <div class="text-md font-bold mb-2" for="password">
-                Password
-            </div>
-            <div class="relative">
-                <input 
-                    class="shadow appearance-none input outline outline-1 outline-slate-400 rounded-lg w-full py-2 px-3 leading-tight focus:outline-slate-400" 
-                    name="password" 
-                    id="password" 
-                    :type="passwordType" 
-                    placeholder="******************"
-                    :minlength="passwordMinLength"
-                    :maxlength="passwordMaxLength"
-                    v-model="password"
-                    required
-                >
-                <button type="button" class="absolute inset-y-0 right-0 flex items-center px-2 btn btn-ghost m-auto mr-2" @click="togglePasswordVisibility">
-                    <svg xmlns="http://www.w3.org/2000/svg" v-if="isPasswordVisible" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                    </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" v-else fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
-                    </svg>
-                </button>
-            </div>
 
-        </div>
-        <div class="mb-10">
-            <div class="text-md font-bold mb-2" for="password_confirmation">
-                Confirm Password
-            </div>
+        <div class="divider my-2"></div>
+
+        <!-- New Password -->
+        <div class="form-control">
+            <label for="new_password" class="label">
+                <span class="label-text font-medium">New Password</span>
+                <span class="label-text-alt text-xs">Min. {{ passwordMinLength }} characters</span>
+            </label>
             <div class="relative">
                 <input 
-                    class="shadow appearance-none input outline outline-1 outline-slate-400 rounded-lg w-full py-2 px-3 leading-tight focus:outline-slate-400" 
-                    name="password_confirmation" 
-                    id="password_confirmation" 
-                    :type="passwordType" 
-                    placeholder="******************" 
+                    id="new_password"
+                    v-model="newPassword"
+                    :type="showNewPassword ? 'text' : 'password'"
+                    name="new_password"
+                    placeholder="Enter new password"
                     :minlength="passwordMinLength"
                     :maxlength="passwordMaxLength"
-                    v-model="password_confirmation"
+                    class="input input-bordered w-full pr-12 focus:input-primary"
+                    :class="{ 'input-error': errors.newPassword, 'input-success': passwordStrength === 'strong' && newPassword.length >= passwordMinLength }"
+                    @input="validatePasswordStrength"
                     required
                 >
-                <button type="button" class="absolute inset-y-0 right-0 flex items-center px-2 btn btn-ghost m-auto mr-2" @click="togglePasswordVisibility">
-                    <svg xmlns="http://www.w3.org/2000/svg" v-if="isPasswordVisible" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <button 
+                    type="button" 
+                    class="absolute inset-y-0 right-0 flex items-center pr-3 hover:text-primary transition-colors"
+                    @click="showNewPassword = !showNewPassword"
+                    tabindex="-1"
+                >
+                    <svg v-if="showNewPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
-                    <svg xmlns="http://www.w3.org/2000/svg" v-else fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
                     </svg>
                 </button>
             </div>
-
+            
+            <!-- Password Strength Indicator -->
+            <div v-if="newPassword.length > 0" class="mt-2">
+                <div class="grid grid-cols-3 gap-1 mb-1">
+                    <div class="h-1 flex-1 rounded-full transition-all bg-primary" v-if="passwordStrength === 'weak' || passwordStrength === 'medium' || passwordStrength === 'strong'"></div>
+                    <div class="h-1 flex-1 rounded-full transition-all bg-primary" v-if="passwordStrength === 'medium' || passwordStrength === 'strong'"></div>
+                    <div class="h-1 flex-1 rounded-full transition-all bg-primary" v-if="passwordStrength === 'strong'"></div>
+                </div>
+                <p class="text-xs" :class="{
+                    'text-error': passwordStrength === 'weak',
+                    'text-warning': passwordStrength === 'medium',
+                    'text-success': passwordStrength === 'strong'
+                }">
+                    Password strength: {{ passwordStrength }}
+                </p>
+            </div>
+            
+            <label v-if="errors.newPassword" class="label">
+                <span class="label-text-alt text-error">{{ errors.newPassword }}</span>
+            </label>
         </div>
-        <div class="items-center justify-between">
-            <button class="btn btn-primary font-bold text-xl py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline w-full" type="input">
-                Update
+
+        <!-- Confirm New Password -->
+        <div class="form-control">
+            <label for="confirm_password" class="label">
+                <span class="label-text font-medium">Confirm New Password</span>
+            </label>
+            <div class="relative">
+                <input 
+                    id="confirm_password"
+                    v-model="confirmPassword"
+                    :type="showConfirmPassword ? 'text' : 'password'"
+                    name="confirm_password"
+                    placeholder="Re-enter new password"
+                    :minlength="passwordMinLength"
+                    :maxlength="passwordMaxLength"
+                    class="input input-bordered w-full pr-12 focus:input-primary"
+                    :class="{ 
+                        'input-error': errors.confirmPassword,
+                        'input-success': confirmPassword.length > 0 && newPassword === confirmPassword && newPassword.length >= passwordMinLength
+                    }"
+                    @input="validatePasswordMatch"
+                    required
+                >
+                <button 
+                    type="button" 
+                    class="absolute inset-y-0 right-0 flex items-center pr-3 hover:text-primary transition-colors"
+                    @click="showConfirmPassword = !showConfirmPassword"
+                    tabindex="-1"
+                >
+                    <svg v-if="showConfirmPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                </button>
+            </div>
+            <label v-if="errors.confirmPassword" class="label">
+                <span class="label-text-alt text-error">{{ errors.confirmPassword }}</span>
+            </label>
+            <label v-else-if="confirmPassword.length > 0 && newPassword === confirmPassword && newPassword.length >= passwordMinLength" class="label">
+                <span class="label-text-alt text-success flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Passwords match
+                </span>
+            </label>
+        </div>
+
+        <!-- Error Alert -->
+        <div v-if="updateError" class="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ updateError }}</span>
+        </div>
+
+        <!-- Success Alert -->
+        <div v-if="updateSuccess" class="alert alert-success">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Password changed successfully!</span>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-control mt-6">
+            <button 
+                type="submit" 
+                class="btn btn-primary btn-lg w-full"
+                :disabled="isLoading || !isFormValid"
+                :class="{ 'loading': isLoading }"
+            >
+                <span v-if="!isLoading">Change Password</span>
+                <span v-else>Changing Password...</span>
             </button>
         </div>
     </form>
-    </template>
+</template>
+
+<script setup>
+import { useAuthStore } from '~/stores/auth'
+import { useUserStore } from '~/stores/user'
+
+const config = useRuntimeConfig()
+const userStore = useUserStore()
+const authStore = useAuthStore()
+
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+
+const showCurrentPassword = ref(false)
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
+
+const passwordMinLength = 12
+const passwordMaxLength = 100
+
+const passwordStrength = ref('')
+const errors = ref({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+})
+
+const updateError = ref('')
+const updateSuccess = ref(false)
+const isLoading = ref(false)
+
+const isFormValid = computed(() => {
+    return currentPassword.value.length >= passwordMinLength &&
+    newPassword.value.length >= passwordMinLength &&
+    confirmPassword.value.length >= passwordMinLength &&
+    newPassword.value === confirmPassword.value &&
+    passwordStrength.value !== 'weak'
+})
+
+function validatePasswordStrength() {
+    errors.value.newPassword = ''
+    const pwd = newPassword.value
     
-    <script setup>
-    import { useAuthStore } from '~/stores/auth';
-    import { useUserStore } from '~/stores/user';
-    import { useRouter } from 'vue-router';
-    
-    const config = useRuntimeConfig()
-    
-    const router = useRouter()
-    
-    const userStore = useUserStore()
-    const authStore = useAuthStore()
-    
-    let isPasswordVisible = ref(false)
-    let passwordType = ref("password")
-    let passwordMinLength = 12
-    let passwordMaxLength = 100
-    
-    let username = ref(null)
-    const maxUsernameLength = 50
-    const usernamePattern = "[A-Za-z0-9_\\-]+"
-    
-    async function handleUserRegistration() {
-        let userData = {
-            'first_name': first_name.value,
-            'last_name': last_name.value,
-            'username': username.value,
-            'email': email.value,
-            'password': password.value,
-            'password_confirmation': password_confirmation.value
-        }
-    
-        await userStore.registerUser(userData)
-    
-        if(userStore.error) {
-            return;
-        }
-    
-        await authStore.login(userData.email, userData.password)
-    
-        if(authStore.error) {
-            return;
-        }
-    
-        await userStore.fetchUserProfile()
-    
-        router.push({
-            'path': '/home'
-        })
+    if (pwd.length < passwordMinLength) {
+        passwordStrength.value = 'weak'
+        return
     }
+
+    let score = 0
     
-    function togglePasswordVisibility() {
-        isPasswordVisible.value = !isPasswordVisible.value
-        passwordType.value = isPasswordVisible.value ? "text" : "password"
+    // Check for different character types
+    if (/[a-z]/.test(pwd)) score++
+    if (/[A-Z]/.test(pwd)) score++
+    if (/[0-9]/.test(pwd)) score++
+    if (/[^a-zA-Z0-9]/.test(pwd)) score++
+    
+    // Check length
+    if (pwd.length >= 16) score++
+    
+    if (score <= 2) {
+        passwordStrength.value = 'weak'
+    } else if (score === 3) {
+        passwordStrength.value = 'medium'
+    } else {
+        passwordStrength.value = 'strong'
     }
-    
-    function clearCustomMessage(e) {
-        e.target.setCustomValidity("");
+
+    // Validate match if confirm password is filled
+    if (confirmPassword.value) {
+        validatePasswordMatch()
     }
+}
+
+function validatePasswordMatch() {
+    errors.value.confirmPassword = ''
     
-    function setCustomMessage(e) {
-        let usernameErrorMessage = ""
-    
-        let usernameNotAllowedPattern = /[^A-Za-z0-9_\-]/g
-    
-        let usernameNotAllowedPatternMatches = [...username.value.matchAll(usernameNotAllowedPattern)].map((x) => x[0])
-    
-        if (usernameNotAllowedPatternMatches.length > 0) {
-            usernameErrorMessage = usernameNotAllowedPatternMatches.length == 1 ? 
-            `The character ${usernameNotAllowedPatternMatches.join(' ')} is not allowed` :
-            `The characters ${usernameNotAllowedPatternMatches.join(' ')} are not allowed.`
-    
-            usernameErrorMessage += "\nOnly letters (A-Z, a-z), numbers (0-9), hyphens (-), and underscores (_) are allowed."
-    
-            e.target.setCustomValidity(usernameErrorMessage)
+    if (confirmPassword.value && newPassword.value !== confirmPassword.value) {
+        errors.value.confirmPassword = 'Passwords do not match'
+    }
+}
+
+async function handlePasswordUpdate() {
+    // Reset states
+    updateError.value = ''
+    updateSuccess.value = false
+    errors.value = {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    }
+
+    // Validate
+    if (newPassword.value !== confirmPassword.value) {
+        errors.value.confirmPassword = 'Passwords do not match'
+        return
+    }
+
+    if (newPassword.value.length < passwordMinLength) {
+        errors.value.newPassword = `Password must be at least ${passwordMinLength} characters`
+        return
+    }
+
+    if (passwordStrength.value === 'weak') {
+        errors.value.newPassword = 'Password is too weak. Use a mix of letters, numbers, and symbols.'
+        return
+    }
+
+    isLoading.value = true
+
+    try {
+        const passwordData = {
+            current_password: currentPassword.value,
+            password: newPassword.value,
+            password_confirmation: confirmPassword.value
+        }
+
+        await userStore.updatePassword(passwordData)
+
+        if (userStore.error) {
+            updateError.value = userStore.error
         } else {
-            e.target.setCustomValidity("");
+            updateSuccess.value = true
+            // Clear form
+            currentPassword.value = ''
+            newPassword.value = ''
+            confirmPassword.value = ''
+            passwordStrength.value = ''
+            
+            setTimeout(() => {
+                updateSuccess.value = false
+            }, 3000)
         }
-        
+    } catch (error) {
+        updateError.value = 'An unexpected error occurred'
+    } finally {
+        isLoading.value = false
     }
-    </script>
-    
-    <style>
-    
-    </style>
+}
+</script>

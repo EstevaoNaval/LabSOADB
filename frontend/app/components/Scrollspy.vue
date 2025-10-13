@@ -1,80 +1,85 @@
+<!-- components/Scrollspy.vue - if you need to create/update it -->
 <template>
-  <div :class="props.scrollspyContainer">
-    <slot></slot>
-    <ul :class="props.scrollspyList">
-      <li
-        v-for="section in props.sections"
-        :key="section.id"
-        :class="[activeSection?.value === section.id ? props.sectionActive : '', props.scrollspyItem, 'cursor-pointer']"
-        @click="scrollToSection(section.id)"
+  <ul :class="scrollspyList">
+    <li 
+      v-for="section in sections" 
+      :key="section.id"
+      :class="[
+        scrollspyItem,
+        { 'border-l-4 border-primary font-bold bg-base-200': activeSection === section.id }
+      ]"
+    >
+      <a 
+        :href="`#${section.id}`"
+        @click.prevent="scrollToSection(section.id)"
+        class="block px-3 py-2"
       >
         {{ section.label }}
-      </li>
-    </ul>
-  </div>
+      </a>
+    </li>
+  </ul>
 </template>
 
 <script setup>
-  import { ref, onMounted, onBeforeUnmount } from 'vue';
-  import debounce from 'lodash/debounce';
+import { ref, onMounted, onUnmounted } from 'vue'
 
-  const props = defineProps({
-    sections: {
-      type: Array,
-      required: true,
-    },
-    scrollspyContainer: {
-      type: String,
-      default: ''
-    },
-    scrollspyList: {
-      type: String,
-      default: ''
-    },
-    scrollspyItem: {
-      type: String,
-      default: ''
-    },
-    sectionActive: {
-      type: String,
-      default: 'text-secondary font-bold border-secondary rounded-sm border-l-4'
-    }
-  });
+const props = defineProps({
+  sections: {
+    type: Array,
+    required: true
+  },
+  scrollspyList: {
+    type: String,
+    default: ''
+  },
+  scrollspyItem: {
+    type: String,
+    default: ''
+  }
+})
 
-  const activeSection = ref(null);
+const emit = defineEmits(['click'])
 
-  const scrollToSection = (id) => {
-    const section = document.getElementById(id);
-    if (section) {
-      window.scrollTo({
-        top: section.offsetTop,
-        behavior: 'smooth',
-      });
-    }
-  };
+const activeSection = ref('')
 
-  const onScroll = debounce(() => {
-    const scrollPosition = window.scrollY + window.innerHeight / 2;
-    const sectionsElements = props.sections.map((section) => document.getElementById(section.id));
+const scrollToSection = (id) => {
+  const element = document.getElementById(id)
+  if (element) {
+    const offset = 80 // Offset for sticky header
+    const elementPosition = element.getBoundingClientRect().top
+    const offsetPosition = elementPosition + window.pageYOffset - offset
 
-    for (const section of sectionsElements) {
-      if (
-        section.offsetTop <= scrollPosition &&
-        section.offsetTop + section.offsetHeight > scrollPosition
-      ) {
-        activeSection.value = section.id;
-        break;
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    })
+  }
+  emit('click')
+}
+
+const handleScroll = () => {
+  const scrollPosition = window.scrollY + 100
+
+  for (const section of props.sections) {
+    const element = document.getElementById(section.id)
+    if (element) {
+      const offsetTop = element.offsetTop
+      const offsetBottom = offsetTop + element.offsetHeight
+
+      if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+        activeSection.value = section.id
+        break
       }
     }
-  }, 100);
+  }
+}
 
-  onMounted(() => {
-    window.addEventListener('scroll', onScroll);
-    
-    onScroll();
-  });
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+  handleScroll() // Initial check
+})
 
-  onBeforeUnmount(() => {
-    window.removeEventListener('scroll', onScroll);
-  });
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>

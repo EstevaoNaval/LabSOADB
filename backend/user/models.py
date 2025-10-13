@@ -12,7 +12,7 @@ class User(AbstractUser):
         validators = [
             RegexValidator(
                 regex=r'^[A-Za-z0-9_-]+$',
-                message="Username must contain only letters, digits, hyphens (-), or underscores (_)."
+                message="Username must contain only letters, digits, hyphens (-) or underscores (_)."
             )
         ]
     )

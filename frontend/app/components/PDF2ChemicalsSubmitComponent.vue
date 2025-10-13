@@ -8,12 +8,12 @@
         <span class="loading loading-lg"></span>
       </div>
       
-      <h2 class="text-center text-2xl font-bold mb-6">PDF2Chemicals: Submission Form</h2>
+      <h2 class="text-center text-2xl font-bold mb-6">PDF2Chemicals</h2>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6">
-        <div class="mx-auto">
-          <p class="text-lg">Export Format</p>
-          <div class="grid grid-cols-1 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6 gap-4">
+        <div class="mx-auto card bg-base-100 p-4 shadow">
+          <p class="text-lg mb-2">Export Format</p>
+          <div class="grid grid-cols-1">
             <label class="label cursor-pointer flex gap-2">
               <input type="radio" name="pdf2chemicals-export-format-radio" value="zip" v-model="exportFormatRadio" class="radio radio-primary" checked="checked" />
               <span class="label-text mr-auto ">ZIP</span>
@@ -25,9 +25,10 @@
           </div>
         </div>
         
-        <div class="mx-auto">
-          <p class="text-lg">Conformations Format</p>
-          <div class="grid grid-cols-2 mb-4">
+        <div class="mx-auto card bg-base-100 p-4 shadow">
+          <p class="text-lg mb-2">Conformations Format</p>
+          <div v-if="exportFormatRadio === 'json'" class="text-sm text-gray-500 mb-2">Fixed to MOL2 for JSON export.</div>
+          <div class="grid grid-cols-2">
             <label v-for="confsFormat in chemicalsConfsFormats" :key="confsFormat.id" class="label cursor-pointer flex gap-2">
               <input 
                 :id="confsFormat.id"
@@ -35,15 +36,16 @@
                 :value="confsFormat.value" 
                 v-model="chemicalsConfsFormatCheckbox"
                 class="checkbox checkbox-primary"
-                required 
+                :disabled="exportFormatRadio === 'json'"
               />
               <span class="label-text mr-auto ">{{ confsFormat.label }}</span>
             </label>
           </div>
         </div>
 
-        <div class="mx-auto">
-          <p class="text-lg">2D Structure Format</p>
+        <div class="mx-auto card bg-base-100 p-4 shadow">
+          <p class="text-lg mb-2">2D Structure Format</p>
+          <div v-if="exportFormatRadio === 'json'" class="text-sm text-gray-500 mb-2">Fixed to SVG for JSON export.</div>
           <div class="grid grid-cols-2">
             <label v-for="chemical2DStructureFormat in chemicals2DStructureFormats" :key="chemical2DStructureFormat.id" class="label cursor-pointer flex gap-2">
               <input 
@@ -52,7 +54,7 @@
                 :value="chemical2DStructureFormat.value" 
                 v-model="chemicals2DStructureFormatCheckbox" 
                 class="checkbox checkbox-primary" 
-                required
+                :disabled="exportFormatRadio === 'json'"
               />
               <span class="label-text mr-auto ">{{ chemical2DStructureFormat.label }}</span>
             </label>
@@ -63,9 +65,13 @@
       <!-- Contêiner do Dashboard do Uppy -->
       <div ref="dashboardContainer" class="bg-base-300 rounded-lg p-4 mb-4"></div>
       
-      <div class="grid grid-cols-2 my-auto">
+      <div class="grid grid-cols-2 my-auto items-center">
         <h2 class="text-left text-slate-500 text-sm md:text-md font-bold my-auto">* Limit of 10 PDF files per upload.</h2>
         <button @click="uploadFiles" class="btn btn-primary text-lg ml-auto">Upload</button>
+      </div>
+
+      <div v-if="uploadMessage" class="mt-4 alert" :class="{ 'alert-success': uploadSuccess, 'alert-error': !uploadSuccess }">
+        {{ uploadMessage }}
       </div>
     </div>
 
@@ -94,6 +100,8 @@ const authStore = useAuthStore()
 const dashboardContainer = ref(null)
 
 const loading = ref(false)
+const uploadMessage = ref('')
+const uploadSuccess = ref(false)
 
 const showLoginPrompt = ref(false);
 const showMainModal = ref(false);
@@ -131,16 +139,15 @@ const chemicals2DStructureFormats = [
     value: 'png'
   },
   {
-    id: 'chemicals2DStructureFormat-3',
+    id: 'chemicals2DStructureFormat-2',
     label: 'JPG',
     value: 'jpg'
   },
   {
-    id: 'chemicals2DStructureFormat-2',
+    id: 'chemicals2DStructureFormat-3',
     label: 'SVG',
     value: 'svg'
   },
-  
 ]
 
 // Configuração do Uppy e estado dos arquivos
@@ -156,13 +163,10 @@ const uppy = new Uppy({
     maxNumberOfFiles: 10,
     allowedFileTypes: ['application/pdf'],
   },
-  autoProceed: false, // Para só iniciar o upload quando o botão for clicado
+  autoProceed: false,
 })
 
 const uploadEndpoint = `${config.public.pdf2ChemicalsPDFSubmitEndpoint}`
-
-console.log(config.public.pdf2ChemicalsPDFSubmitEndpoint)
-console.log(uploadEndpoint)
 
 const uppyHeaders = {
   Authorization: `Bearer ${authStore.token}`,
@@ -178,10 +182,9 @@ const checkAuth = () => {
 
 const initializeUppy = () => {
   if(authStore.isAuthenticated) {
-    // Inicializa o Dashboard dentro do contêiner
     uppy.use(Dashboard, {
       target: dashboardContainer.value,
-      inline: true, // Exibe o Dashboard diretamente na página
+      inline: true,
       showProgressDetails: true,
       note: 'Drag PDF files or click to select',
       width: '100%',
@@ -197,12 +200,24 @@ const initializeUppy = () => {
       endpoint: uploadEndpoint,
       fieldName: 'pdf_files'
     })
+
+    // Add event listeners for better UX feedback
+    uppy.on('upload-success', () => {
+      uploadSuccess.value = true
+      uploadMessage.value = 'Upload successful!'
+    })
+
+    uppy.on('upload-error', () => {
+      uploadSuccess.value = false
+      uploadMessage.value = 'Upload failed. Please try again.'
+    })
   }
 }
 
 const uploadFiles = async () => {
   if (loading.value) return;
   loading.value = true;
+  uploadMessage.value = ''
 
   try {
     setUppyUploadMeta()
@@ -225,32 +240,16 @@ const setUppyUploadMeta = () => {
     uppyUploadMeta['structure_format'] = chemicals2DStructureFormatCheckbox.value
   }
 
-  console.log(uppyUploadMeta)
-
   uppy.setMeta(uppyUploadMeta);
 }
 
-const setJsonConfsDefaultFormat = () => {
-  chemicalsConfsFormatCheckbox.value = ['mol2']
-}
-
-const setJson2DStructureDefaultFormat = () => {
-  chemicals2DStructureFormatCheckbox.value = ['svg']
-}
-
-const toggleConfsFormatCheckboxDisabled = () => {
-  for (let i = 0; i < chemicalsConfsFormats.length; i++) {
-    let confsFormatHTMLEntity = document.querySelector(`#${chemicalsConfsFormats[i].id}`)
-    confsFormatHTMLEntity.disabled = !confsFormatHTMLEntity.disabled
+watch(exportFormatRadio, (newVal) => {
+  if (newVal === 'json') {
+    chemicalsConfsFormatCheckbox.value = ['mol2']
+    chemicals2DStructureFormatCheckbox.value = ['svg']
   }
-}
-
-const toggle2DStructureFormatCheckboxDisabled = () => {
-  for (let i = 0; i < chemicals2DStructureFormats.length; i++) {
-    let chemical2DStructureFormatHTMLEntity = document.querySelector(`#${chemicals2DStructureFormats[i].id}`)
-    chemical2DStructureFormatHTMLEntity.disabled = !chemical2DStructureFormatHTMLEntity.disabled
-  }
-}
+  // No need for toggles; :disabled handles it
+})
 
 onBeforeMount(() => {
   checkAuth()
@@ -262,16 +261,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (uppy) uppy.destroy();
-})
-
-watch(() => exportFormatRadio.value, () => {
-  if(exportFormatRadio.value == 'json') {
-    setJsonConfsDefaultFormat()
-    setJson2DStructureDefaultFormat()
-  }
-
-  toggleConfsFormatCheckboxDisabled()
-  toggle2DStructureFormatCheckboxDisabled()
 })
 </script>
 

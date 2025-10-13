@@ -10,10 +10,15 @@
                     <p class="text-lg hidden md:flex">Clear All</p>
                 </button>
             </div>
+            
             <div class="divider"></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <template v-for="data in histogramDataArr" :key="data.id">
-                    <div class="mx-auto" v-if="data.data.length > 1">
+            
+            <div v-if="loading" class="text-center">
+                <span class="loading loading-spinner loading-lg"></span>
+            </div>
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="mx-auto" v-for="data in histogramDataArr" :key="data.id">
+                    <template v-if="data.data.length > 1" >
                         <div class="flex">
                             <p class="mr-auto text-lg font-semibold text-center md:text-left my-auto">{{ data.label }}</p>
                             <button type="button" class="btn btn-ghost btn-sm text-lg ml-auto my-auto" v-if="histogramRangeSliderStore.properties[data.propName].filterActivated" @click="clearFilter(data.propName, data.rangeFilter)">
@@ -31,8 +36,8 @@
                             :propName="data.propName"
                             @reloadHistogramRangeSlider="reloadHistogramRangeSliderDiv"
                         />
-                    </div>
-                </template>
+                    </template>
+                </div>
             </div>
         </div>
 
@@ -57,6 +62,7 @@ const filterStore = useFilterStore()
 const histogramRangeSliderStore = useHistogramRangeSliderStore()
 
 const histogramRangeSliderDiv = ref(1)
+var loading = ref(false)
 
 var histogramDataArr = ref([])
 
@@ -68,6 +74,8 @@ async function reloadHistogramRangeSliderDiv() {
 }
 
 const loadChemPropsList = async () => {
+    loading.value = true
+
     await chemicalPropertiesListStore.fetchAllChemicalProperties()
 
     histogramDataArr.value = [
@@ -249,6 +257,8 @@ const loadChemPropsList = async () => {
             propName: 'pains_alert'
         },
     ]
+
+    loading.value = false
 }
 
 const clearAllFilter = () => {

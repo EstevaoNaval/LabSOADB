@@ -23,7 +23,7 @@ urlpatterns = [
     ),
     path('register/', include('dj_rest_auth.registration.urls')),
     
-    # Gerenciamento de usuários pelo dj-rest-auth
+    # Gerenciamento de senhas pelo dj-rest-auth
     path('password/change/', PasswordChangeView.as_view(), name='password_change'),
     path('password/reset/', PasswordResetView.as_view(), name='password_reset'),
     path(
@@ -36,5 +36,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='knox_logout'),
     path('logoutall/', LogoutAllView.as_view(), name='knox_logoutall'),
     
+    # Gerenciamento de usuários pelo dj-rest-auth
     path('user/', UserDetailsView.as_view(), name='user_details')
 ]

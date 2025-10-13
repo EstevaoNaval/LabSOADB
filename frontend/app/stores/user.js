@@ -14,17 +14,19 @@ export const useUserStore = defineStore('user', {
 
             const authStore = useAuthStore();
 
-            if (authStore.token) {
-                await $axios.get(
-                    config.public.userProfileAPIEndpoint,
-                    {
-                        headers: { Authorization: `Bearer ${authStore.token}` }
-                    }
-                ).then((response) => {
-                    this.clearUserProfile()
-                    this.user = response.data
-                })
+            if (!authStore.token) {
+                return;
             }
+
+            await $axios.get(
+                config.public.userProfileAPIEndpoint,
+                {
+                    headers: { Authorization: `Bearer ${authStore.token}` }
+                }
+            ).then((response) => {
+                this.clearUserProfile()
+                this.user = response.data
+            })
         },
 
         async resendEmail(email) {
@@ -81,22 +83,47 @@ export const useUserStore = defineStore('user', {
             })
         },
 
+        async updateUser(userData) {
+            const { $axios } = useNuxtApp()
+            const config = useRuntimeConfig()
+
+            const authStore = useAuthStore();
+
+            if (!authStore.token) {
+                return;
+            }
+
+            await $axios.patch(
+                config.public.userProfileAPIEndpoint,
+                userData,
+                {
+                    headers: { Authorization: `Bearer ${authStore.token}` }
+                }
+
+            ).then((response) => {
+                this.clearUserProfile()
+                this.user = response.data
+            })
+        },
+
         async deleteUser() {
             const { $axios } = useNuxtApp()
             const config = useRuntimeConfig()
 
             const authStore = useAuthStore();
 
-            if (authStore.token) {
-                await $axios.delete(
-                    config.public.userAPIEndpoint,
-                    {
-                        headers: { Authorization: `Bearer ${authStore.token}` }
-                    }
-                ).then((response) => {
-                    this.clearUserProfile()
-                })
+            if (!authStore.token) {
+                return;
             }
+
+            await $axios.delete(
+                config.public.userProfileAPIEndpoint,
+                {
+                    headers: { Authorization: `Bearer ${authStore.token}` }
+                }
+            ).then((response) => {
+                this.clearUserProfile()
+            })
         },
 
         clearUserProfile() {
