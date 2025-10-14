@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { defineNuxtConfig } from 'nuxt/config'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   ssr: true,
@@ -31,7 +32,10 @@ export default defineNuxtConfig({
           rewrite: (path) => path,
         }
       }
-    }
+    },
+    plugins: [
+      tailwindcss()
+    ]
   },
 
   nitro: {
@@ -52,7 +56,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
-    '@nuxtjs/tailwindcss',
+    //'@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@nuxt/image',
@@ -77,7 +81,8 @@ export default defineNuxtConfig({
   },
 
   css: [
-    '~/assets/css/collapse-animation.css'
+    '~/assets/css/collapse-animation.css',
+    '~/assets/css/tailwind.css'
   ],
 
   runtimeConfig: {
@@ -91,6 +96,7 @@ export default defineNuxtConfig({
       docsAPIEndpoint: process.env.NUXT_PUBLIC_DOCS_API_ENDPOINT,
       loginAPIEndpoint: process.env.NUXT_PUBLIC_LOGIN_API_ENDPOINT,
       logoutAPIEndpoint: process.env.NUXT_PUBLIC_LOGOUT_API_ENDPOINT,
+      passwordChangeAPIEndpoint: process.env.NUXT_PUBLIC_PASSWORD_CHANGE_API_ENDPOINT,
       resetPasswordAPIEndpoint: process.env.NUXT_PUBLIC_RESET_PASSWORD_API_ENDPOINT,
       confirmResetPasswordAPIEndpoint: process.env.NUXT_PUBLIC_CONFIRM_RESET_PASSWORD_API_ENDPOINT,
       userProfileAPIEndpoint: process.env.NUXT_PUBLIC_USER_PROFILE_API_ENDPOINT,

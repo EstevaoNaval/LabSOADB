@@ -1,18 +1,22 @@
 <template>
   <div class='h-[48rem] flex flex-col justify-center bg-base-100'>
-    
-    <iframe class="ketcher-iframe rounded-xl" ref='ketcherIFrame' v-if='isInView' :src='ketcherSrc' allowfullscreen></iframe>
-    
+
+    <iframe class="ketcher-iframe rounded-xl" ref='ketcherIFrame' v-if='isInView' :src='ketcherSrc'
+      allowfullscreen></iframe>
+
     <div class="grid grid-cols-2 mt-4 max-w-auto">
       <div class="flex flex-col my-auto font-semibold">
         <div v-if="searchSelected === searchOptions[1].value" class="flex my-auto max-w-auto">
           <div class="flex flex-col">
             <label for="rangeid" class="my-auto text-sm font-semibold">Tanimoto Similarity</label>
-            <input v-model="inputSimilarityPercent" min="0" max="100" id="rangeid" type="range" class="range range-primary w-64" />
+            <input v-model="inputSimilarityPercent" min="0" max="100" id="rangeid" type="range"
+              class="range range-primary w-64" />
           </div>
           <div class="divider divider-horizontal"></div>
           <div class="m-auto text-primary flex font-semibold text-3xl gap-1">
-            <input v-model="inputSimilarityPercent" type="number" min="0" max="100" class="max-w-14 text-center rounded-box" /><p>%</p>
+            <input v-model="inputSimilarityPercent" type="number" min="0" max="100"
+              class="max-w-14 text-center rounded-box" />
+            <p>%</p>
           </div>
         </div>
         <label class="cursor-pointer m-auto label gap-2" v-if="searchSelected !== searchOptions[1].value">
@@ -20,16 +24,19 @@
           <span class="label-text text-lg text-primary">Match Tautomers</span>
         </label>
       </div>
-    
+
       <div :class="searchSelected !== searchOptions[1].value ? 'join flex m-auto' : 'join flex my-auto ml-auto'">
-        <select v-model="searchSelected" class="join-item select select-bordered font-semibold text-lg" required>
+        <select v-model="searchSelected" class="join-item select  font-semibold text-lg" required>
           <option class="font-semibold" value="" disabled selected>Search Type</option>
-          <option class="font-semibold" v-for="option in searchOptions" :key="option.id" :value="option.value">{{ option.text }}</option>
+          <option class="font-semibold" v-for="option in searchOptions" :key="option.id" :value="option.value">{{
+            option.text }}</option>
         </select>
         <div class="indicator">
           <button class="btn btn-primary join-item" @click="handleSearchByDrawnStructure">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-6 m-auto">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+              stroke="currentColor" class="size-6 m-auto">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
             </svg>
           </button>
         </div>
@@ -73,18 +80,18 @@ onMounted(() => {
 
 const getSmiles = () => {
   return ketcherContentWindow.ketcher
-  .getSmiles()
-  .then((smiles) => smiles)
-  .catch((err) => {
-    console.error(err);
-    return '';
-  })
+    .getSmiles()
+    .then((smiles) => smiles)
+    .catch((err) => {
+      console.error(err);
+      return '';
+    })
 }
 
 const handleSearchByDrawnStructure = async () => {
   try {
     var smiles = await getSmiles()
-    
+
     const fetchChemicalStore = useFetchChemicalStore()
     const filterStore = useFilterStore()
     const sortStore = useSortStore()
@@ -93,7 +100,7 @@ const handleSearchByDrawnStructure = async () => {
       filterStore.$reset()
       fetchChemicalStore.$reset()
       sortStore.$reset()
-      
+
       if (searchSelected.value === 'similarity') {
         const similarity_threshold = inputSimilarityPercent.value * 0.01
 
@@ -116,7 +123,7 @@ const handleSearchByDrawnStructure = async () => {
       router.push('/chemicals/search')
     }
 
-    
+
   } catch (error) {
     console.error('Error sending data:', error);
   }

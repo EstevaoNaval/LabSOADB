@@ -1,43 +1,40 @@
 <template>
   <main>
     <div v-if="showMainModal" class="container mx-auto p-6 relative overflow-hidden">
-      <div
-        v-if="loading"
-        class="absolute inset-0 bg-base-200 bg-opacity-85 flex items-center justify-center rounded-box z-10"
-      >
+      <div v-if="loading"
+        class="absolute inset-0 bg-base-200 bg-opacity-85 flex items-center justify-center rounded-box z-10">
         <span class="loading loading-lg"></span>
       </div>
-      
+
       <h2 class="text-center text-2xl font-bold mb-6">PDF2Chemicals</h2>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-6 gap-4">
         <div class="mx-auto card bg-base-100 p-4 shadow">
           <p class="text-lg mb-2">Export Format</p>
-          <div class="grid grid-cols-1">
+          <div class="grid grid-cols-1 gap-2">
             <label class="label cursor-pointer flex gap-2">
-              <input type="radio" name="pdf2chemicals-export-format-radio" value="zip" v-model="exportFormatRadio" class="radio radio-primary" checked="checked" />
+              <input type="radio" name="pdf2chemicals-export-format-radio" value="zip" v-model="exportFormatRadio"
+                class="radio radio-primary" checked="checked" />
               <span class="label-text mr-auto ">ZIP</span>
             </label>
             <label class="label cursor-pointer flex gap-2">
-              <input type="radio" name="pdf2chemicals-export-format-radio" value="json" v-model="exportFormatRadio" class="radio radio-primary" />
+              <input type="radio" name="pdf2chemicals-export-format-radio" value="json" v-model="exportFormatRadio"
+                class="radio radio-primary" />
               <span class="label-text mr-auto ">JSON</span>
             </label>
           </div>
         </div>
-        
+
         <div class="mx-auto card bg-base-100 p-4 shadow">
           <p class="text-lg mb-2">Conformations Format</p>
-          <div v-if="exportFormatRadio === 'json'" class="text-sm text-gray-500 mb-2">Fixed to MOL2 for JSON export.</div>
+          <div v-if="exportFormatRadio === 'json'" class="text-sm text-gray-500 mb-2">Fixed to MOL2 for JSON export.
+          </div>
           <div class="grid grid-cols-2">
-            <label v-for="confsFormat in chemicalsConfsFormats" :key="confsFormat.id" class="label cursor-pointer flex gap-2">
-              <input 
-                :id="confsFormat.id"
-                type="checkbox"
-                :value="confsFormat.value" 
-                v-model="chemicalsConfsFormatCheckbox"
-                class="checkbox checkbox-primary"
-                :disabled="exportFormatRadio === 'json'"
-              />
+            <label v-for="confsFormat in chemicalsConfsFormats" :key="confsFormat.id"
+              class="label cursor-pointer flex gap-2">
+              <input :id="confsFormat.id" type="checkbox" :value="confsFormat.value"
+                v-model="chemicalsConfsFormatCheckbox" class="checkbox checkbox-primary"
+                :disabled="exportFormatRadio === 'json'" />
               <span class="label-text mr-auto ">{{ confsFormat.label }}</span>
             </label>
           </div>
@@ -45,37 +42,37 @@
 
         <div class="mx-auto card bg-base-100 p-4 shadow">
           <p class="text-lg mb-2">2D Structure Format</p>
-          <div v-if="exportFormatRadio === 'json'" class="text-sm text-gray-500 mb-2">Fixed to SVG for JSON export.</div>
+          <div v-if="exportFormatRadio === 'json'" class="text-sm text-gray-500 mb-2">Fixed to SVG for JSON export.
+          </div>
           <div class="grid grid-cols-2">
-            <label v-for="chemical2DStructureFormat in chemicals2DStructureFormats" :key="chemical2DStructureFormat.id" class="label cursor-pointer flex gap-2">
-              <input 
-                type="checkbox" 
-                :id="chemical2DStructureFormat.id"
-                :value="chemical2DStructureFormat.value" 
-                v-model="chemicals2DStructureFormatCheckbox" 
-                class="checkbox checkbox-primary" 
-                :disabled="exportFormatRadio === 'json'"
-              />
+            <label v-for="chemical2DStructureFormat in chemicals2DStructureFormats" :key="chemical2DStructureFormat.id"
+              class="label cursor-pointer flex gap-2">
+              <input type="checkbox" :id="chemical2DStructureFormat.id" :value="chemical2DStructureFormat.value"
+                v-model="chemicals2DStructureFormatCheckbox" class="checkbox checkbox-primary"
+                :disabled="exportFormatRadio === 'json'" />
               <span class="label-text mr-auto ">{{ chemical2DStructureFormat.label }}</span>
             </label>
           </div>
         </div>
       </div>
-      
+
       <!-- Contêiner do Dashboard do Uppy -->
       <div ref="dashboardContainer" class="bg-base-300 rounded-lg p-4 mb-4"></div>
-      
+
       <div class="grid grid-cols-2 my-auto items-center">
-        <h2 class="text-left text-slate-500 text-sm md:text-md font-bold my-auto">* Limit of 10 PDF files per upload.</h2>
+        <h2 class="text-left text-slate-500 text-sm md:text-md font-bold my-auto">* Limit of 10 PDF files per upload.
+        </h2>
         <button @click="uploadFiles" class="btn btn-primary text-lg ml-auto">Upload</button>
       </div>
 
-      <div v-if="uploadMessage" class="mt-4 alert" :class="{ 'alert-success': uploadSuccess, 'alert-error': !uploadSuccess }">
+      <div v-if="uploadMessage" class="mt-4 alert"
+        :class="{ 'alert-success': uploadSuccess, 'alert-error': !uploadSuccess }">
         {{ uploadMessage }}
       </div>
     </div>
 
-    <LoginRequiredPrompt loginRequiredTo="PDF2Chemicals" v-if="showLoginPrompt" @close="showLoginPrompt = false"></LoginRequiredPrompt>
+    <LoginRequiredPrompt loginRequiredTo="PDF2Chemicals" v-if="showLoginPrompt" @close="showLoginPrompt = false">
+    </LoginRequiredPrompt>
   </main>
 </template>
 
@@ -181,7 +178,7 @@ const checkAuth = () => {
 };
 
 const initializeUppy = () => {
-  if(authStore.isAuthenticated) {
+  if (authStore.isAuthenticated) {
     uppy.use(Dashboard, {
       target: dashboardContainer.value,
       inline: true,
@@ -225,18 +222,18 @@ const uploadFiles = async () => {
   } finally {
     loading.value = false
   }
-} 
+}
 
 const setUppyUploadMeta = () => {
   let uppyUploadMeta = {}
 
   uppyUploadMeta['export_format'] = exportFormatRadio.value
 
-  if(chemicalsConfsFormatCheckbox.value.length > 0) {
+  if (chemicalsConfsFormatCheckbox.value.length > 0) {
     uppyUploadMeta['conf_format'] = chemicalsConfsFormatCheckbox.value
   }
 
-  if(chemicals2DStructureFormatCheckbox.value.length > 0) {
+  if (chemicals2DStructureFormatCheckbox.value.length > 0) {
     uppyUploadMeta['structure_format'] = chemicals2DStructureFormatCheckbox.value
   }
 

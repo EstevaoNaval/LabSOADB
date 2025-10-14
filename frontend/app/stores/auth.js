@@ -12,8 +12,6 @@ export const useAuthStore = defineStore('auth', {
             const { $axios } = useNuxtApp()
             const config = useRuntimeConfig()
 
-            console.log(config.public.loginAPIEndpoint)
-
             await $axios.post(
                 config.public.loginAPIEndpoint,
                 {
@@ -35,53 +33,6 @@ export const useAuthStore = defineStore('auth', {
                     }
                 }
             );
-        },
-
-        async resetPassword(email) {
-            const { $axios } = useNuxtApp()
-            const config = useRuntimeConfig()
-
-            await $axios.post(
-                config.public.resetPasswordAPIEndpoint,
-                {
-                    email: email
-                }
-            ).then((response) => {
-                this.token = null;
-                this.isAuthenticated = false;
-                this.error = [];
-            }).catch((err) => {
-                if (err.response) {
-                    this.error = Object.values(err.response.data).flat(1)
-                } else if (err.request) {
-                    this.error = ['Connection failed']
-                }
-            });
-        },
-
-        async confirmResetPassword(uid, token, new_passoword1, new_passoword2) {
-            const { $axios } = useNuxtApp()
-            const config = useRuntimeConfig()
-
-            await $axios.post(
-                config.public.confirmResetPasswordAPIEndpoint,
-                {
-                    uid: uid,
-                    token: token,
-                    new_passoword1: new_passoword1,
-                    new_passoword2: new_passoword2
-                }
-            ).then((response) => {
-                this.token = null;
-                this.isAuthenticated = false;
-                this.error = [];
-            }).catch((err) => {
-                if (err.response) {
-                    this.error = Object.values(err.response.data).flat(1)
-                } else if (err.request) {
-                    this.error = ['Connection failed']
-                }
-            });
         },
 
         async logout() {

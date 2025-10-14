@@ -27,7 +27,7 @@ export const useThemeStore = defineStore('theme', {
     },
     setTheme(theme) {
       this.theme = theme;
-      if (process.client) {
+      if (import.meta.client) {
         document.documentElement.setAttribute('data-theme', theme);
       }
     },
