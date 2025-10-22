@@ -20,7 +20,7 @@ const toggleComponentModal = () => {
     if (!isComponentModelOpened.value) {
         isComponentModelOpened.value = true
         drawStructureModal.value.showModal()
-    } 
+    }
 }
 
 const closeModal = () => {
