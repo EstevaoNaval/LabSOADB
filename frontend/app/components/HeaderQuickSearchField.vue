@@ -1,6 +1,6 @@
 <template>
   <main>
-    <div class="join">
+    <div class="join w-full">
       <div class="w-full relative">
         <input class="input  join-item pr-12 text-md md:text-lg w-full" type="text" placeholder="Search Chemical"
           v-model="querySearchByRepr" @keydown.enter="handleSearchByRepresentation" required>

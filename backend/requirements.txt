@@ -22,3 +22,4 @@ pyfsig==1.1.1
 django-clamd==1.0.0
 django-import-export[all]==4.3.8
 django-import-export-extensions==1.8.0
+gunicorn==23.0.0

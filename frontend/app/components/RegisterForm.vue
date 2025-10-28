@@ -130,16 +130,26 @@
                 </div>
 
                 <!-- Password Strength Indicator -->
-                <div v-if="password && password.length > 0" class="mt-2">
-                    <div class="flex gap-1 mb-1">
+                <div v-if="password.length > 0" class="mt-2">
+                    <div class="grid grid-cols-3 gap-1 mb-1">
                         <div class="h-1 flex-1 rounded-full transition-all"
-                            :class="passwordStrength === 'weak' || passwordStrength === 'medium' || passwordStrength === 'strong' ? 'bg-error' : 'bg-base-300'">
-                        </div>
+                            v-if="passwordStrength === 'weak' || passwordStrength === 'medium' || passwordStrength === 'strong'"
+                            :class="{
+                                'bg-error': passwordStrength === 'weak',
+                                'bg-warning': passwordStrength === 'medium',
+                                'bg-success': passwordStrength === 'strong'
+                            }"></div>
                         <div class="h-1 flex-1 rounded-full transition-all"
-                            :class="passwordStrength === 'medium' || passwordStrength === 'strong' ? 'bg-warning' : 'bg-base-300'">
-                        </div>
-                        <div class="h-1 flex-1 rounded-full transition-all"
-                            :class="passwordStrength === 'strong' ? 'bg-success' : 'bg-base-300'"></div>
+                            v-if="passwordStrength === 'medium' || passwordStrength === 'strong'" :class="{
+                                'bg-error': passwordStrength === 'weak',
+                                'bg-warning': passwordStrength === 'medium',
+                                'bg-success': passwordStrength === 'strong'
+                            }"></div>
+                        <div class="h-1 flex-1 rounded-full transition-all" v-if="passwordStrength === 'strong'" :class="{
+                            'bg-error': passwordStrength === 'weak',
+                            'bg-warning': passwordStrength === 'medium',
+                            'bg-success': passwordStrength === 'strong'
+                        }"></div>
                     </div>
                     <p class="text-xs" :class="{
                         'text-error': passwordStrength === 'weak',
@@ -153,7 +163,7 @@
                 <label v-if="userStore.error?.password1" class="label px-0">
                     <span class="label-text-alt text-error">
                         {{ Array.isArray(userStore.error.password1) ? userStore.error.password1[0] :
-                        userStore.error.password1 }}
+                            userStore.error.password1 }}
                     </span>
                 </label>
             </div>
@@ -207,7 +217,7 @@
                 <label v-else-if="userStore.error?.password2" class="label px-0">
                     <span class="label-text-alt text-error">
                         {{ Array.isArray(userStore.error.password2) ? userStore.error.password2[0] :
-                        userStore.error.password2 }}
+                            userStore.error.password2 }}
                     </span>
                 </label>
             </div>
