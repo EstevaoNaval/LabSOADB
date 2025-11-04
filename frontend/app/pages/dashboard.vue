@@ -97,7 +97,7 @@
                 <span class="font-semibold text-sm md:text-base lg:text-lg text-center">Draw Structure</span>
               </button>
 
-              <NuxtLink to="/chemicals/advanced"
+              <NuxtLink to="/chemicals/search/advanced"
                 class="group btn btn-ghost bg-base-100/50 hover:bg-base-100 border border-base-300 hover:border-primary/50 flex flex-col items-center justify-center gap-3 p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 aria-label="Advanced Search">
                 <div

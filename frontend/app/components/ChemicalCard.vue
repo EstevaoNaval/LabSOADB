@@ -32,9 +32,10 @@
           :value="`${props.chemical.physical_property.molecular_weight.toFixed(1)} g/mol`"
         >
           <template #icon>
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 485 485" xmlns="http://www.w3.org/2000/svg">
+            <!--<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 485 485" xmlns="http://www.w3.org/2000/svg">
               <path d="M411.097,110H257.5V87.42c17.459-6.192,30-22.865,30-42.42c0-24.813-20.187-45-45-45s-45,20.187-45,45c0,19.555,12.541,36.228,30,42.42V110H73.903L0,272.057v3.259c0,46.068,37.479,83.548,83.548,83.548s83.548-37.479,83.548-83.548v-3.259L106.875,140H227.5v255h-72.241l-30,90h234.481l-30-90H257.5V140h120.625l-60.222,132.057v3.259c0,46.068,37.479,83.548,83.548,83.548S485,321.384,485,275.315v-3.259L411.097,110z M242.5,30c8.271,0,15,6.729,15,15s-6.729,15-15,15s-15-6.729-15-15S234.229,30,242.5,30z M83.548,328.863c-24.321,0-44.894-16.301-51.397-38.548h102.794C128.442,312.562,107.869,328.863,83.548,328.863z M128.77,260.315H38.327l45.222-99.164L128.77,260.315z M318.118,455H166.882l10-30h131.235L318.118,455z M401.452,161.151l45.222,99.164H356.23L401.452,161.151z M401.452,328.863c-24.321,0-44.894-16.301-51.397-38.548h102.794C446.346,312.562,425.772,328.863,401.452,328.863z"/>
-            </svg>
+            </svg>-->
+            <ScaleIcon class="w-4 h-4" fill="currentColor"></ScaleIcon>
           </template>
         </PropertyItem>
 
@@ -84,8 +85,11 @@
 </template>
 
 <script setup>
-import PropertyItem from "~/components/PropertyItem.vue"
+import {
+  ScaleIcon
+} from '@heroicons/vue/24/outline'
 
+import PropertyItem from "~/components/PropertyItem.vue"
 import utils from "~/utils/util"
 
 const props = defineProps({

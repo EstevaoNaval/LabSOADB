@@ -7,7 +7,14 @@ export const useFilterStore = defineStore('filterStore', {
                 query: '',
                 citation: '',
                 doi: '',
-                title: ''
+                title: '',
+                gastrointestinal_absorption: null,
+                blood_brain_barrier_permeation: null,
+                cyp1a2_inhibitor: null,
+                cyp2c9_inhibitor: null,
+                cyp2c19_inhibitor: null,
+                cyp2d6_inhibitor: null,
+                cyp3a4_inhibitor: null,
             },
             range: {
                 jplogp: {
@@ -66,12 +73,12 @@ export const useFilterStore = defineStore('filterStore', {
 
             // Exact filters
             Object.entries(this.filters.exact).forEach(([key, value]) => {
-                if (value) {
-                    params[key] = value;  // e.g., { doi: '10.1000/xyz123' }
+                if (value !== null && value !== '' && value !== false) {
+                    params[key] = value;
                 }
             });
 
-            // Range filters
+            // Range filters (mantém sua lógica existente)
             Object.entries(this.filters.range).forEach(([key, range]) => {
                 if (range.gte !== null) {
                     params[`${key}__gte`] = range.gte;
@@ -80,7 +87,6 @@ export const useFilterStore = defineStore('filterStore', {
                     params[`${key}__lte`] = range.lte;
                 }
 
-                // Special case for dates
                 if (key === 'publication_date') {
                     if (range.after !== null) {
                         params['publication_date_after'] = range.after;

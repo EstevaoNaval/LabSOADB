@@ -492,7 +492,7 @@
                   Draw Structure
                 </button>
                 <NuxtLink 
-                  to="/chemicals/advanced"
+                  to="/chemicals/search/advanced"
                   class="link link-primary hover:link-hover transition-colors no-underline hover:underline"
                 >
                   Advanced Search
@@ -549,7 +549,7 @@
               Draw Structure
             </button>
             <NuxtLink 
-              to="/chemicals/advanced"
+              to="/chemicals/search/advanced"
               class="link link-primary hover:link-hover no-underline hover:underline active:text-primary-focus"
               @click="isSearchBarVisible = false"
             >
