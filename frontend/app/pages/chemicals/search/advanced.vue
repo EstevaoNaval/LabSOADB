@@ -119,22 +119,22 @@
                     Supported Query Types
                   </h3>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 hidden md:flex md:flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                       <p class="font-medium mb-1">SMILES</p>
                       <code class="text-sm">C1=CC=C(C=C1)C=O</code>
                       <p class="text-xs text-base-content/70 mt-2">Simplified Molecular Input Line Entry System</p>
                     </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 hidden md:flex md:flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                       <p class="font-medium mb-1">SMARTS</p>
                       <code class="text-sm">[X3&H0]</code>
                       <p class="text-xs text-base-content/70 mt-2">Substructure search pattern</p>
                     </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 hidden md:flex md:flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                       <p class="font-medium mb-1">InChI</p>
                       <code class="text-sm text-xs">InChI=1S/C3H6O/c1-3(2)4...</code>
                       <p class="text-xs text-base-content/70 mt-2">International Chemical Identifier</p>
                     </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 hidden md:flex md:flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                       <p class="font-medium mb-1">Formula</p>
                       <code class="text-sm">C25H20O4</code>
                       <p class="text-xs text-base-content/70 mt-2">Molecular formula</p>
@@ -149,17 +149,17 @@
                     Available Filter Categories
                   </h3>
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 hidden md:flex md:flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                       <div class="stat-title">Physical Properties</div>
                       <div class="stat-value text-2xl">15+</div>
                       <div class="stat-desc">MW, atoms, bonds, rings</div>
                     </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 hidden md:flex md:flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                       <div class="stat-title">Drug-Likeness</div>
                       <div class="stat-value text-2xl">12+</div>
                       <div class="stat-desc">Lipinski, QED, SA Score</div>
                     </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 hidden md:flex md:flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                       <div class="stat-title">Pharmacokinetics</div>
                       <div class="stat-value text-2xl">7+</div>
                       <div class="stat-desc">ADME, CYP inhibition</div>
@@ -192,6 +192,7 @@ import { useRouter } from 'vue-router'
 import { useFilterStore } from '~/stores/filterStore'
 import { useFetchChemicalStore } from '~/stores/fetchChemicalStore'
 import { useHistogramRangeSliderStore } from '~/stores/histogramRangeSliderStore'
+import { useChemicalPropertiesListStore } from '~/stores/chemicalPropertiesList'
 import { useSortStore } from '~/stores/sortingStore'
 
 import SearchField from '~/components/SearchField.vue'
@@ -214,6 +215,7 @@ import {
 const router = useRouter()
 const filterStore = useFilterStore()
 const fetchChemicalStore = useFetchChemicalStore()
+const chemicalPropertiesListStore = useChemicalPropertiesListStore()
 const histogramRangeSliderStore = useHistogramRangeSliderStore()
 const sortStore = useSortStore()
 
@@ -235,7 +237,7 @@ const activeFiltersCount = computed(() => {
   
   // Count range filters
   Object.entries(filterStore.filters.range).forEach(([key, range]) => {
-    if (range.gte !== null || range.lte !== null) count++
+    if (range.gte != null || range.lte != null) count++
   })
   
   return count
@@ -245,12 +247,13 @@ const getMolecularFiltersCount = computed(() => {
   let count = 0
   const molecularProps = [
     'molecular_weight', 'tpsa', 'count_heavy_atom', 
-    'count_rotatable_bond', 'count_h_bond_donor', 'count_h_bond_acceptor'
+    'count_rotatable_bond', 'count_h_bond_donor', 'count_h_bond_acceptor',
+    'mp_lower_bound', 'mp_upper_bound'
   ]
   
   molecularProps.forEach(prop => {
     const range = filterStore.filters.range[prop]
-    if (range && (range.gte !== null || range.lte !== null)) count++
+    if (range && (range.gte != null || range.lte != null)) count++
   })
   
   return count
@@ -262,7 +265,7 @@ const getDrugLikenessFiltersCount = computed(() => {
   
   drugLikeProps.forEach(prop => {
     const range = filterStore.filters.range[prop]
-    if (range && (range.gte !== null || range.lte !== null)) count++
+    if (range && (range.gte != null || range.lte != null)) count++
   })
   
   return count
@@ -291,18 +294,24 @@ const handleSearch = async () => {
   }
 }
 
-const handleClearAllFilters = () => {
+const handleClearAllFilters = async () => {
+  // Reseta as stores
   histogramRangeSliderStore.$reset()
-  filterStore.clearExactFilter()
-  filterStore.clearAllRangeFilter()
+  filterStore.$reset()  // ✅ Usando $reset() ao invés de método customizado
   sortStore.$reset()
-  fetchChemicalStore.fetchChemicals()
+
+  // Busca novos dados
+  await fetchChemicalStore.fetchChemicals()
+
+  // ✅ Recarrega histogramas (FALTAVA ISSO!)
+  await chemicalPropertiesListStore.fetchAllChemicalProperties()
+
+  // ✅ Força reload visual dos histogramas nos componentes filhos
+  // Trigger para MolecularPropertiesFilters e DrugLikenessFilters
+  reloadHistogramTrigger.value *= -1
 }
 
-// Provide reload function for child components
-const reloadHistogramRangeSlider = () => {
-  // Trigger can be added if needed
-}
-
-provide('reloadSearchResultsDiv', reloadHistogramRangeSlider)
+// Provide para os componentes filhos
+const reloadHistogramTrigger = ref(1)
+provide('reloadHistogramTrigger', reloadHistogramTrigger)
 </script>

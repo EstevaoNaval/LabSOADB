@@ -7,6 +7,29 @@
     </div>
 
     <div v-else class="space-y-6">
+      <!-- ✅ BADGES DE FILTROS ATIVOS (IGUAL AO MolecularPropertiesFilters) -->
+      <div v-if="activeFilters.length > 0" class="flex flex-wrap gap-2 mb-4" role="list">
+        <div 
+          v-for="filter in activeFilters" 
+          :key="filter.propName"
+          class="badge badge-primary badge-lg gap-2 px-3 py-3"
+          role="listitem"
+        >
+          <span class="text-sm font-medium">{{ filter.label }}: {{ filter.range }}</span>
+          <button 
+            type="button" 
+            @click="clearFilter(filter.propName, filter.rangeFilter)"
+            class="btn btn-ghost btn-xs btn-circle hover:bg-primary-content"
+            :aria-label="`Remove ${filter.label} filter`"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="size-4" viewBox="0 0 16 16">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Histogram Cards -->
       <div 
         v-for="data in histogramDataArr" 
         :key="data.id"
@@ -21,15 +44,17 @@
               <button 
                 v-if="histogramRangeSliderStore.properties[data.propName]?.filterActivated"
                 type="button"
-                class="btn btn-ghost btn-sm btn-circle hover:btn-error"
+                class="btn btn-ghost btn-sm btn-circle hover:btn-error tooltip tooltip-left"
+                data-tip="Clear this filter"
                 @click="clearFilter(data.propName, data.rangeFilter)"
+                :aria-label="`Clear ${data.label} filter`"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="size-5" viewBox="0 0 16 16">
                   <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
                 </svg>
               </button>
             </div>
-
+  
             <HistogramRangeSlider 
               class="w-full" 
               :chemPropArr="data.data" 
@@ -38,7 +63,7 @@
               :propName="data.propName"
               @reloadHistogramRangeSlider="reloadHistogramRangeSliderDiv" 
             />
-
+              
             <div 
               v-if="histogramRangeSliderStore.properties[data.propName]?.filterActivated"
               class="mt-3 pt-3 border-t border-base-300"
@@ -73,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue"
+import { ref, computed, onMounted, inject, watch } from "vue"
 import HistogramRangeSlider from "~/components/HistogramRangeSlider.vue"
 import { useChemicalPropertiesListStore } from "~/stores/chemicalPropertiesList"
 import { useFetchChemicalStore } from "~/stores/fetchChemicalStore"
@@ -88,6 +113,9 @@ const histogramRangeSliderStore = useHistogramRangeSliderStore()
 const histogramRangeSliderDiv = ref(1)
 const loading = ref(false)
 
+// ✅ Recebe trigger da página pai
+const reloadHistogramTrigger = inject<Ref<number>>('reloadHistogramTrigger', ref(1))
+
 interface HistogramData {
   id: number
   label: string
@@ -101,6 +129,18 @@ interface HistogramData {
 }
 
 const histogramDataArr = ref<HistogramData[]>([])
+
+// ✅ COMPUTED: Active filters (IGUAL AO MolecularPropertiesFilters)
+const activeFilters = computed(() => {
+  return histogramDataArr.value
+    .filter(data => histogramRangeSliderStore.properties[data.propName]?.filterActivated)
+    .map(data => ({
+      propName: data.propName,
+      label: data.label,
+      rangeFilter: data.rangeFilter,
+      range: formatFilterRange(data.propName)
+    }))
+})
 
 const formatFilterRange = (propName: string) => {
   const props = histogramRangeSliderStore.properties[propName]
@@ -171,7 +211,12 @@ const clearFilter = async (propName: string, rangeFilter: any) => {
   await reloadHistogramRangeSliderDiv()
 }
 
-onMounted(() => {
-  loadChemPropsList()
+// ✅ Watch para reload quando pai limpar todos os filtros
+watch(reloadHistogramTrigger, async () => {
+  await reloadHistogramRangeSliderDiv()
+})
+
+onMounted(async () => {
+  await loadChemPropsList()
 })
 </script>

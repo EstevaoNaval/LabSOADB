@@ -177,7 +177,7 @@
               @click="handleNotifications"
             >
               <div class="indicator">
-                <span class="indicator-item badge badge-xs badge-primary" aria-hidden="true"></span>
+                <span class="indicator-item indicator-end	indicator-top	status status-primary status-pulse" aria-hidden="true"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" class="w-5 h-5" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 
@@ -187,6 +187,7 @@
                 </svg>
               </div>
             </button>
+
 
             <!-- User Menu -->
             <div v-if="authStore.isAuthenticated && userStore.user" class="dropdown dropdown-end">
@@ -969,6 +970,35 @@ watch(() => router.currentRoute.value, () => {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+.status-pulse {
+  position: relative;
+}
+
+.status-pulse::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  transform: translate(-50%, -50%);
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  opacity: 0;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
   }
 }
 

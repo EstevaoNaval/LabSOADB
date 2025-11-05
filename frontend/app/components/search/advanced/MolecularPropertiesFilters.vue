@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { ref, computed, onMounted, onBeforeUnmount, inject } from "vue"
 import HistogramRangeSlider from "~/components/HistogramRangeSlider.vue"
 import { useChemicalPropertiesListStore } from "~/stores/chemicalPropertiesList"
 import { useFetchChemicalStore } from "~/stores/fetchChemicalStore"
@@ -144,6 +144,14 @@ const formatFilterRange = (propName: string) => {
   
   return `${props.minSelected ?? props.min} - ${props.maxSelected ?? props.max}`
 }
+
+// ✅ Recebe trigger da página pai
+const reloadHistogramTrigger = inject<Ref<number>>('reloadHistogramTrigger', ref(1))
+
+// ✅ Watch para reload quando pai limpar todos os filtros
+watch(reloadHistogramTrigger, async () => {
+  await reloadHistogramRangeSliderDiv()
+})
 
 // Reload histogram data
 async function reloadHistogramRangeSliderDiv() {
