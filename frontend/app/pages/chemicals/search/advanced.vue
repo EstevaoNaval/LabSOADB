@@ -1,6 +1,6 @@
 <!-- pages/chemicals/search/advanced.vue -->
 <template>
-  <main class="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200">
+  <main class="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200 pb-20 sm:pb-0">
     <!-- Hero Section -->
     <section class="bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 border-b border-base-300">
       <div class="container mx-auto px-4 py-6 lg:py-10">
@@ -77,67 +77,66 @@
                 </div>
               </div>
 
-              <!-- Active Badge -->
-              <div v-if="activeFiltersCount > 0" class="ml-auto">
-                <div class="badge badge-primary badge-lg gap-2">
-                  <BoltIcon class="h-4 w-4" />
-                  <span class="font-semibold">{{ activeFiltersCount }} active</span>
-                </div>
-              </div>
-            </div>
+              <!-- Action Buttons Row - Desktop Only -->
+              <div class="hidden sm:flex flex-wrap gap-2 ml-auto">
+                <button 
+                  @click="handleSearch" 
+                  class="btn btn-primary gap-2"
+                  :disabled="isSearching"
+                >
+                  <MagnifyingGlassIcon class="h-5 w-5" />
+                  <span>{{ isSearching ? 'Searching...' : 'Search Now' }}</span>
+                  <span v-if="isSearching" class="loading loading-spinner loading-sm"></span>
+                </button>
 
-            <!-- Action Buttons Row -->
-            <div class="flex flex-wrap gap-2">
-              <button 
-                @click="handleSearch" 
-                class="btn btn-primary gap-2 flex-1 sm:flex-none"
-                :disabled="isSearching"
-              >
-                <MagnifyingGlassIcon class="h-5 w-5" />
-                <span>{{ isSearching ? 'Searching...' : 'Search Now' }}</span>
-                <span v-if="isSearching" class="loading loading-spinner loading-sm"></span>
-              </button>
-              
-              <button 
-                @click="handleClearAllFilters" 
-                class="btn btn-outline btn-error gap-2"
-                :disabled="activeFiltersCount === 0 || isSearching"
-              >
-                <ArrowPathIcon class="h-5 w-5" />
-                <span class="hidden sm:inline">Reset All</span>
-                <span class="sm:hidden">Reset</span>
-              </button>
+                <button 
+                  @click="handleClearAllFilters" 
+                  class="btn btn-outline btn-error gap-2"
+                  :disabled="activeFiltersCount === 0 || isSearching"
+                >
+                  <ArrowPathIcon class="h-5 w-5" />
+                  <span>Reset All</span>
+                </button>
 
-              <!-- Info Dropdown -->
-              <div class="dropdown dropdown-end">
-                <label tabindex="0" class="btn btn-ghost btn-circle">
-                  <InformationCircleIcon class="h-6 w-6" />
-                </label>
-                <div tabindex="0" class="dropdown-content z-[1] card compact w-80 shadow-2xl bg-base-100 border border-base-300 mt-2">
-                  <div class="card-body">
-                    <h3 class="font-bold flex items-center gap-2 text-sm mb-3">
-                      <InformationCircleIcon class="h-5 w-5 text-info" />
-                      Quick Guide
-                    </h3>
-                    <div class="space-y-2 text-sm">
-                      <div class="flex gap-2">
-                        <div class="badge badge-sm badge-primary shrink-0">1</div>
-                        <span>Enter query (SMILES, InChI, formula, DOI)</span>
-                      </div>
-                      <div class="flex gap-2">
-                        <div class="badge badge-sm badge-primary shrink-0">2</div>
-                        <span>Adjust histogram sliders to set ranges</span>
-                      </div>
-                      <div class="flex gap-2">
-                        <div class="badge badge-sm badge-primary shrink-0">3</div>
-                        <span>Combine filters across categories</span>
-                      </div>
-                      <div class="flex gap-2">
-                        <div class="badge badge-sm badge-primary shrink-0">4</div>
-                        <span>Click "Search Now" to view results</span>
+                <!-- Info Dropdown -->
+                <div class="dropdown dropdown-end">
+                  <label tabindex="0" class="btn btn-ghost btn-circle">
+                    <InformationCircleIcon class="h-6 w-6" />
+                  </label>
+                  <div tabindex="0" class="dropdown-content z-[1] card compact w-80 shadow-2xl bg-base-100 border border-base-300 mt-2">
+                    <div class="card-body">
+                      <h3 class="font-bold flex items-center gap-2 text-sm mb-3">
+                        <InformationCircleIcon class="h-5 w-5 text-info" />
+                        Quick Guide
+                      </h3>
+                      <div class="space-y-2 text-sm">
+                        <div class="flex gap-2">
+                          <div class="badge badge-sm badge-primary shrink-0">1</div>
+                          <span>Enter query (SMILES, InChI, formula, DOI)</span>
+                        </div>
+                        <div class="flex gap-2">
+                          <div class="badge badge-sm badge-primary shrink-0">2</div>
+                          <span>Adjust histogram sliders to set ranges</span>
+                        </div>
+                        <div class="flex gap-2">
+                          <div class="badge badge-sm badge-primary shrink-0">3</div>
+                          <span>Combine filters across categories</span>
+                        </div>
+                        <div class="flex gap-2">
+                          <div class="badge badge-sm badge-primary shrink-0">4</div>
+                          <span>Click "Search Now" to view results</span>
+                        </div>
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <!-- Active Badge -->
+              <div v-if="activeFiltersCount > 0" class="hidden sm:block ml-auto">
+                <div class="badge badge-primary badge-lg gap-2">
+                  <BoltIcon class="h-4 w-4" />
+                  <span class="font-semibold">{{ activeFiltersCount }} active</span>
                 </div>
               </div>
             </div>
@@ -153,7 +152,7 @@
             <span class="hidden sm:inline font-medium">Literature</span>
             <span class="sm:hidden font-medium">Lit</span>
             <span v-if="getLiteratureFiltersCount > 0" 
-                  class="absolute -top-1 -right-1 badge badge-xs badge-error w-5 h-5 p-0">
+                  class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0">
               {{ getLiteratureFiltersCount }}
             </span>
           </a>
@@ -168,7 +167,7 @@
             <span class="hidden sm:inline font-medium">Molecular</span>
             <span class="sm:hidden font-medium">Mol</span>
             <span v-if="getMolecularFiltersCount > 0" 
-                  class="absolute -top-1 -right-1 badge badge-xs badge-error w-5 h-5 p-0 flex items-center justify-center">
+                  class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0 flex items-center justify-center">
               {{ getMolecularFiltersCount }}
             </span>
           </a>
@@ -183,7 +182,7 @@
             <span class="hidden sm:inline font-medium">Drug-Like</span>
             <span class="sm:hidden font-medium">Drug</span>
             <span v-if="getDrugLikenessFiltersCount > 0" 
-                  class="absolute -top-1 -right-1 badge badge-xs badge-error w-5 h-5 p-0 flex items-center justify-center">
+                  class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0 flex items-center justify-center">
               {{ getDrugLikenessFiltersCount }}
             </span>
           </a>
@@ -193,7 +192,7 @@
             <span class="hidden sm:inline font-medium">Pharmacokinetics</span>
             <span class="sm:hidden font-medium">PK</span>
             <span v-if="getPharmacokineticsFiltersCount > 0" 
-                  class="absolute -top-1 -right-1 badge badge-xs badge-error w-5 h-5 p-0">
+                  class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0">
               {{ getPharmacokineticsFiltersCount }}
             </span>
           </a>
@@ -285,6 +284,73 @@
               <div>• Drag histogram sliders for ranges</div>
               <div>• Combine multiple categories</div>
               <div>• Monitor active filter count</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky Action Bar - Mobile Only -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-base-100 border-t border-base-300 shadow-2xl">
+      <div class="container mx-auto px-4 py-3">
+        <div class="flex items-center gap-2">
+          <!-- Active Filters Badge -->
+          <div v-if="activeFiltersCount > 0" class="badge badge-primary badge-sm gap-1 shrink-0">
+            <BoltIcon class="h-3 w-3" />
+            {{ activeFiltersCount }}
+          </div>
+
+          <!-- Search Button -->
+          <button 
+            @click="handleSearch" 
+            class="btn btn-primary btn-sm gap-2 flex-1"
+            :disabled="isSearching"
+          >
+            <MagnifyingGlassIcon class="h-4 w-4" />
+            <span>{{ isSearching ? 'Searching...' : 'Search' }}</span>
+            <span v-if="isSearching" class="loading loading-spinner loading-xs"></span>
+          </button>
+
+          <!-- Reset Button -->
+          <button 
+            @click="handleClearAllFilters" 
+            class="btn btn-outline btn-error btn-sm gap-1"
+            :disabled="activeFiltersCount === 0 || isSearching"
+          >
+            <ArrowPathIcon class="h-4 w-4" />
+            <span>Reset</span>
+          </button>
+
+          <!-- Info Dropdown -->
+          <div class="dropdown dropdown-top dropdown-end">
+            <label tabindex="0" class="btn btn-ghost btn-sm btn-circle">
+              <InformationCircleIcon class="h-5 w-5" />
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] card compact w-80 shadow-2xl bg-base-100 border border-base-300 mb-2">
+              <div class="card-body">
+                <h3 class="font-bold flex items-center gap-2 text-sm mb-3">
+                  <InformationCircleIcon class="h-5 w-5 text-info" />
+                  Quick Guide
+                </h3>
+                <div class="space-y-2 text-sm">
+                  <div class="flex gap-2">
+                    <div class="badge badge-sm badge-primary shrink-0">1</div>
+                    <span>Enter query (SMILES, InChI, formula, DOI)</span>
+                  </div>
+                  <div class="flex gap-2">
+                    <div class="badge badge-sm badge-primary shrink-0">2</div>
+                    <span>Adjust histogram sliders to set ranges</span>
+                  </div>
+                  <div class="flex gap-2">
+                    <div class="badge badge-sm badge-primary shrink-0">3</div>
+                    <span>Combine filters across categories</span>
+                  </div>
+                  <div class="flex gap-2">
+                    <div class="badge badge-sm badge-primary shrink-0">4</div>
+                    <span>Click "Search Now" to view results</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -413,7 +479,6 @@ const getPharmacokineticsFiltersCount = computed(() => {
   
   return count
 })
-
 
 const handleSearch = async () => {
   isSearching.value = true

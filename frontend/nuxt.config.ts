@@ -55,6 +55,11 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
+  devServer: {
+    port: 3000,
+    host: '0.0.0.0'
+  },
+
   modules: [
     //'@nuxtjs/tailwindcss',
     '@pinia/nuxt',
