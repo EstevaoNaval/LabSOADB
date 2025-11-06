@@ -3,11 +3,11 @@ import { defineStore } from 'pinia';
 export const useThemeStore = defineStore('theme', {
   state: () => ({
     darkMode: true,
-    theme: process.client ? document.documentElement.getAttribute('data-theme') || 'night' : 'night',
+    theme: import.meta.client ? document.documentElement.getAttribute('data-theme') || 'night' : 'night',
   }),
   actions: {
     initializeTheme() {
-      if (process.client) {
+      if (import.meta.client) {
         const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         this.setDarkMode(userPrefersDark);
       }
@@ -36,5 +36,8 @@ export const useThemeStore = defineStore('theme', {
     currentTheme: (state) => state.theme,
     isDarkMode: (state) => state.darkMode
   },
-  persist: true,
+  persist: {
+    storage: piniaPluginPersistedstate.localStorage(), // ✅ Correto
+    pick: ['isDarkMode']
+  }
 });

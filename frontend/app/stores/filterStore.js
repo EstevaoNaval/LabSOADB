@@ -185,5 +185,8 @@ export const useFilterStore = defineStore('filterStore', {
             };
         }
     },
-    persist: true,
+    persist: {
+        storage: piniaPluginPersistedstate.localStorage(), // ✅ Correto
+        pick: ['filters']
+    }
 });

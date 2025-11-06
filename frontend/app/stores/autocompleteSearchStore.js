@@ -13,6 +13,5 @@ export const useAutocompleteSearchStore = defineStore('autocompleteSearch', {
             
             this.suggestions = response.data
         }
-    },
-    persist: true,
+    }
 })

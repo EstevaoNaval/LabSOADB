@@ -26,6 +26,5 @@ export const useUserChemicalsStore = defineStore('userChemicalsStore', {
             }
 
         }
-    },
-    persist: true
+    }
 })

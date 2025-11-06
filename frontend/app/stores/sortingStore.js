@@ -85,6 +85,5 @@ export const useSortStore = defineStore('sort', {
         toggleSortDirection() {
             this.ascDirection = !this.ascDirection;
         }
-    },
-    persist: true
+    }
 });

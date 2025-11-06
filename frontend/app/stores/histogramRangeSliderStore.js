@@ -143,5 +143,19 @@ export const useHistogramRangeSliderStore = defineStore('histogramRangeSliderSto
             };
         },
     },
-    persist: true
+    persist: {
+        storage: piniaPluginPersistedstate.localStorage(), // ✅ Correto
+        omit: [ // ✅ Não persiste arrays grandes
+          'properties.jplogp.arr',
+          'properties.molecular_weight.arr',
+          'properties.tpsa.arr',
+          'properties.melting_point.arr',
+          'properties.h_bond_acceptor.arr',
+          'properties.h_bond_donor.arr',
+          'properties.heavy_atom.arr',
+          'properties.rotatable_bond.arr',
+          'properties.lipinski_violation.arr',
+          'properties.pains_alert.arr'
+        ]
+    }
 })

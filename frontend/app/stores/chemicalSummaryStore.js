@@ -49,6 +49,5 @@ export const useChemicalSummaryStore = defineStore('chemicalSummary', {
             this.summaries = response.data.results
             this.totalSummaries = response.data.count
         }
-    },
-    persist: true,
+    }
 })

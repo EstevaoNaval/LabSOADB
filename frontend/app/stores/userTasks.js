@@ -115,6 +115,5 @@ export const useUserTasksStore = defineStore('userTasksStore', {
 
             return totalFailedTasks
         }
-    },
-    persist: true
+    }
 })

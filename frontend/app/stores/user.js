@@ -135,5 +135,11 @@ export const useUserStore = defineStore('user', {
             this.error = null
         }
     },
-    persist: true
+    persist: {
+        storage: piniaPluginPersistedstate.cookies({ // ✅ Correto
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 24, // 1 dia
+        }),
+        pick: ['user']
+    }
 });

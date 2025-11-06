@@ -50,6 +50,5 @@ export const useChemicalPropertiesListStore = defineStore('chemicalPropertiesLis
                 rotatable_bond: response.data.results.rotatable_bond.map(utils.roundValue) || [],
             }
         }
-    },
-    persist: true, // Persistência da store
+    }
 })

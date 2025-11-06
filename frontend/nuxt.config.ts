@@ -62,6 +62,14 @@ export default defineNuxtConfig({
     '@nuxt/image',
   ],
 
+  piniaPluginPersistedstate: {
+    storage: 'cookies', // Default para SSR
+    cookieOptions: {
+      sameSite: 'strict',
+    },
+    debug: false, // true para ver logs
+  },
+
   srcDir: 'app/',
 
   plugins: [

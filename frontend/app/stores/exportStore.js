@@ -84,5 +84,8 @@ export const useExportStore = defineStore('export', {
             return exportTaskId
         }
     },
-    persist: true
+    persist: {
+        storage: piniaPluginPersistedstate.localStorage(), // ✅ Correto
+        pick: ['currExportFormatId']
+    }
 });

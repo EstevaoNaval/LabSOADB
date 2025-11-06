@@ -1,186 +1,293 @@
 <!-- pages/chemicals/search/advanced.vue -->
 <template>
-  <main class="min-h-screen bg-base-200">
-    <Head>
-      <Title>Advanced Search | LabSOADB</Title>
-    </Head>
+  <main class="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 border-b border-base-300">
+      <div class="container mx-auto px-4 py-6 lg:py-10">
+        <div class="max-w-6xl mx-auto">
+          <!-- Breadcrumbs -->
+          <div class="breadcrumbs text-sm mb-4">
+            <ul>
+              <li><a href="/" class="link link-hover">Home</a></li>
+              <li><a href="/chemicals" class="link link-hover">Chemicals</a></li>
+              <li class="font-semibold">Advanced Search</li>
+            </ul>
+          </div>
 
-    <!-- Hero Search Section -->
-    <section class="relative bg-gradient-to-br from-primary/10 via-base-100 to-secondary/10">
-      <div class="container mx-auto px-4 py-12 lg:py-16">
-        <div class="max-w-4xl mx-auto text-center mb-8">
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Advanced Chemical Search
-          </h1>
-          <p class="text-base md:text-lg lg:text-xl text-base-content/70 max-w-3xl mx-auto">
-            Refine your search with detailed molecular properties, drug-likeness parameters, and literature filters
-          </p>
-        </div>
+          <div class="text-center mb-6">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 badge badge-lg badge-primary badge-outline mb-3">
+              <ShieldCheckIcon class="h-4 w-4" />
+              Advanced Filtering
+            </div>
+            
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Advanced Chemical Search
+            </h1>
+            <p class="text-sm md:text-base text-base-content/70 max-w-2xl mx-auto">
+              Refine your molecular search with powerful filters before querying our database
+            </p>
+          </div>
 
-        <!-- Main Search Field -->
-        <div class="max-w-4xl mx-auto">
+          <!-- Search Field -->
           <SearchField :typewriterEffect="true" />
         </div>
       </div>
     </section>
 
-    <!-- Advanced Filters Section -->
-    <div class="container mx-auto px-4 py-8">
-      <!-- Active Filters Summary -->
-      <div v-if="activeFiltersCount > 0" class="alert mb-6 shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <div class="flex-1">
-          <span class="font-semibold">{{ activeFiltersCount }} active filter{{ activeFiltersCount > 1 ? 's' : '' }}</span>
-        </div>
-        <button @click="handleClearAllFilters" class="btn btn-sm btn-ghost gap-2">
-          <XMarkIcon class="h-5 w-5" />
-          Clear all
-        </button>
-      </div>
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
+      
+      <!-- Stats & Action Bar -->
+      <div class="card bg-base-100 shadow-xl border border-base-300 mb-6">
+        <div class="card-body p-4">
+          <div class="flex flex-col gap-4">
+            <!-- Stats Row -->
+            <div class="flex flex-wrap items-center gap-3">
+              <!-- Active Filters -->
+              <div class="stats stats-horizontal shadow-sm bg-base-200 border border-base-300">
+                <div class="stat p-3 min-w-[120px]">
+                  <div class="stat-figure text-primary">
+                    <FunnelIcon class="h-6 w-6" />
+                  </div>
+                  <div class="stat-title text-xs">Filters</div>
+                  <div class="stat-value text-primary text-xl">{{ activeFiltersCount }}</div>
+                </div>
+              </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- Filters Sidebar -->
-        <aside class="lg:col-span-1 space-y-4">
-          <!-- Literature Filters -->
-          <LiteratureFilters />
-          
-          <!-- Molecular Properties -->
-          <div class="collapse collapse-arrow bg-base-100 shadow-lg border border-base-300">
-            <input type="checkbox" v-model="sectionsExpanded.molecular" />
-            <div class="collapse-title text-lg font-semibold flex items-center gap-2">
-              <BeakerIcon class="h-5 w-5" />
-              Molecular Properties
-              <span v-if="getMolecularFiltersCount > 0" class="badge badge-primary badge-sm ml-auto">
-                {{ getMolecularFiltersCount }}
-              </span>
-            </div>
-            <div class="collapse-content">
-              <MolecularPropertiesFilters />
-            </div>
-          </div>
+              <!-- Categories -->
+              <div class="stats stats-horizontal shadow-sm bg-base-200 border border-base-300">
+                <div class="stat p-3 min-w-[120px]">
+                  <div class="stat-figure text-secondary">
+                    <Squares2X2Icon class="h-6 w-6" />
+                  </div>
+                  <div class="stat-title text-xs">Categories</div>
+                  <div class="stat-value text-secondary text-xl">{{ availableCategoriesCount }}</div>
+                </div>
+              </div>
 
-          <!-- Drug-Likeness -->
-          <div class="collapse collapse-arrow bg-base-100 shadow-lg border border-base-300">
-            <input type="checkbox" v-model="sectionsExpanded.drugLikeness" />
-            <div class="collapse-title text-lg font-semibold flex items-center gap-2">
-              <CubeIcon class="h-5 w-5" />
-              Drug-Likeness
-              <span v-if="getDrugLikenessFiltersCount > 0" class="badge badge-primary badge-sm ml-auto">
-                {{ getDrugLikenessFiltersCount }}
-              </span>
-            </div>
-            <div class="collapse-content">
-              <DrugLikenessFilters />
-            </div>
-          </div>
+              <!-- Results -->
+              <div v-if="fetchChemicalStore.totalChemicals > 0" class="stats stats-horizontal shadow-sm bg-base-200 border border-base-300">
+                <div class="stat p-3 min-w-[120px]">
+                  <div class="stat-figure text-success">
+                    <CheckCircleIcon class="h-6 w-6" />
+                  </div>
+                  <div class="stat-title text-xs">Results</div>
+                  <div class="stat-value text-success text-xl">{{ formatNumber(fetchChemicalStore.totalChemicals) }}</div>
+                </div>
+              </div>
 
-          <!-- Pharmacokinetics -->
-          <div class="collapse collapse-arrow bg-base-100 shadow-lg border border-base-300">
-            <input type="checkbox" v-model="sectionsExpanded.pharmacokinetics" />
-            <div class="collapse-title text-lg font-semibold flex items-center gap-2">
-              <ChartBarIcon class="h-5 w-5" />
-              Pharmacokinetics
-              <span v-if="getPharmacokineticsFiltersCount > 0" class="badge badge-primary badge-sm ml-auto">
-                {{ getPharmacokineticsFiltersCount }}
-              </span>
+              <!-- Active Badge -->
+              <div v-if="activeFiltersCount > 0" class="ml-auto">
+                <div class="badge badge-primary badge-lg gap-2">
+                  <BoltIcon class="h-4 w-4" />
+                  <span class="font-semibold">{{ activeFiltersCount }} active</span>
+                </div>
+              </div>
             </div>
-            <div class="collapse-content">
-              <PharmacokineticsFilters />
-            </div>
-          </div>
 
-          <!-- Action Buttons -->
-          <div class="sticky bottom-4 flex flex-col gap-2 bg-base-200 p-4 rounded-lg shadow-lg border border-base-300">
-            <button @click="handleSearch" class="btn btn-primary w-full gap-2" :disabled="isSearching">
-              <MagnifyingGlassIcon class="h-5 w-5" />
-              {{ isSearching ? 'Searching...' : 'Search' }}
-              <span v-if="isSearching" class="loading loading-spinner loading-sm"></span>
-            </button>
-            <button @click="handleClearAllFilters" class="btn btn-outline w-full gap-2">
-              <ArrowPathIcon class="h-5 w-5" />
-              Reset All Filters
-            </button>
-          </div>
-        </aside>
-
-        <!-- Preview/Info Panel -->
-        <main class="lg:col-span-3">
-          <div class="card bg-base-100 shadow-lg border border-base-300">
-            <div class="card-body">
-              <h2 class="card-title text-2xl mb-4">Search Tips</h2>
+            <!-- Action Buttons Row -->
+            <div class="flex flex-wrap gap-2">
+              <button 
+                @click="handleSearch" 
+                class="btn btn-primary gap-2 flex-1 sm:flex-none"
+                :disabled="isSearching"
+              >
+                <MagnifyingGlassIcon class="h-5 w-5" />
+                <span>{{ isSearching ? 'Searching...' : 'Search Now' }}</span>
+                <span v-if="isSearching" class="loading loading-spinner loading-sm"></span>
+              </button>
               
-              <div class="space-y-6">
-                <!-- Query Types -->
-                <div>
-                  <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
-                    <DocumentTextIcon class="h-5 w-5 text-primary" />
-                    Supported Query Types
-                  </h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                      <p class="font-medium mb-1">SMILES</p>
-                      <code class="text-sm">C1=CC=C(C=C1)C=O</code>
-                      <p class="text-xs text-base-content/70 mt-2">Simplified Molecular Input Line Entry System</p>
-                    </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                      <p class="font-medium mb-1">SMARTS</p>
-                      <code class="text-sm">[X3&H0]</code>
-                      <p class="text-xs text-base-content/70 mt-2">Substructure search pattern</p>
-                    </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                      <p class="font-medium mb-1">InChI</p>
-                      <code class="text-sm text-xs">InChI=1S/C3H6O/c1-3(2)4...</code>
-                      <p class="text-xs text-base-content/70 mt-2">International Chemical Identifier</p>
-                    </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                      <p class="font-medium mb-1">Formula</p>
-                      <code class="text-sm">C25H20O4</code>
-                      <p class="text-xs text-base-content/70 mt-2">Molecular formula</p>
-                    </div>
-                  </div>
-                </div>
+              <button 
+                @click="handleClearAllFilters" 
+                class="btn btn-outline btn-error gap-2"
+                :disabled="activeFiltersCount === 0 || isSearching"
+              >
+                <ArrowPathIcon class="h-5 w-5" />
+                <span class="hidden sm:inline">Reset All</span>
+                <span class="sm:hidden">Reset</span>
+              </button>
 
-                <!-- Filter Categories -->
-                <div>
-                  <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
-                    <FunnelIcon class="h-5 w-5 text-primary" />
-                    Available Filter Categories
-                  </h3>
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                      <div class="stat-title">Physical Properties</div>
-                      <div class="stat-value text-2xl">15+</div>
-                      <div class="stat-desc">MW, atoms, bonds, rings</div>
+              <!-- Info Dropdown -->
+              <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle">
+                  <InformationCircleIcon class="h-6 w-6" />
+                </label>
+                <div tabindex="0" class="dropdown-content z-[1] card compact w-80 shadow-2xl bg-base-100 border border-base-300 mt-2">
+                  <div class="card-body">
+                    <h3 class="font-bold flex items-center gap-2 text-sm mb-3">
+                      <InformationCircleIcon class="h-5 w-5 text-info" />
+                      Quick Guide
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                      <div class="flex gap-2">
+                        <div class="badge badge-sm badge-primary shrink-0">1</div>
+                        <span>Enter query (SMILES, InChI, formula, DOI)</span>
+                      </div>
+                      <div class="flex gap-2">
+                        <div class="badge badge-sm badge-primary shrink-0">2</div>
+                        <span>Adjust histogram sliders to set ranges</span>
+                      </div>
+                      <div class="flex gap-2">
+                        <div class="badge badge-sm badge-primary shrink-0">3</div>
+                        <span>Combine filters across categories</span>
+                      </div>
+                      <div class="flex gap-2">
+                        <div class="badge badge-sm badge-primary shrink-0">4</div>
+                        <span>Click "Search Now" to view results</span>
+                      </div>
                     </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                      <div class="stat-title">Drug-Likeness</div>
-                      <div class="stat-value text-2xl">12+</div>
-                      <div class="stat-desc">Lipinski, QED, SA Score</div>
-                    </div>
-                    <div class="group rounded-lg bg-base-200/100 hover:bg-base-200 border border-base-300 hover:border-primary/50 flex flex-col p-4 md:p-6 h-auto transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                      <div class="stat-title">Pharmacokinetics</div>
-                      <div class="stat-value text-2xl">7+</div>
-                      <div class="stat-desc">ADME, CYP inhibition</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Quick Start -->
-                <div class="alert alert-info">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <div>
-                    <h4 class="font-bold">Quick Start</h4>
-                    <p class="text-sm">Start with a query in the search box above, then refine results using filters on the left. Click "Search" to view results.</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </main>
+        </div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="mb-6">
+        <div role="tablist" class="tabs tabs-boxed bg-base-100 shadow-lg border border-base-300 p-1.5">
+          <a role="tab" class="tab gap-2 relative" @click="activeTab = 'literature'">
+            <DocumentTextIcon class="h-5 w-5" />
+            <span class="hidden sm:inline font-medium">Literature</span>
+            <span class="sm:hidden font-medium">Lit</span>
+            <span v-if="getLiteratureFiltersCount > 0" 
+                  class="absolute -top-1 -right-1 badge badge-xs badge-error w-5 h-5 p-0">
+              {{ getLiteratureFiltersCount }}
+            </span>
+          </a>
+          
+          <a 
+            role="tab" 
+            class="tab gap-2 relative"
+            :class="{ 'tab-active': activeTab === 'molecular' }"
+            @click="activeTab = 'molecular'"
+          >
+            <BeakerIcon class="h-5 w-5" />
+            <span class="hidden sm:inline font-medium">Molecular</span>
+            <span class="sm:hidden font-medium">Mol</span>
+            <span v-if="getMolecularFiltersCount > 0" 
+                  class="absolute -top-1 -right-1 badge badge-xs badge-error w-5 h-5 p-0 flex items-center justify-center">
+              {{ getMolecularFiltersCount }}
+            </span>
+          </a>
+          
+          <a 
+            role="tab" 
+            class="tab gap-2 relative"
+            :class="{ 'tab-active': activeTab === 'druglike' }"
+            @click="activeTab = 'druglike'"
+          >
+            <CubeIcon class="h-5 w-5" />
+            <span class="hidden sm:inline font-medium">Drug-Like</span>
+            <span class="sm:hidden font-medium">Drug</span>
+            <span v-if="getDrugLikenessFiltersCount > 0" 
+                  class="absolute -top-1 -right-1 badge badge-xs badge-error w-5 h-5 p-0 flex items-center justify-center">
+              {{ getDrugLikenessFiltersCount }}
+            </span>
+          </a>
+          
+          <a role="tab" class="tab gap-2 relative" @click="activeTab = 'pharmaco'">
+            <ChartBarIcon class="h-5 w-5" />
+            <span class="hidden sm:inline font-medium">Pharmacokinetics</span>
+            <span class="sm:hidden font-medium">PK</span>
+            <span v-if="getPharmacokineticsFiltersCount > 0" 
+                  class="absolute -top-1 -right-1 badge badge-xs badge-error w-5 h-5 p-0">
+              {{ getPharmacokineticsFiltersCount }}
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="card bg-base-100 shadow-xl border border-base-300">
+        <div class="card-body p-6 min-h-[500px]">
+          <!-- Tab Header -->
+          <div class="flex items-center gap-3 mb-6 pb-4 border-b border-base-300">
+            <div class="w-1 h-8 bg-gradient-to-b from-primary to-secondary rounded-full"></div>
+            <div>
+              <h2 class="text-lg font-bold flex items-center gap-2">
+                <DocumentTextIcon v-if="activeTab === 'literature'" class="h-5 w-5 text-primary" />
+                <BeakerIcon v-if="activeTab === 'molecular'" class="h-5 w-5 text-primary" />
+                <CubeIcon v-if="activeTab === 'druglike'" class="h-5 w-5 text-primary" />
+                <ChartBarIcon v-if="activeTab === 'pharmaco'" class="h-5 w-5 text-primary" />
+                
+                <span v-if="activeTab === 'literature'">Literature Filters</span>
+                <span v-if="activeTab === 'molecular'">Molecular Properties</span>
+                <span v-if="activeTab === 'druglike'">Drug-Likeness Criteria</span>
+                <span v-if="activeTab === 'pharmaco'">Pharmacokinetics Parameters</span>
+              </h2>
+              <p class="text-xs text-base-content/60">
+                <span v-if="activeTab === 'literature'">Filter by publication metadata</span>
+                <span v-if="activeTab === 'molecular'">Refine by physicochemical properties</span>
+                <span v-if="activeTab === 'druglike'">Apply Lipinski and ADMET rules</span>
+                <span v-if="activeTab === 'pharmaco'">Filter by ADME parameters</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Tab Content Panels -->
+          <div v-show="activeTab === 'literature'">
+            <div class="max-w-4xl mx-auto">
+              <LiteratureFilters />
+            </div>
+          </div>
+
+          <div v-show="activeTab === 'molecular'">
+            <MolecularPropertiesFilters />
+          </div>
+
+          <div v-show="activeTab === 'druglike'">
+            <DrugLikenessFilters />
+          </div>
+
+          <div v-show="activeTab === 'pharmaco'">
+            <PharmacokineticsFilters />
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Info Cards - Compact -->
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <!-- Query Types -->
+        <div class="alert shadow-lg">
+          <BeakerIcon class="h-6 w-6 text-primary shrink-0" />
+          <div>
+            <h4 class="font-semibold text-sm">Query Types</h4>
+            <div class="text-xs text-base-content/70 mt-1 space-y-0.5">
+              <div><strong>SMILES:</strong> <code class="badge badge-xs">C1=CC=CC=C1</code></div>
+              <div><strong>InChI:</strong> <code class="badge badge-xs">InChI=1S/...</code></div>
+              <div><strong>Formula:</strong> <code class="badge badge-xs">C6H6</code></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="alert shadow-lg">
+          <FunnelIcon class="h-6 w-6 text-secondary shrink-0" />
+          <div>
+            <h4 class="font-semibold text-sm">Filter Categories</h4>
+            <div class="text-xs text-base-content/70 mt-1 space-y-0.5">
+              <div><strong>Molecular:</strong> MW, TPSA, bonds</div>
+              <div><strong>Drug-Like:</strong> Lipinski, PAINS</div>
+              <div><strong>Literature:</strong> DOI, dates</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="alert shadow-lg">
+          <LightBulbIcon class="h-6 w-6 text-warning shrink-0" />
+          <div>
+            <h4 class="font-semibold text-sm">Pro Tips</h4>
+            <div class="text-xs text-base-content/70 mt-1 space-y-0.5">
+              <div>• Drag histogram sliders for ranges</div>
+              <div>• Combine multiple categories</div>
+              <div>• Monitor active filter count</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -204,38 +311,42 @@ import PharmacokineticsFilters from '~/components/search/advanced/Pharmacokineti
 import {
   MagnifyingGlassIcon,
   ArrowPathIcon,
-  XMarkIcon,
   BeakerIcon,
   CubeIcon,
   ChartBarIcon,
   DocumentTextIcon,
-  FunnelIcon
+  InformationCircleIcon,
+  FunnelIcon,
+  LightBulbIcon,
+  ShieldCheckIcon,
+  Squares2X2Icon,
+  CheckCircleIcon,
+  BoltIcon
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const filterStore = useFilterStore()
 const fetchChemicalStore = useFetchChemicalStore()
-const chemicalPropertiesListStore = useChemicalPropertiesListStore()
 const histogramRangeSliderStore = useHistogramRangeSliderStore()
+const chemicalPropertiesListStore = useChemicalPropertiesListStore()
 const sortStore = useSortStore()
 
 const isSearching = ref(false)
-const sectionsExpanded = ref({
-  molecular: false,
-  drugLikeness: false,
-  pharmacokinetics: false
-})
+const activeTab = ref('literature')
 
-// Computed
+const formatNumber = (num: number) => {
+  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
+  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
+  return num.toString()
+}
+
 const activeFiltersCount = computed(() => {
   let count = 0
   
-  // Count exact filters
   Object.entries(filterStore.filters.exact).forEach(([key, value]) => {
-    if (value && value !== '') count++
+    if (value && value != '') count++
   })
   
-  // Count range filters
   Object.entries(filterStore.filters.range).forEach(([key, range]) => {
     if (range.gte != null || range.lte != null) count++
   })
@@ -243,11 +354,13 @@ const activeFiltersCount = computed(() => {
   return count
 })
 
+const availableCategoriesCount = computed(() => 4)
+
 const getMolecularFiltersCount = computed(() => {
   let count = 0
   const molecularProps = [
     'molecular_weight', 'tpsa', 'count_heavy_atom', 
-    'count_rotatable_bond', 'count_h_bond_donor', 'count_h_bond_acceptor',
+    'count_rotatable_bond', 'count_h_bond_donor', 'count_h_bond_acceptor', 
     'mp_lower_bound', 'mp_upper_bound'
   ]
   
@@ -271,13 +384,37 @@ const getDrugLikenessFiltersCount = computed(() => {
   return count
 })
 
-const getPharmacokineticsFiltersCount = computed(() => {
+const getLiteratureFiltersCount = computed(() => {
   let count = 0
-  // Add logic for pharmacokinetics filters when implemented
+  
+  if (filterStore.filters.exact.doi) count++
+  if (filterStore.filters.exact.title) count++
+  if (filterStore.filters.range.publication_date?.after || 
+      filterStore.filters.range.publication_date?.before) count++
+  
   return count
 })
 
-// Methods
+const getPharmacokineticsFiltersCount = computed(() => {
+  let count = 0
+  const pharmaProps = [
+    'gastrointestinal_absorption',
+    'blood_brain_barrier_permeation',
+    'cyp1a2_inhibitor',
+    'cyp2c9_inhibitor',
+    'cyp2c19_inhibitor',
+    'cyp2d6_inhibitor',
+    'cyp3a4_inhibitor'
+  ]
+  
+  pharmaProps.forEach(prop => {
+    if (filterStore.filters.exact[prop] === true) count++
+  })
+  
+  return count
+})
+
+
 const handleSearch = async () => {
   isSearching.value = true
   
@@ -285,6 +422,7 @@ const handleSearch = async () => {
     fetchChemicalStore.setType('search')
     fetchChemicalStore.setMode('summary')
     await fetchChemicalStore.fetchChemicals()
+    await chemicalPropertiesListStore.fetchAllChemicalProperties()
     
     router.push('/chemicals/search')
   } catch (error) {
@@ -295,23 +433,16 @@ const handleSearch = async () => {
 }
 
 const handleClearAllFilters = async () => {
-  // Reseta as stores
   histogramRangeSliderStore.$reset()
-  filterStore.$reset()  // ✅ Usando $reset() ao invés de método customizado
+  filterStore.$reset()
   sortStore.$reset()
-
-  // Busca novos dados
+  
   await fetchChemicalStore.fetchChemicals()
-
-  // ✅ Recarrega histogramas (FALTAVA ISSO!)
   await chemicalPropertiesListStore.fetchAllChemicalProperties()
-
-  // ✅ Força reload visual dos histogramas nos componentes filhos
-  // Trigger para MolecularPropertiesFilters e DrugLikenessFilters
-  reloadHistogramTrigger.value *= -1
+  
+  reloadHistogramTrigger.value++
 }
 
-// Provide para os componentes filhos
-const reloadHistogramTrigger = ref(1)
+const reloadHistogramTrigger = ref(0)
 provide('reloadHistogramTrigger', reloadHistogramTrigger)
 </script>

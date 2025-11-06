@@ -34,6 +34,5 @@ export const useSelectedChemicalStore = defineStore('selectedChemical', {
 
             return firstPublicationDate
         }
-    },
-    persist: true,
+    }
 })

@@ -59,6 +59,5 @@ export const useFetchChemicalStore = defineStore('fetchChemicalStore', {
         setType(type) {
             this.type = type
         }
-    },
-    persist: true
+    }
 });

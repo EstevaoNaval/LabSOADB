@@ -36,6 +36,5 @@ export const useChemicalStore = defineStore('chemical', {
             this.chemicals = response.data.results
             this.totalChemicals = response.data.count
         }
-    },
-    persist: true,
+    }
 })

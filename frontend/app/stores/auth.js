@@ -62,5 +62,11 @@ export const useAuthStore = defineStore('auth', {
             this.error = []
         }
     },
-    persist: true
+    persist: {
+        storage: piniaPluginPersistedstate.cookies({ // ✅ Correto
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 24 * 7, // 7 dias
+        }),
+        pick: ['token', 'refreshToken', 'isAuthenticated']
+    }
 });

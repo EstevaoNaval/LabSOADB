@@ -4,91 +4,92 @@
     <!-- Loading State -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-16 space-y-4" role="status">
       <span class="loading loading-spinner loading-lg text-primary"></span>
-      <p class="text-base-content/60 text-sm">Loading filter options...</p>
+      <p class="text-base-content/60 text-sm">Loading molecular properties...</p>
     </div>
 
-    <!-- Filters Grid -->
+    <!-- Content -->
     <div v-else class="space-y-6">
-      <!-- Active Filters Summary -->
-      <div v-if="activeFilters.length > 0" class="flex flex-wrap gap-2 mb-4">
+      <!-- Active Filters Badges -->
+      <div v-if="activeFilters.length > 0" class="flex flex-wrap gap-2" role="list" aria-label="Active filters">
         <div 
           v-for="filter in activeFilters" 
           :key="filter.propName"
-          class="badge badge-primary badge-lg gap-2 px-3 py-3"
+          class="badge badge-primary gap-2 px-3 py-2"
+          role="listitem"
         >
-          <span class="text-sm font-medium">{{ filter.label }}: {{ filter.range }}</span>
+          <span class="text-xs font-medium">{{ filter.label }}: {{ filter.range }}</span>
           <button 
             type="button" 
             @click="clearFilter(filter.propName, filter.rangeFilter)"
             class="btn btn-ghost btn-xs btn-circle hover:bg-primary-content"
+            :aria-label="`Remove ${filter.label} filter`"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="size-4" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="size-3" viewBox="0 0 16 16">
               <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
             </svg>
           </button>
         </div>
       </div>
 
-      <!-- Histogram Cards -->
-      <div 
-        v-for="data in histogramDataArr" 
-        :key="data.id"
-        class="card bg-base-200 shadow-sm hover:shadow-md transition-shadow duration-200"
-      >
-        <template v-if="data.data.length > 1">
-          <div class="card-body p-5">
-            <!-- Filter Header -->
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="card-title text-base font-semibold text-primary">
-                {{ data.label }}
-              </h3>
-              <button 
+      <!-- Histograms Grid - Responsivo -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div 
+          v-for="data in histogramDataArr" 
+          :key="data.id"
+          class="card bg-base-200 shadow-sm hover:shadow-md transition-shadow duration-200"
+        >
+          <template v-if="data.data.length > 1">
+            <div class="card-body p-4">
+              <!-- Header -->
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-semibold text-primary line-clamp-1" :title="data.label">
+                  {{ data.label }}
+                </h4>
+                <button 
+                  v-if="histogramRangeSliderStore.properties[data.propName]?.filterActivated"
+                  type="button"
+                  class="btn btn-ghost btn-xs btn-circle hover:btn-error"
+                  @click="clearFilter(data.propName, data.rangeFilter)"
+                  :aria-label="`Clear ${data.label} filter`"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="size-4" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Histogram Component -->
+              <HistogramRangeSlider 
+                class="w-full" 
+                :chemPropArr="data.data" 
+                :step="data.step"
+                :rangeFilter="data.rangeFilter" 
+                :propName="data.propName"
+                @reloadHistogramRangeSlider="reloadHistogramRangeSliderDiv" 
+              />
+
+              <!-- Active Range Display -->
+              <div 
                 v-if="histogramRangeSliderStore.properties[data.propName]?.filterActivated"
-                type="button"
-                class="btn btn-ghost btn-sm btn-circle hover:btn-error tooltip tooltip-left"
-                data-tip="Clear this filter" 
-                @click="clearFilter(data.propName, data.rangeFilter)"
+                class="mt-3 pt-3 border-t border-base-300"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="size-5" viewBox="0 0 16 16">
-                  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
-                </svg>
-              </button>
+                <p class="text-xs text-base-content/60 text-center">
+                  Active: <span class="font-semibold text-primary">{{ formatFilterRange(data.propName) }}</span>
+                </p>
+              </div>
             </div>
-
-            <!-- Histogram Component -->
-            <HistogramRangeSlider 
-              class="w-full" 
-              :chemPropArr="data.data" 
-              :step="data.step"
-              :rangeFilter="data.rangeFilter" 
-              :propName="data.propName"
-              @reloadHistogramRangeSlider="reloadHistogramRangeSliderDiv" 
-            />
-
-            <!-- Current Range Display -->
-            <div 
-              v-if="histogramRangeSliderStore.properties[data.propName]?.filterActivated"
-              class="mt-3 pt-3 border-t border-base-300"
-            >
-              <p class="text-xs text-base-content/60 text-center">
-                Active range:
-                <span class="font-semibold text-primary">
-                  {{ formatFilterRange(data.propName) }}
-                </span>
-              </p>
-            </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
 
       <!-- Empty State -->
-      <div v-if="histogramDataArr.length === 0" class="alert alert-warning">
+      <div v-if="histogramDataArr.length === 0" class="alert alert-warning shadow-lg">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <div>
           <h4 class="font-bold">No histogram data available</h4>
-          <p class="text-sm">Perform a search to enable histogram filters.</p>
+          <p class="text-sm">Enter a query in the search field above to load histogram filters.</p>
         </div>
       </div>
     </div>
@@ -96,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, inject } from "vue"
+import { ref, computed, onMounted, inject, watch } from "vue"
 import HistogramRangeSlider from "~/components/HistogramRangeSlider.vue"
 import { useChemicalPropertiesListStore } from "~/stores/chemicalPropertiesList"
 import { useFetchChemicalStore } from "~/stores/fetchChemicalStore"
@@ -110,6 +111,7 @@ const histogramRangeSliderStore = useHistogramRangeSliderStore()
 
 const histogramRangeSliderDiv = ref(1)
 const loading = ref(false)
+const reloadHistogramTrigger = inject<Ref<number>>('reloadHistogramTrigger', ref(0))
 
 interface HistogramData {
   id: number
@@ -142,16 +144,19 @@ const formatFilterRange = (propName: string) => {
   const props = histogramRangeSliderStore.properties[propName]
   if (!props || !props.filterActivated) return ''
   
-  return `${props.minSelected ?? props.min} - ${props.maxSelected ?? props.max}`
+  const min = props.minSelected ?? props.min
+  const max = props.maxSelected ?? props.max
+  
+  // Format large numbers
+  const formatNum = (num: number) => {
+    if (Math.abs(num) >= 1000) {
+      return num.toLocaleString()
+    }
+    return num
+  }
+  
+  return `${formatNum(min)} - ${formatNum(max)}`
 }
-
-// ✅ Recebe trigger da página pai
-const reloadHistogramTrigger = inject<Ref<number>>('reloadHistogramTrigger', ref(1))
-
-// ✅ Watch para reload quando pai limpar todos os filtros
-watch(reloadHistogramTrigger, async () => {
-  await reloadHistogramRangeSliderDiv()
-})
 
 // Reload histogram data
 async function reloadHistogramRangeSliderDiv() {
@@ -169,7 +174,7 @@ const loadChemPropsList = async () => {
     histogramDataArr.value = [
       {
         id: 1,
-        label: 'Molecular Weight, g/mol',
+        label: 'Molecular Weight (g/mol)',
         data: chemicalPropertiesListStore.properties.molecular_weight,
         step: 25,
         rangeFilter: {
@@ -180,7 +185,7 @@ const loadChemPropsList = async () => {
       },
       {
         id: 2,
-        label: 'Polar Surface Area (TPSA), Ų',
+        label: 'TPSA (Ų)',
         data: chemicalPropertiesListStore.properties.tpsa,
         step: 10,
         rangeFilter: {
@@ -202,7 +207,7 @@ const loadChemPropsList = async () => {
       },
       {
         id: 4,
-        label: 'Rotatable Bond Count',
+        label: 'Rotatable Bonds',
         data: chemicalPropertiesListStore.properties.rotatable_bond,
         step: 1,
         rangeFilter: {
@@ -213,7 +218,7 @@ const loadChemPropsList = async () => {
       },
       {
         id: 5,
-        label: 'H-Bond Donor Count',
+        label: 'H-Bond Donors',
         data: chemicalPropertiesListStore.properties.h_bond_donor,
         step: 1,
         rangeFilter: {
@@ -224,7 +229,7 @@ const loadChemPropsList = async () => {
       },
       {
         id: 6,
-        label: 'H-Bond Acceptor Count',
+        label: 'H-Bond Acceptors',
         data: chemicalPropertiesListStore.properties.h_bond_acceptor,
         step: 1,
         rangeFilter: {
@@ -235,7 +240,7 @@ const loadChemPropsList = async () => {
       },
       {
         id: 7,
-        label: 'Melting Point, °C',
+        label: 'Melting Point (°C)',
         data: [
           ...chemicalPropertiesListStore.properties.mp_lower_bound,
           ...chemicalPropertiesListStore.properties.mp_upper_bound
@@ -249,7 +254,7 @@ const loadChemPropsList = async () => {
       }
     ].filter(item => item.data.length > 1) // Only show histograms with data
   } catch (error) {
-    console.error('Error loading chemical properties:', error)
+    console.error('Error loading molecular properties:', error)
   } finally {
     loading.value = false
   }
@@ -265,13 +270,13 @@ const clearFilter = async (propName: string, rangeFilter: any) => {
   await reloadHistogramRangeSliderDiv()
 }
 
-// Lifecycle hooks
-onMounted(() => {
-  loadChemPropsList()
+// Watch for reload trigger from parent
+watch(reloadHistogramTrigger, async () => {
+  await reloadHistogramRangeSliderDiv()
 })
 
-onBeforeUnmount(() => {
-  // Don't reset on unmount - preserve filters
-  // chemicalPropertiesListStore.$reset()
+// Lifecycle hooks
+onMounted(async () => {
+  await loadChemPropsList()
 })
 </script>
