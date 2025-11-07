@@ -20,8 +20,9 @@
               <ShieldCheckIcon class="h-4 w-4" />
               Advanced Filtering
             </div>
-            
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+
+            <h1
+              class="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Advanced Chemical Search
             </h1>
             <p class="text-sm md:text-base text-base-content/70 max-w-2xl mx-auto">
@@ -37,7 +38,7 @@
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-6 max-w-7xl">
-      
+
       <!-- Stats & Action Bar -->
       <div class="card bg-base-100 shadow-xl border border-base-300 mb-6">
         <div class="card-body p-4">
@@ -67,33 +68,28 @@
               </div>
 
               <!-- Results -->
-              <div v-if="fetchChemicalStore.totalChemicals > 0" class="stats stats-horizontal shadow-sm bg-base-200 border border-base-300">
+              <div v-if="fetchChemicalStore.totalChemicals > 0"
+                class="stats stats-horizontal shadow-sm bg-base-200 border border-base-300">
                 <div class="stat p-3 min-w-[120px]">
                   <div class="stat-figure text-success">
                     <CheckCircleIcon class="h-6 w-6" />
                   </div>
                   <div class="stat-title text-xs">Results</div>
-                  <div class="stat-value text-success text-xl">{{ formatNumber(fetchChemicalStore.totalChemicals) }}</div>
+                  <div class="stat-value text-success text-xl">{{ formatNumber(fetchChemicalStore.totalChemicals) }}
+                  </div>
                 </div>
               </div>
 
               <!-- Action Buttons Row - Desktop Only -->
               <div class="hidden sm:flex flex-wrap gap-2 ml-auto">
-                <button 
-                  @click="handleSearch" 
-                  class="btn btn-primary gap-2"
-                  :disabled="isSearching"
-                >
+                <button @click="handleSearch" class="btn btn-primary gap-2" :disabled="isSearching">
                   <MagnifyingGlassIcon class="h-5 w-5" />
                   <span>{{ isSearching ? 'Searching...' : 'Search Now' }}</span>
                   <span v-if="isSearching" class="loading loading-spinner loading-sm"></span>
                 </button>
 
-                <button 
-                  @click="handleClearAllFilters" 
-                  class="btn btn-outline btn-error gap-2"
-                  :disabled="activeFiltersCount === 0 || isSearching"
-                >
+                <button @click="handleClearAllFilters" class="btn btn-outline btn-error gap-2"
+                  :disabled="activeFiltersCount === 0 || isSearching">
                   <ArrowPathIcon class="h-5 w-5" />
                   <span>Reset All</span>
                 </button>
@@ -103,7 +99,8 @@
                   <label tabindex="0" class="btn btn-ghost btn-circle">
                     <InformationCircleIcon class="h-6 w-6" />
                   </label>
-                  <div tabindex="0" class="dropdown-content z-[1] card compact w-80 shadow-2xl bg-base-100 border border-base-300 mt-2">
+                  <div tabindex="0"
+                    class="dropdown-content z-[1] card compact w-80 shadow-2xl bg-base-100 border border-base-300 mt-2">
                     <div class="card-body">
                       <h3 class="font-bold flex items-center gap-2 text-sm mb-3">
                         <InformationCircleIcon class="h-5 w-5 text-info" />
@@ -133,7 +130,7 @@
               </div>
 
               <!-- Active Badge -->
-              <div v-if="activeFiltersCount > 0" class="hidden sm:block ml-auto">
+              <div v-if="activeFiltersCount > 0" class="hidden sm:block">
                 <div class="badge badge-primary badge-lg gap-2">
                   <BoltIcon class="h-4 w-4" />
                   <span class="font-semibold">{{ activeFiltersCount }} active</span>
@@ -151,48 +148,40 @@
             <DocumentTextIcon class="h-5 w-5" />
             <span class="hidden sm:inline font-medium">Literature</span>
             <span class="sm:hidden font-medium">Lit</span>
-            <span v-if="getLiteratureFiltersCount > 0" 
-                  class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0">
+            <span v-if="getLiteratureFiltersCount > 0"
+              class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0">
               {{ getLiteratureFiltersCount }}
             </span>
           </a>
-          
-          <a 
-            role="tab" 
-            class="tab gap-2 relative"
-            :class="{ 'tab-active': activeTab === 'molecular' }"
-            @click="activeTab = 'molecular'"
-          >
+
+          <a role="tab" class="tab gap-2 relative" :class="{ 'tab-active': activeTab === 'molecular' }"
+            @click="activeTab = 'molecular'">
             <BeakerIcon class="h-5 w-5" />
             <span class="hidden sm:inline font-medium">Molecular</span>
             <span class="sm:hidden font-medium">Mol</span>
-            <span v-if="getMolecularFiltersCount > 0" 
-                  class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0 flex items-center justify-center">
+            <span v-if="getMolecularFiltersCount > 0"
+              class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0 flex items-center justify-center">
               {{ getMolecularFiltersCount }}
             </span>
           </a>
-          
-          <a 
-            role="tab" 
-            class="tab gap-2 relative"
-            :class="{ 'tab-active': activeTab === 'druglike' }"
-            @click="activeTab = 'druglike'"
-          >
+
+          <a role="tab" class="tab gap-2 relative" :class="{ 'tab-active': activeTab === 'druglike' }"
+            @click="activeTab = 'druglike'">
             <CubeIcon class="h-5 w-5" />
             <span class="hidden sm:inline font-medium">Drug-Like</span>
             <span class="sm:hidden font-medium">Drug</span>
-            <span v-if="getDrugLikenessFiltersCount > 0" 
-                  class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0 flex items-center justify-center">
+            <span v-if="getDrugLikenessFiltersCount > 0"
+              class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0 flex items-center justify-center">
               {{ getDrugLikenessFiltersCount }}
             </span>
           </a>
-          
+
           <a role="tab" class="tab gap-2 relative" @click="activeTab = 'pharmaco'">
             <ChartBarIcon class="h-5 w-5" />
             <span class="hidden sm:inline font-medium">Pharmacokinetics</span>
             <span class="sm:hidden font-medium">PK</span>
-            <span v-if="getPharmacokineticsFiltersCount > 0" 
-                  class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0">
+            <span v-if="getPharmacokineticsFiltersCount > 0"
+              class="absolute -top-1 -right-1 badge badge-xs badge-primary w-5 h-5 p-0">
               {{ getPharmacokineticsFiltersCount }}
             </span>
           </a>
@@ -211,7 +200,7 @@
                 <BeakerIcon v-if="activeTab === 'molecular'" class="h-5 w-5 text-primary" />
                 <CubeIcon v-if="activeTab === 'druglike'" class="h-5 w-5 text-primary" />
                 <ChartBarIcon v-if="activeTab === 'pharmaco'" class="h-5 w-5 text-primary" />
-                
+
                 <span v-if="activeTab === 'literature'">Literature Filters</span>
                 <span v-if="activeTab === 'molecular'">Molecular Properties</span>
                 <span v-if="activeTab === 'druglike'">Drug-Likeness Criteria</span>
@@ -301,22 +290,15 @@
           </div>
 
           <!-- Search Button -->
-          <button 
-            @click="handleSearch" 
-            class="btn btn-primary btn-sm gap-2 flex-1"
-            :disabled="isSearching"
-          >
+          <button @click="handleSearch" class="btn btn-primary btn-sm gap-2 flex-1" :disabled="isSearching">
             <MagnifyingGlassIcon class="h-4 w-4" />
             <span>{{ isSearching ? 'Searching...' : 'Search' }}</span>
             <span v-if="isSearching" class="loading loading-spinner loading-xs"></span>
           </button>
 
           <!-- Reset Button -->
-          <button 
-            @click="handleClearAllFilters" 
-            class="btn btn-outline btn-error btn-sm gap-1"
-            :disabled="activeFiltersCount === 0 || isSearching"
-          >
+          <button @click="handleClearAllFilters" class="btn btn-outline btn-error btn-sm gap-1"
+            :disabled="activeFiltersCount === 0 || isSearching">
             <ArrowPathIcon class="h-4 w-4" />
             <span>Reset</span>
           </button>
@@ -326,7 +308,8 @@
             <label tabindex="0" class="btn btn-ghost btn-sm btn-circle">
               <InformationCircleIcon class="h-5 w-5" />
             </label>
-            <div tabindex="0" class="dropdown-content z-[1] card compact w-80 shadow-2xl bg-base-100 border border-base-300 mb-2">
+            <div tabindex="0"
+              class="dropdown-content z-[1] card compact w-80 shadow-2xl bg-base-100 border border-base-300 mb-2">
               <div class="card-body">
                 <h3 class="font-bold flex items-center gap-2 text-sm mb-3">
                   <InformationCircleIcon class="h-5 w-5 text-info" />
@@ -408,15 +391,15 @@ const formatNumber = (num: number) => {
 
 const activeFiltersCount = computed(() => {
   let count = 0
-  
+
   Object.entries(filterStore.filters.exact).forEach(([key, value]) => {
     if (value && value != '') count++
   })
-  
+
   Object.entries(filterStore.filters.range).forEach(([key, range]) => {
     if (range.gte != null || range.lte != null) count++
   })
-  
+
   return count
 })
 
@@ -425,39 +408,39 @@ const availableCategoriesCount = computed(() => 4)
 const getMolecularFiltersCount = computed(() => {
   let count = 0
   const molecularProps = [
-    'molecular_weight', 'tpsa', 'count_heavy_atom', 
-    'count_rotatable_bond', 'count_h_bond_donor', 'count_h_bond_acceptor', 
+    'molecular_weight', 'tpsa', 'count_heavy_atom',
+    'count_rotatable_bond', 'count_h_bond_donor', 'count_h_bond_acceptor',
     'mp_lower_bound', 'mp_upper_bound'
   ]
-  
+
   molecularProps.forEach(prop => {
     const range = filterStore.filters.range[prop]
     if (range && (range.gte != null || range.lte != null)) count++
   })
-  
+
   return count
 })
 
 const getDrugLikenessFiltersCount = computed(() => {
   let count = 0
   const drugLikeProps = ['count_lipinski_violation', 'count_pains_alert', 'jplogp']
-  
+
   drugLikeProps.forEach(prop => {
     const range = filterStore.filters.range[prop]
     if (range && (range.gte != null || range.lte != null)) count++
   })
-  
+
   return count
 })
 
 const getLiteratureFiltersCount = computed(() => {
   let count = 0
-  
+
   if (filterStore.filters.exact.doi) count++
   if (filterStore.filters.exact.title) count++
-  if (filterStore.filters.range.publication_date?.after || 
-      filterStore.filters.range.publication_date?.before) count++
-  
+  if (filterStore.filters.range.publication_date?.after ||
+    filterStore.filters.range.publication_date?.before) count++
+
   return count
 })
 
@@ -472,23 +455,23 @@ const getPharmacokineticsFiltersCount = computed(() => {
     'cyp2d6_inhibitor',
     'cyp3a4_inhibitor'
   ]
-  
+
   pharmaProps.forEach(prop => {
     if (filterStore.filters.exact[prop] === true) count++
   })
-  
+
   return count
 })
 
 const handleSearch = async () => {
   isSearching.value = true
-  
+
   try {
     fetchChemicalStore.setType('search')
     fetchChemicalStore.setMode('summary')
     await fetchChemicalStore.fetchChemicals()
     await chemicalPropertiesListStore.fetchAllChemicalProperties()
-    
+
     router.push('/chemicals/search')
   } catch (error) {
     console.error('Search error:', error)
@@ -501,10 +484,10 @@ const handleClearAllFilters = async () => {
   histogramRangeSliderStore.$reset()
   filterStore.$reset()
   sortStore.$reset()
-  
+
   await fetchChemicalStore.fetchChemicals()
   await chemicalPropertiesListStore.fetchAllChemicalProperties()
-  
+
   reloadHistogramTrigger.value++
 }
 
