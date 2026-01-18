@@ -3,6 +3,8 @@ from celery import Task
 from django.apps import apps
 import logging
 
+from tasks.models import UserTask
+
 logger = logging.getLogger(__name__)
 
 
@@ -53,7 +55,6 @@ class ChainedTask(AbortableTask):
         
         # Check your UserTask model for explicit revocation
         try:
-            UserTask = apps.get_model('tasks', 'UserTask')
             task = UserTask.objects.filter(task_id=self.request.id).first()
             
             if task and task.is_revoked:
@@ -81,7 +82,6 @@ class ChainedTask(AbortableTask):
         Use this to detect revocation after task completes.
         """
         try:
-            UserTask = apps.get_model('tasks', 'UserTask')
             user_task = UserTask.objects.filter(task_id=task_id).first()
             
             # If explicitly revoked, trigger cleanup

@@ -11,6 +11,10 @@ class UserTask(models.Model):
     def _user_directory_path(instance, filename):
         return f"tasks/{uuid.uuid4()}/{filename}"
     
+    @property
+    def is_revoked(self) -> bool:
+        return True if self.status == self.TaskStatus.REVOKED else False
+    
     class TaskStatus(models.TextChoices):
         """Task possible statuses.
 
