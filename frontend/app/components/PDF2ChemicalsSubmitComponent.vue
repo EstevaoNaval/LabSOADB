@@ -180,6 +180,8 @@ import XHRUpload from '@uppy/xhr-upload'
 import '@uppy/core/css/style.min.css';
 import '@uppy/dashboard/css/style.min.css';
 
+import { navigateTo } from 'nuxt/app';
+
 import { useThemeStore } from '~/stores/theme';
 import { useAuthStore } from '~/stores/auth'
 
@@ -330,6 +332,9 @@ const uploadFiles = async () => {
   try {
     setUppyUploadMeta()
     await uppy.upload()
+
+    closeModal()
+    navigateTo('/dashboard#user-task-table')
   } finally {
     loading.value = false
   }
@@ -350,6 +355,8 @@ const setUppyUploadMeta = () => {
 
   uppy.setMeta(uppyUploadMeta);
 }
+
+const closeModal = inject('closeModal')
 
 watch(exportFormatRadio, (newVal) => {
   if (newVal === 'json') {

@@ -182,7 +182,7 @@ def replace_filename_formats_in_template(script_content: str, filename: str):
 # Function to generate a script name with a random suffix
 def generate_script_name(base_name="pbs-script") -> str:
     """
-    Generates a unique PBS script name with a uuid4 suffix.
+    Generates a unique PBS script name with a uuid4 suffix.\n
     Returns: The script name with the random suffix.
     """
         

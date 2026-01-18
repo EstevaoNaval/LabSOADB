@@ -8,8 +8,12 @@
           <!-- Breadcrumbs -->
           <div class="breadcrumbs text-sm mb-4">
             <ul>
-              <li><a href="/" class="link link-hover">Home</a></li>
-              <li><a href="/chemicals" class="link link-hover">Chemicals</a></li>
+              <li>
+                <NuxtLink to="/" class="link link-hover">Home</NuxtLink>
+              </li>
+              <li>
+                <NuxtLink to="/chemicals" class="link link-hover">Chemicals</NuxtLink>
+              </li>
               <li class="font-semibold">Advanced Search</li>
             </ul>
           </div>

@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "daisyui": "^5.2.3",
+    "nuxt-anchorscroll": "^1.0.5",
     "sass": "^1.77.5"
   }
 }

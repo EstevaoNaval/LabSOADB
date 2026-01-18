@@ -61,10 +61,10 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    //'@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@nuxt/image',
+    'nuxt-anchorscroll'
   ],
 
   piniaPluginPersistedstate: {
@@ -97,6 +97,10 @@ export default defineNuxtConfig({
     '~/assets/css/collapse-animation.css',
     '~/assets/css/tailwind.css'
   ],
+
+  anchorscroll: {
+    hooks: ['page:finish'], // Default hook; triggers after page loads
+  },
 
   runtimeConfig: {
     public: {

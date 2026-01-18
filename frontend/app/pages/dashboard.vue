@@ -172,7 +172,7 @@
     <!-- Content Sections -->
     <div class="container mx-auto px-4 py-12 space-y-12">
       <!-- User Tasks Section -->
-      <section class="space-y-6">
+      <section class="space-y-6" id="user-task">
         <div class="flex items-center justify-between">
           <h2 class="text-2xl md:text-3xl font-bold">User Tasks</h2>
           <div class="badge badge-lg badge-neutral">
@@ -185,7 +185,7 @@
           :pagination="userTaskPagination" />
 
         <!-- Table -->
-        <div class="card bg-base-100 shadow-xl overflow-x-auto">
+        <div class="card bg-base-100 shadow-xl overflow-x-auto" id="user-task-table">
           <user-tasks-table />
         </div>
 
@@ -236,7 +236,7 @@ import UserTasksTable from '~/components/UserTasksTable.vue'
 import UserChemicalsTable from '~/components/UserChemicalsTable.vue'
 import PaginationControls from '~/components/PaginationControls.vue'
 
-import { useRouter } from 'nuxt/app'
+import { useRoute, useRouter } from 'nuxt/app'
 import { defineAsyncComponent, watch } from 'vue'
 import { useUserChemicalsStore } from '~/stores/userChemicals'
 import { useUserTasksStore } from '~/stores/userTasks'
@@ -256,6 +256,8 @@ const PDF2ChemicalsSubmitComponent = defineAsyncComponent({
 })
 
 
+const { scrollToAnchor } = useAnchorScroll()
+const route = useRoute()
 const router = useRouter()
 
 // Stores
@@ -351,6 +353,15 @@ watch(() => userChemicalsPagination.state.page, (newPage) => {
 // Lifecycle
 onBeforeMount(() => {
   loadDashboardData()
+})
+
+onMounted(() => {
+  if (route.hash) {
+
+    setTimeout(() => {
+      scrollToAnchor(route.hash.slice(1))
+    }, 200)
+  }
 })
 
 definePageMeta({
