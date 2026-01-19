@@ -10,15 +10,12 @@ import json
 import subprocess
 import uuid
 import logging
-from datetime import datetime
+
 from celery import chain, group, shared_task
-from celery.result import AsyncResult
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
 from tasks.models import UserTask
-from tasks.util.tasks import BaseTask
 from user.models import User
 from pdf2chemicals_service.util.tasks import ChainedTask
 from chemicals.tasks import post_chemical
@@ -92,7 +89,7 @@ def extract_and_save_chemicals_from_pdf(
         raise self.retry(countdown=10, max_retries=5)
     
     # ✅ Create UserTask record
-    pdf_task = UserTask.objects.update_or_create(
+    pdf_task, _ = UserTask.objects.update_or_create(
         task_id=parent_task_id,
         defaults={
             "user": user,

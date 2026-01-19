@@ -1,10 +1,15 @@
 import uuid
+import logging
+
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from user.models import User
 from import_export_extensions.models import ExportJob
+
+logger = logging.getLogger(__name__)
 
 class UserTask(models.Model):
     
@@ -14,6 +19,13 @@ class UserTask(models.Model):
     @property
     def is_revoked(self) -> bool:
         return True if self.status == self.TaskStatus.REVOKED else False
+    
+    def mark_revoked(self):
+        """Mark task as revoked"""
+        self.status = self.TaskStatus.REVOKED
+        self.concluded_at = timezone.now()
+        self.save()
+        logger.info(f"✓ Task {self.task_id} marked as revoked")
     
     class TaskStatus(models.TextChoices):
         """Task possible statuses.
