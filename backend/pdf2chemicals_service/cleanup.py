@@ -1,13 +1,11 @@
-import os
 import logging
+
 from celery import shared_task
-from django.conf import settings
-from tasks.models import UserTask
-from .cluster import ClusterNodeManager
-from .util.util import remove_file
+
+from .cluster import ClusterNodeManager, cancel_hpc_job
+from .util.util import remove_file, file_exists
 
 logger = logging.getLogger(__name__)
-
 
 @shared_task(
     name='pdf2chemicals_service.tasks.cleanup_pdf2chemicals_resources',
@@ -19,88 +17,59 @@ logger = logging.getLogger(__name__)
 )
 def cleanup_pdf2chemicals_resources(self, cleanup_data):
     """
-    Dedicated cleanup task for revocation scenarios.
+    Cleanup resources on revocation or error.
     
-    Handles release of cluster resources and deletion of temporary files.
-    
-    Args:
-        cleanup_data (dict): Dictionary containing:
-            - node_name (str): Cluster node to release
-            - reservation_id (str): Reservation ID to validate
-            - pbs_script_path (str): PBS script file to delete
-            - pdf_path (str): PDF file to delete
-            - json_filepath (str): JSON result file to delete
-            - job_id (str, optional): HPC job ID if submitted
-            - task_id (str): Celery task ID for tracking
-    
-    Returns:
-        dict: Cleanup status report
+    Handles all file types:
+    - JSON files
+    - PBS scripts
+    - PDFs
+    - HPC nodes
     """
-    if not cleanup_data:
-        logger.warning('cleanup_pdf2chemicals_resources called with empty data')
-        return {'cleanup': 'skipped', 'reason': 'no cleanup data'}
     
-    task_id = cleanup_data.get('task_id', 'unknown')
-    cleanup_report = {
-        'task_id': task_id,
-        'node_released': False,
-        'files_deleted': [],
-        'errors': []
-    }
-    
-    cluster_node_manager = ClusterNodeManager()
-    
-    # Step 1: Release cluster node (CRITICAL - prevents starvation)
-    if cleanup_data.get('node_name'):
+    # Clean JSON file
+    json_filepath = cleanup_data.get('json_filepath')
+    if json_filepath and file_exists(json_filepath):
         try:
-            cluster_node_manager.mark_node_as_available(
-                cleanup_data['node_name']
-            )
-            cleanup_report['node_released'] = True
-            logger.info(
-                f"✓ Released cluster node {cleanup_data['node_name']} "
-                f"(task: {task_id})"
-            )
+            remove_file(json_filepath)
+            logger.info(f"✓ Cleaned up JSON: {json_filepath}")
         except Exception as e:
-            error_msg = (
-                f"Failed to release node {cleanup_data['node_name']}: {e}"
-            )
-            logger.error(error_msg)
-            cleanup_report['errors'].append(error_msg)
+            logger.warning(f"Failed to cleanup JSON: {e}")
     
-    # Step 2: Delete temporary files
-    file_keys = ['pbs_script_path', 'pdf_path', 'json_filepath']
-    for file_key in file_keys:
-        if cleanup_data.get(file_key):
-            file_path = cleanup_data[file_key]
-            try:
-                if os.path.exists(file_path):
-                    remove_file(file_path)
-                    cleanup_report['files_deleted'].append(file_path)
-                    logger.info(f"✓ Deleted {file_key}: {file_path}")
-            except Exception as e:
-                error_msg = f"Failed to delete {file_key}: {e}"
-                logger.warning(error_msg)
-                cleanup_report['errors'].append(error_msg)
+    # Clean PBS script
+    pbs_script = cleanup_data.get('pbs_script_path')
+    if pbs_script and file_exists(pbs_script):
+        try:
+            remove_file(pbs_script)
+            logger.info(f"✓ Cleaned up PBS script: {pbs_script}")
+        except Exception as e:
+            logger.warning(f"Failed to cleanup PBS: {e}")
     
-    # Step 3: Update UserTask status to REVOKED
-    try:
-        UserTask.objects.filter(task_id=task_id).update(
-            status=UserTask.TaskStatus.REVOKED
-        )
-        logger.info(f"✓ Updated UserTask {task_id} status to REVOKED")
-    except Exception as e:
-        error_msg = f"Failed to update UserTask {task_id}: {e}"
-        logger.error(error_msg)
-        cleanup_report['errors'].append(error_msg)
+    # Clean PDF
+    pdf_path = cleanup_data.get('pdf_path')
+    if pdf_path and file_exists(pdf_path):
+        try:
+            remove_file(pdf_path)
+            logger.info(f"✓ Cleaned up PDF: {pdf_path}")
+        except Exception as e:
+            logger.warning(f"Failed to cleanup PDF: {e}")
     
-    # Log final report
-    if cleanup_report['errors']:
-        logger.warning(
-            f"Cleanup completed for {task_id} with errors: "
-            f"{cleanup_report['errors']}"
-        )
-    else:
-        logger.info(f"✓ Cleanup completed successfully for {task_id}")
+    # Release cluster node
+    node_name = cleanup_data.get('node_name')
+    if node_name:
+        try:
+            cluster_node_manager = ClusterNodeManager()
+            cluster_node_manager.mark_node_as_available(node_name)
+            logger.info(f"✓ Released node: {node_name}")
+        except Exception as e:
+            logger.warning(f"Failed to release node: {e}")
     
-    return cleanup_report
+    # Kill HPC job
+    job_id = cleanup_data.get('job_id')
+    if job_id:
+        try:
+            cancel_hpc_job(job_id)
+            logger.info(f"✓ Killed job: {job_id}")
+        except Exception as e:
+            logger.warning(f"Failed to kill job: {e}")
+    
+    logger.info(f"✓ Cleanup completed for revoked task")

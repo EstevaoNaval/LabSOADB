@@ -177,8 +177,7 @@ class RevokeTaskAPIView(APIView):
             # Step 4: Update database status
             # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             
-            user_task.status = UserTask.TaskStatus.REVOKED
-            user_task.save()
+            user_task.mark_revoked()
             
             # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             # Step 5: Send abort to Celery worker
