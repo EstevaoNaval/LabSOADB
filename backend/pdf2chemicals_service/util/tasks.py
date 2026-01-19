@@ -32,40 +32,41 @@ class ChainedTask(AbortableTask):
             args = ()
         return super(ChainedTask, self).__call__(*args, **kwargs)
     
-    def check_revocation(self):
+    def check_revocation(self, task_id=None):
         """
-        Check if task was revoked either via:
-        1. Celery's internal abortion flag (is_aborted())
-        2. UserTask model is_revoked flag
+        Check if task is revoked via UserTask.status field.
+        
+        Args:
+            task_id (str, optional): Task ID to check. 
+                                    Defaults to current task ID.
         
         Returns:
-            bool: True if task should abort, False otherwise
+            bool: True if task status is REVOKED
         
-        Usage:
-            if self.check_revocation():
-                # Cleanup and return
+        Example:
+            if self.check_revocation(parent_task_id):
+                logger.warning("Task was revoked")
                 return {'revoked': True}
         """
-        # Check Celery's internal abortion flag
-        if self.is_aborted():
-            logger.warning(
-                f'Task {self.request.id} aborted via Celery signal'
-            )
-            return True
+        check_id = task_id or str(self.request.id)
         
-        # Check your UserTask model for explicit revocation
         try:
-            task = UserTask.objects.filter(task_id=self.request.id).first()
+            user_task = UserTask.objects.get(task_id=check_id)
+            is_revoked = user_task.status == UserTask.TaskStatus.REVOKED
             
-            if task and task.is_revoked:
+            if is_revoked:
                 logger.warning(
-                    f'Task {self.request.id} revoked via UserTask model'
+                    f"Task {check_id} is revoked (status={user_task.status})"
                 )
-                return True
-        except Exception as e:
-            logger.error(f'Error checking UserTask revocation: {e}')
+            
+            return is_revoked
         
-        return False
+        except UserTask.DoesNotExist:
+            logger.warning(f"UserTask not found for {check_id}")
+            return False
+        except Exception as e:
+            logger.error(f"Error checking revocation for {check_id}: {e}")
+            return False
     
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         """
