@@ -644,12 +644,11 @@ def post_chemicals_in_db(self, *args, **kwargs):
         dict: chemical_count and parent_task_id (or revocation signal)
     """
     # Extract from args (chain passes result_data as first arg)
-    result_data = args if args else {}
     user_id = kwargs.get('user_id')
     parent_task_id = kwargs.get('parent_task_id')
     
     # ✅ CHECK IF PREVIOUS TASK WAS REVOKED
-    if isinstance(result_data, dict) and result_data.get('revoked'):
+    if kwargs.get('revoked'):
         logger.warning(f"Skipped - chain was revoked")
         return {'revoked': True, 'parent_task_id': parent_task_id}
     
@@ -659,7 +658,7 @@ def post_chemicals_in_db(self, *args, **kwargs):
         return {'revoked': True, 'parent_task_id': parent_task_id}
     
     # Extract chemical list
-    chemical_list = result_data.get('chemical_list', [])
+    chemical_list = kwargs.get('chemical_list', [])
     
     if not chemical_list:
         logger.warning(f"No chemicals to post")
@@ -715,11 +714,9 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
     Returns:
         dict: Final result with file path and metadata
     """
-    # Extract from args (chain passes chemical_count_data as first arg)
-    chemical_count_data = args if args else {}
-    
+
     # ✅ CHECK IF PREVIOUS TASK WAS REVOKED
-    if isinstance(chemical_count_data, dict) and chemical_count_data.get('revoked'):
+    if kwargs.get('revoked'):
         logger.warning(f"Revoked before final result")
         task_id = kwargs.get('task_id')
         if task_id:
@@ -739,6 +736,7 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
     output_dir = kwargs.get('output_dir')
     output_filename = kwargs.get('output_filename')
     export_format = kwargs.get('export_format')
+    chemical_count = kwargs.get('chemical_count', 0)    
     
     # Validate required parameters
     if not all([task_id, output_dir, output_filename, export_format]):
@@ -758,7 +756,7 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
         user_task.result = {
             'file': output_relative_filepath,
             'format': export_format,
-            'chemical_count': chemical_count_data.get('chemical_count', 0)
+            'chemical_count': chemical_count
         }
         user_task.concluded_at = timezone.now()
         user_task.save()
