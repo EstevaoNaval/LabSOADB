@@ -1,7 +1,6 @@
 import logging
 
 from celery import current_app
-from celery.result import AsyncResult
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
@@ -185,7 +184,7 @@ class RevokeTaskAPIView(APIView):
             
             # For AbortableTask-based tasks:
             # This triggers is_aborted() → check_revocation() → cleanup
-            AsyncResult(str(task_id)).abort()
+            current_app.control.revoke(task_id, terminate=True, signal='SIGKILL')
             
             # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             # Step 6: Audit logging
