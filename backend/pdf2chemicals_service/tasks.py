@@ -18,17 +18,13 @@ import json
 import subprocess
 import uuid
 import logging
-from datetime import datetime
 from celery import chain, group, shared_task
-from celery.result import AsyncResult
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
 from tasks.models import UserTask
-from tasks.util.tasks import BaseTask
 from user.models import User
-from pdf2chemicals_service.util.tasks import ChainedTask
+from tasks.util.tasks import ChainedTask, ChainedFinalTask
 from chemicals.tasks import post_chemical
 from .util.util import file_exists, remove_file
 from .cluster import (
@@ -136,7 +132,6 @@ def extract_and_save_chemicals_from_pdf(
                 export_format=export_format,
                 output_dir=output_dir,
                 output_filename=output_filename,
-                task_id=parent_task_id,
                 parent_task_id=parent_task_id
             )
         )
@@ -150,7 +145,7 @@ def extract_and_save_chemicals_from_pdf(
                 export_format=export_format,
                 conf_formats=conf_formats,
                 structure_formats=structure_formats,
-                task_id=parent_task_id
+                parent_task_id=parent_task_id
             ),
             task_id=parent_task_id
         )
@@ -193,27 +188,27 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     export_format = kwargs.get('export_format')
     conf_formats = kwargs.get('conf_formats')
     structure_formats = kwargs.get('structure_formats')
-    task_id = kwargs.get('task_id')
+    parent_task_id = kwargs.get('parent_task_id')
     
-    task = UserTask.objects.filter(task_id=task_id).first()
+    task = UserTask.objects.filter(task_id=parent_task_id).first()
     
     if not task:
-        logger.error(f"Task {task_id} not found in error handler")
+        logger.error(f"Task {parent_task_id} not found in error handler")
         return
     
     # ✅ Skip retry if task was revoked
     if task.status == UserTask.TaskStatus.REVOKED:
-        logger.info(f"Skipping retry for revoked task {task_id}")
+        logger.info(f"Skipping retry for revoked task {parent_task_id}")
         return
     
     # Skip retry if already succeeded or in retry state
     if task.status in [UserTask.TaskStatus.SUCCESS, UserTask.TaskStatus.RETRY]:
         logger.info(
-            f"Skipping retry for task {task_id} with status {task.status}"
+            f"Skipping retry for task {parent_task_id} with status {task.status}"
         )
         return
     
-    logger.warning(f"Retrying task {task_id} for user {user_id} in 5 minutes")
+    logger.warning(f"Retrying task {parent_task_id} for user {user_id} in 5 minutes")
     
     extract_and_save_chemicals_from_pdf.apply_async(
         kwargs={
@@ -228,7 +223,7 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
     )
     
     UserTask.objects.update_or_create(
-        task_id=task_id,
+        task_id=parent_task_id,
         defaults={'status': UserTask.TaskStatus.RETRY}
     )
 
@@ -551,7 +546,7 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
     queue='pdf2chemicals_tasks',
     priority=10,
     autoretry_for=(Exception,),
-    max_retries=5,
+    max_retries=3,
     default_retry_delay=60 * 2,
     retry_backoff=True,
     task_reject_on_worker_lost=True
@@ -622,7 +617,7 @@ def load_chemical_from_json(self, *args, **kwargs):
     queue='pdf2chemicals_tasks',
     priority=1,
     autoretry_for=(Exception,),
-    max_retries=5,
+    max_retries=3,
     default_retry_delay=60 * 2,
     retry_backoff=True,
     task_reject_on_worker_lost=True
@@ -686,14 +681,14 @@ def post_chemicals_in_db(self, *args, **kwargs):
 
 
 @shared_task(
-    base=ChainedTask,
+    base=ChainedFinalTask,
     name='pdf2chemicals_service.tasks.return_pdf2chemicals_task_final_result',
     bind=True,
     acks_late=True,
     queue='pdf2chemicals_tasks',
     priority=1,
     autoretry_for=(Exception,),
-    max_retries=5,
+    max_retries=3,
     default_retry_delay=60 * 2,
     retry_backoff=True,
     task_reject_on_worker_lost=True
@@ -715,31 +710,31 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
         dict: Final result with file path and metadata
     """
 
+    parent_task_id = kwargs.get('parent_task_id')
+    
     # ✅ CHECK IF PREVIOUS TASK WAS REVOKED
     if kwargs.get('revoked'):
         logger.warning(f"Revoked before final result")
-        task_id = kwargs.get('task_id')
-        if task_id:
+        
+        if parent_task_id:
             try:
-                user_task = UserTask.objects.get(task_id=task_id)
+                user_task = UserTask.objects.get(task_id=parent_task_id)
                 user_task.status = UserTask.TaskStatus.REVOKED
                 user_task.concluded_at = timezone.now()
                 user_task.save()
-                logger.info(f"✓ Task {task_id} marked as REVOKED")
+                logger.info(f"✓ Task {parent_task_id} marked as REVOKED")
             except Exception as e:
                 logger.error(f"Failed to update revoked task: {e}")
         return {'revoked': True}
     
     # ✅ Safe parameter extraction
-    parent_task_id = kwargs.get('parent_task_id')
-    task_id = kwargs.get('task_id')
     output_dir = kwargs.get('output_dir')
     output_filename = kwargs.get('output_filename')
     export_format = kwargs.get('export_format')
     chemical_count = kwargs.get('chemical_count', 0)    
     
     # Validate required parameters
-    if not all([task_id, output_dir, output_filename, export_format]):
+    if not all([parent_task_id, output_dir, output_filename, export_format]):
         logger.error(f"Missing required parameters in final result task")
         raise ValueError("task_id, output_dir, output_filename, export_format are required")
     
@@ -750,26 +745,26 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
     output_abs_filepath = os.path.join(settings.MEDIA_ROOT, output_relative_filepath)
     
     # ✅ UPDATE UserTask STATUS TO SUCCESS
-    try:
-        user_task = UserTask.objects.get(task_id=task_id)
-        user_task.status = UserTask.TaskStatus.SUCCESS
-        user_task.result = {
-            'file': output_relative_filepath,
-            'format': export_format,
-            'chemical_count': chemical_count
-        }
-        user_task.concluded_at = timezone.now()
-        user_task.save()
-        logger.info(f"✓ Task {task_id} marked as SUCCESS")
-    except Exception as e:
-        logger.error(f"Failed to update UserTask: {e}")
-        raise
+    #try:
+    #    user_task = UserTask.objects.get(task_id=parent_task_id)
+    #    user_task.status = UserTask.TaskStatus.SUCCESS
+    #    user_task.result = {
+    #        'file': output_relative_filepath,
+    #        'format': export_format,
+    #        'chemical_count': chemical_count
+    #    }
+    #    user_task.concluded_at = timezone.now()
+    #    user_task.save()
+    #    logger.info(f"✓ Task {parent_task_id} marked as SUCCESS")
+    #except Exception as e:
+    #    logger.error(f"Failed to update UserTask: {e}")
+    #    raise
     
     logger.info(f"✓ PDF2Chemicals workflow completed: {output_relative_filepath}")
     
     return {
         'status': 'success',
-        'file': output_relative_filepath,
+        'filepath': output_relative_filepath,
         'format': export_format,
-        'task_id': str(task_id)
+        'parent_task_id': str(parent_task_id)
     }

@@ -16,10 +16,7 @@ logger = logging.getLogger(__name__)
 class BaseAbortableTask(AbortableTask):
     abstract = True
     
-    def _file_field_from_path(self, path):
-        data_filename = os.path.basename(path)
-        f = open(path, 'rb')
-        return File(f, name=data_filename)
+    
     
     def check_revocation(self, task_id=None):
         """
@@ -57,28 +54,7 @@ class BaseAbortableTask(AbortableTask):
             logger.error(f"Error checking revocation for {check_id}: {e}")
             return False
     
-    def on_success(self, retval, task_id, args, kwargs):
-        result = retval.get('result', {})
-        data_filepath = retval.get('data_file', None)
-        data_file = self._file_field_from_path(data_filepath) if data_filepath else None
-        
-        user_task_defaults = {
-            'status': UserTask.TaskStatus.SUCCESS,
-            'concluded_at': timezone.now(),
-            'result': result,
-            'data_file': data_file
-        }
-                
-        # Atualiza o registro do UserTask com status SUCCESS e o resultado retornado
-        UserTask.objects.update_or_create(
-            task_id=task_id,
-            defaults=user_task_defaults
-        )
-        
-        if data_file:
-            data_file.close()
-        
-        return super().on_success(retval, task_id, args, kwargs)
+    
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         """
@@ -155,5 +131,43 @@ class ChainedTask(BaseAbortableTask):
         return super(ChainedTask, self).__call__(*args, **kwargs)
     
 
+class ChainedFinalTask(ChainedTask):
+    abstract = True
+    
+    def _get_file_field_from_path(self, path):
+        data_filename = os.path.basename(path)
+        f = open(path, 'rb')
+        return File(f, name=data_filename)
+    
+    def on_success(self, retval, task_id, args, kwargs):
+        format = retval.get('format', {})
+        filepath = retval.get('filepath', None)
+        parent_task_id = retval.get('parent_task_id', None)
+        
+        data_file = self._get_file_field_from_path(filepath) if filepath else None
+        
+        result = {
+            'file': data_file,
+            'format': format
+        }
+        
+        user_task_defaults = {
+            'status': UserTask.TaskStatus.SUCCESS,
+            'concluded_at': timezone.now(),
+            'result': result,
+            'data_file': data_file
+        }
+                
+        # Atualiza o registro do UserTask com status SUCCESS e o resultado retornado
+        UserTask.objects.update_or_create(
+            task_id=parent_task_id,
+            defaults=user_task_defaults
+        )
+        
+        if data_file:
+            data_file.close()
+        
+        return super().on_success(retval, task_id, args, kwargs)
+    
 def get_task_from_task_id(task_id):
     return AsyncResult(task_id, app=current_app)
