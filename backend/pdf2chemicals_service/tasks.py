@@ -462,7 +462,6 @@ def _queue_cleanup(parent_task_id, reason='unknown', cleanup_data=None):
     try:
         cleanup_pdf2chemicals_resources.apply_async(
             args=[cleanup_data],
-            queue='pdf2chemicals_tasks'
         )
         logger.info(
             f"[CLEANUP] Queued cleanup task for {parent_task_id} ({reason})"
@@ -742,7 +741,7 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
         if self.check_revocation(parent_task_id):
             logger.warning("[MONITOR] Task revoked, cancelling job")
             try:
-                cancel_hpc_job(job_id, node=node_name)
+                cancel_hpc_job(job_id)
             except Exception as e:
                 logger.warning(f"[MONITOR] Failed to cancel job: {e}")
             
@@ -754,7 +753,7 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
             }
         
         # Check job completion status
-        if is_pbs_job_completed(job_id, node=node_name):
+        if is_pbs_job_completed(job_id):
             logger.info(f"[MONITOR] ✓ Job {job_id} completed on {node_name}")
             
             # ✅ Return standard message dict (serializable)
@@ -882,9 +881,9 @@ def post_chemicals_in_db(self, *args, **kwargs):
     ✅ Chemical insertion happens in background
     
     Message In: chemical_list from Stage 4, user_id from initial
-    Message Out: Same + chemical_posted_count (just the count, not list)
+    Message Out: Same + chemical_count (just the count, not list)
     
-    NOTE: We return chemical_posted_count (int), NOT chemical_list.
+    NOTE: We return chemical_count (int), NOT chemical_list.
     Chemical insertion is fire-and-forget in background.
     """
     
@@ -924,10 +923,7 @@ def post_chemicals_in_db(self, *args, **kwargs):
         return {
             **kwargs,
             'status': 'success',
-            'stage': 'post_db',
-            'chemical_posted_count': len(chemical_list),
-            # ✅ IMPORTANT: Don't return chemical_list anymore
-            # (it was causing serialization issues)
+            'stage': 'post_db'
         }
         
     except Exception as e:
@@ -961,7 +957,7 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
     output_dir = kwargs.get('output_dir')
     output_filename = kwargs.get('output_filename')
     export_format = kwargs.get('export_format')
-    chemical_posted_count = kwargs.get('chemical_posted_count', 0)
+    chemical_count = kwargs.get('chemical_count', 0)
     
     logger.info(f"[FINAL] Completing task {parent_task_id}")
     
@@ -1016,7 +1012,7 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
             'parent_task_id': parent_task_id,
             'filepath': output_filepath,
             'format': export_format,
-            'chemical_count': chemical_posted_count,
+            'chemical_count': chemical_count,
         }
         
     except Exception as e:

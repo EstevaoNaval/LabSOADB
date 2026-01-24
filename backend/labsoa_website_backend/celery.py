@@ -47,7 +47,7 @@ pdf2chemicals_tasks = Queue(
     queue_arguments={
         'x-dead-letter-exchange': 'pdf2chemicals_tasks_dlx',
         'x-dead-letter-routing-key': 'dlq_pdf2chemicals',
-        'x-message-ttl': 2 * 60 * 60 * 1000,
+        'x-message-ttl': 7 * 60 * 60 * 1000,
         'x-max-length': 50000,
     },
 )
