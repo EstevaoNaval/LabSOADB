@@ -283,6 +283,14 @@ CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_DEFAULT_DELIVERY_MODE = 'persistent'
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERYD_MAX_TASKS_PER_CHILD = 100  # Reinicia worker após 100 tarefas
+# Worker loss handling
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+# Time limits
+CELERY_TASK_SOFT_TIME_LIMIT = 3600  # 1 hour (graceful timeout)
+CELERY_TASK_TIME_LIMIT = 3600 * 12   # 12 hours (hard kill)
+# Broker resilience
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
 
 LANGUAGE_CODE = "en-us"
 

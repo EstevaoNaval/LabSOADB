@@ -91,3 +91,99 @@ class UserTask(models.Model):
 
     def __str__(self):
         return f"({self.task_id}) - {self.status}"
+
+
+class TaskRetryTracker(models.Model):
+    """
+    Centralized retry tracking across error handler invocations.
+    
+    Problem solved:
+    - Error handler is called as a new task with NEW task_id
+    - self.request.retries resets to 0 in each error handler invocation
+    - We lose track of actual retry count
+    
+    Solution:
+    - Use ONE database record per workflow (keyed by parent_task_id)
+    - Increment counter on each error handler invocation
+    - Check counter to know when to give up
+    
+    This survives error handler task_id changes because it's in the database.
+    """
+    
+    parent_task_id = models.UUIDField(unique=True, db_index=True, editable=False)
+    retry_count = models.IntegerField(default=0)
+    max_retries = models.IntegerField(default=5)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'tasks_task_retry_tracker'
+        indexes = [
+            models.Index(fields=['parent_task_id']),
+        ]
+    
+    @classmethod
+    def increment_and_check(cls, parent_task_id, max_retries=5):
+        """
+        Increment retry count and check if max exceeded.
+        
+        This is the core method used by error handlers.
+        Atomically increments counter in database.
+        
+        Args:
+            parent_task_id: UUID of parent workflow task
+            max_retries: Max allowed retries (usually 5)
+        
+        Returns:
+            tuple: (retry_count_after_increment, max_exceeded)
+                Example: (1, False) on first call
+                Example: (5, True) on fifth call
+        
+        Usage:
+            retry_count, max_exceeded = TaskRetryTracker.increment_and_check(
+                parent_task_id,
+                max_retries=5
+            )
+            
+            if max_exceeded:
+                # Don't retry, route to DLQ
+                return {'status': 'failed_max_retries'}
+            else:
+                # Schedule retry
+                workflow.apply_async(...)
+        """
+        tracker, created = cls.objects.get_or_create(
+            parent_task_id=parent_task_id,
+            defaults={'max_retries': max_retries}
+        )
+        
+        tracker.retry_count += 1
+        tracker.save(update_fields=['retry_count', 'updated_at'])
+        
+        is_max_exceeded = tracker.retry_count >= max_retries
+        
+        return tracker.retry_count, is_max_exceeded
+    
+    @classmethod
+    def get_retry_count(cls, parent_task_id):
+        """Get current retry count for a task."""
+        try:
+            return cls.objects.get(parent_task_id=parent_task_id).retry_count
+        except cls.DoesNotExist:
+            return 0
+    
+    @classmethod
+    def cleanup(cls, parent_task_id):
+        """
+        Delete tracker after task completed successfully.
+        
+        Called when task completes or exhausts retries.
+        Keeps database clean of old records.
+        """
+        cls.objects.filter(parent_task_id=parent_task_id).delete()
+    
+    def __str__(self):
+        return f"TaskRetry({self.parent_task_id}, {self.retry_count}/{self.max_retries})"
+    
+    def __repr__(self):
+        return f"<TaskRetryTracker: {self.parent_task_id} ({self.retry_count}/{self.max_retries})>"
