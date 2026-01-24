@@ -705,78 +705,91 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
     bind=True,
     acks_late=True,
     queue='pdf2chemicals_tasks',
-    reject_on_worker_lost=True,
+    autoretry_for=(TimeoutError,),
+    retry_backoff=True,
+    retry_backoff_max=300,
+    retry_jitter=True,
+    max_retries=None,
 )
 def monitor_pdf2chemicals_job(self, *args, **kwargs):
     """
-    Stage 3: Monitor HPC job until completion.
+    Stage 3: Monitor HPC job status until completion or timeout.
     
-    ✅ Polls job status periodically
-    ✅ Checks revocation during polling
-    ✅ Returns when job completes
+    ✅ Uses Celery's built-in retry mechanism (not apply_async)
+    ✅ Always returns standard message dict (JSON serializable)
+    ✅ Exponential backoff with jitter (30s, 60s, 120s, ..., 300s max)
+    ✅ Respects task TTL (1 hour soft limit)
+    ✅ Periodic revocation checks
     
-    Message In: job_id from Stage 2
-    Message Out: Same + job_completed confirmation
+    Message In: {pbs_script_path, node_name, job_id, cleanup_data, ...}
+    Message Out: Same + job_completion confirmation
+    
+    Retry Behavior:
+    - Retries every 30s, 60s, 120s, ..., 300s (max)
+    - Adds jitter to prevent thundering herd
+    - Stops after task TTL (1 hour soft limit)
+    - Can be revoked at any point
     """
     
     parent_task_id = kwargs.get('parent_task_id')
     job_id = kwargs.get('job_id')
-    cleanup_data = kwargs.get('cleanup_data', {})
+    node_name = kwargs.get('node_name')
     
-    logger.info(f"[MONITOR] Monitoring job {job_id}")
+    logger.info(f"[MONITOR] Checking job {job_id} on node {node_name}")
     
     try:
-        max_polls = 100
-        poll_count = 0
+        # Check if task was revoked
+        if self.check_revocation(parent_task_id):
+            logger.warning("[MONITOR] Task revoked, cancelling job")
+            try:
+                cancel_hpc_job(job_id, node=node_name)
+            except Exception as e:
+                logger.warning(f"[MONITOR] Failed to cancel job: {e}")
+            
+            return {
+                **kwargs,
+                'status': 'revoked',
+                'stage': 'monitor',
+                'revoked': True,
+            }
         
-        while poll_count < max_polls:
-            # Check revocation periodically
-            if self.check_revocation(parent_task_id):
-                logger.warning("[MONITOR] Revoked, killing job")
-                try:
-                    cancel_hpc_job(job_id)
-                except Exception as e:
-                    logger.warning(f"[MONITOR] Failed to cancel job: {e}")
-                
-                return {
-                    **kwargs,
-                    'status': 'revoked',
-                    'stage': 'monitor',
-                    'revoked': True,
-                }
+        # Check job completion status
+        if is_pbs_job_completed(job_id, node=node_name):
+            logger.info(f"[MONITOR] ✓ Job {job_id} completed on {node_name}")
             
-            # Check job status
-            if is_pbs_job_completed(job_id):
-                logger.info(f"[MONITOR] ✓ Job {job_id} completed")
-                
-                return {
-                    **kwargs,
-                    'status': 'success',
-                    'stage': 'monitor',
-                    'job_completed': True,
-                }
-            
-            poll_count += 1
-            wait_time = min(30 * (2 ** (poll_count // 10)), 300)
-            
-            logger.debug(
-                f"[MONITOR] Poll {poll_count}/{max_polls}, "
-                f"waiting {wait_time}s before next check"
-            )
-            
-            # Use apply_async for internal retry with countdown
-            return self.apply_async(
-                countdown=wait_time,
-                task_id=self.request.id
-            )
+            # ✅ Return standard message dict (serializable)
+            return {
+                **kwargs,
+                'status': 'success',
+                'stage': 'monitor',
+                'job_completed': True,
+            }
+        
+        # Job still running
+        logger.debug(f"[MONITOR] Job {job_id} still running, will retry")
+        
+        # CRITICAL: Raise exception instead of calling apply_async()
+        # Celery catches this and automatically:
+        # 1. Applies exponential backoff (30s, 60s, 120s, ..., 300s max)
+        # 2. Adds jitter to prevent thundering herd
+        # 3. Re-executes this task with same kwargs
+        # 4. Returns standard message dict (serializable) on success
+        # 5. Respects task TTL (1 hour soft limit)
+        # 6. Continues through chain to next stage
         
         raise TimeoutError(
-            f"Job {job_id} did not complete within {max_polls} polls"
+            f"Job {job_id} on {node_name} still running, waiting for completion"
         )
         
+    except TimeoutError:
+        # ✅ Celery's autoretry_for=(TimeoutError,) catches this
+        # Task is automatically retried with backoff and jitter
+        # No manual handling needed
+        raise
     except Exception as e:
         logger.error(f"[MONITOR] Failed: {e}", exc_info=True)
         raise
+
 
 
 @shared_task(

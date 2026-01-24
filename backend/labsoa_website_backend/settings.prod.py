@@ -283,15 +283,24 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
     'message_persistent': True,
     'heartbeat': 600
 }
-CELERY_TASK_ACKS_LATE = True
+
 CELERY_TASK_DEFAULT_DELIVERY_MODE = 'persistent'
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
-CELERYD_MAX_TASKS_PER_CHILD = 100  # Reinicia worker após 100 tarefas 
-# Worker loss handling
+CELERYD_MAX_TASKS_PER_CHILD = 100  # Reinicia worker após 100 tarefas
+
+# Acknowledge late to prevent task loss on worker crash
 CELERY_TASK_REJECT_ON_WORKER_LOST = True
+CELERY_TASK_ACKS_LATE = True
+
 # Time limits
-CELERY_TASK_SOFT_TIME_LIMIT = 3600  # 1 hour (graceful timeout)
-CELERY_TASK_TIME_LIMIT = 3600 * 12   # 12 hours (hard kill)
+CELERY_TASK_SOFT_TIME_LIMIT = 6 * 60 * 60  # 6 hours ≥ 6 hour workflows
+CELERY_TASK_TIME_LIMIT = 7 * 60 * 60 # 7 hours (1 hour buffer)
+CELERY_TASK_SOFT_TIME_LIMITS = {
+    'pdf2chemicals_service.tasks.extract_and_save_chemicals_from_pdf': 7 * 60 * 60,
+    'pdf2chemicals_service.tasks.monitor_pdf2chemicals_job': 7 * 60 * 60,
+}
+CELERY_RESULT_EXPIRES = 24 * 60 * 60 # 24 hours
+
 # Broker resilience
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
