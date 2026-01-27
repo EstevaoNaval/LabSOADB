@@ -122,7 +122,7 @@ class ChainedFinalTask(ChainedTask):
         data_file = self._get_file_field_from_path(filepath) if filepath else None
         
         result = {
-            'file': data_file,
+            'file': data_file.name,
             'format': format
         }
         
