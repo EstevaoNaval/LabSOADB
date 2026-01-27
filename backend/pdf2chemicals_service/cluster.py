@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 from datetime import datetime
 import redis
@@ -96,8 +97,9 @@ class ClusterNodeManager:
         
         if available_gpu_node != "":
             self._mark_node_as_busy(node_name=available_gpu_node)
+            return available_gpu_node
             
-        return available_gpu_node
+        return ""
     
     def cleanup_stale_nodes(self, max_age_hours: int = 2):
         """Limpa registros antigos de nós ocupados"""
@@ -296,3 +298,81 @@ def is_pbs_job_completed(job_id: str) -> bool:
     except FileNotFoundError:
         print("Error: tracejob or grep not found. Check your installation.")
         return False
+
+def get_pbs_job_status(job_id: str) -> str:
+    """
+    Get the status of a PBS/Torque job.
+    
+    Returns 'COMPLETED', 'FAILED', 'RUNNING', or 'QUEUED' based on job state.
+    
+    Args:
+        job_id (str): Job ID to check
+        
+    Returns:
+        str: Job status - 'COMPLETED', 'FAILED', 'RUNNING', or 'QUEUED'
+    """
+    try:
+        # Step 1: Check if job has completed using existing function
+        if is_pbs_job_completed(job_id):
+            # Job finished - check exit status with tracejob
+            result = subprocess.run(
+                f"tracejob -q -n 30 {job_id} | grep 'Exit_status'",
+                shell=True,
+                capture_output=True,
+                text=True
+            )
+            
+            # Parse exit status from tracejob output
+            if result.returncode == 0 and result.stdout:
+                # Extract exit status value (format: "Exit_status=<number>")
+                match = re.search(r'Exit_status=(\d+)', result.stdout)
+                if match:
+                    exit_code = int(match.group(1))
+                    return 'COMPLETED' if exit_code == 0 else 'FAILED'
+            
+            # Default to COMPLETED if can't parse exit status
+            return 'COMPLETED'
+        
+        # Step 2: Job not completed - check current state with qstat
+        result = subprocess.run(
+            f"qstat {job_id}",
+            shell=True,
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode != 0:
+            # Job not found in queue - might be completed
+            return 'COMPLETED'
+        
+        # Parse status from qstat output (status is in column 'S')
+        lines = result.stdout.strip().split('\n')
+        if len(lines) < 2:  # Header + job line
+            return 'RUNNING'
+            
+        # Get status character from output
+        # Format: JobID  Name  User  Time  Use  S  Queue
+        job_line = lines[-1]
+        parts = job_line.split()
+        if len(parts) < 5: # Doesn't corresponds to the format.
+            return 'RUNNING'
+            
+        status_char = parts[4]  # Status column
+        
+        # Map TORQUE status codes to simplified status
+        if status_char == 'Q':
+            return 'QUEUED'
+        
+        if status_char in ['C', 'E']:
+            # Should be caught by is_pbs_job_completed, but handle anyway
+            return 'COMPLETED'
+        
+        # R, H, T, W, S all mapped to RUNNING
+        return 'RUNNING'
+        
+    except FileNotFoundError:
+        print("Error: qstat or tracejob not found. Check TORQUE installation.")
+        return 'UNKNOWN'
+    except Exception as e:
+        print(f"Error checking job status: {e}")
+        return 'UNKNOWN'

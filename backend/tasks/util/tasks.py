@@ -16,8 +16,6 @@ logger = logging.getLogger(__name__)
 class BaseAbortableTask(AbortableTask):
     abstract = True
     
-    
-    
     def check_revocation(self, task_id=None):
         """
         Check if task is revoked via UserTask.status field.
@@ -53,29 +51,6 @@ class BaseAbortableTask(AbortableTask):
         except Exception as e:
             logger.error(f"Error checking revocation for {check_id}: {e}")
             return False
-    
-    
-
-    def on_failure(self, exc, task_id, args, kwargs, einfo):
-        """
-        Called when task fails with exception.
-        Triggers cleanup for resource-intensive tasks.
-        """
-        logger.error(f'Task {task_id} failed: {exc}')
-        self._perform_cleanup(task_id, kwargs, status='FAILED')
-        
-        UserTask.objects.update_or_create(
-            task_id=task_id, 
-            defaults={
-                'status': UserTask.TaskStatus.FAILURE,
-                'result': { 'error': str(exc) },
-                'error_message': str(exec),
-                'traceback': exec,
-                'concluded_at': timezone.now()
-            }
-        )
-        
-        return super().on_failure(exc, task_id, args, kwargs, einfo)
     
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         """

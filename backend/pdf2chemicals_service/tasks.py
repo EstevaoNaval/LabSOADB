@@ -23,6 +23,7 @@ from .cluster import (
     ClusterNodeManager,
     generate_pbs_script,
     is_pbs_job_completed,
+    get_pbs_job_status,
     cancel_hpc_job,
 )
 from .cleanup import cleanup_pdf2chemicals_resources
@@ -285,11 +286,6 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
             cleanup_data=cleanup_data
         )
         
-        user_task.status = UserTask.TaskStatus.REVOKED
-        user_task.error_message = "Task revoked by user"
-        user_task.concluded_at = timezone.now()
-        user_task.save()
-        
         TaskRetryTracker.cleanup(parent_task_id)
         
         return {
@@ -340,7 +336,7 @@ def handle_pdf2chemicals_task_error(self, *args, **kwargs):
         # Clean up retry tracker
         TaskRetryTracker.cleanup(parent_task_id)
         
-        # ✅ CRITICAL: Don't call apply_async()
+        # CRITICAL: Don't call apply_async()
         # This causes message to expire and route to DLQ
         
         return {
@@ -796,58 +792,121 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
     name='pdf2chemicals_service.tasks.load_chemical_from_json',
     bind=True,
     acks_late=True,
-    queue='pdf2chemicals_tasks',
-    max_retries=3,
-    default_retry_delay=60 * 2,
+    queue='pdf2chemicals_tasks'
 )
 def load_chemical_from_json(self, *args, **kwargs):
     """
-    Stage 4: Load chemical data from JSON file produced by HPC.
+    Stage 4: Load chemicals from JSON output file.
     
-    ✅ Parses JSON output from HPC job
-    ✅ Extracts chemical list
-    ✅ Validates file exists before parsing
+    ✅ Checks HPC job status FIRST
+    ✅ Fails immediately on job failure (no retries)
+    ✅ Clear error messages indicating actual problem
     
-    Message In: json_filepath from Stage 1
-    Message Out: Same + chemical_list, chemical_count
+    Message In: job_id, json_filepath from Stage 2/3
+    Message Out: Same + chemical_data and chemical_count
     """
     
     parent_task_id = kwargs.get('parent_task_id')
+    job_id = kwargs.get('job_id')
     json_filepath = kwargs.get('json_filepath')
+    node_name = kwargs.get('node_name', 'unknown')
     
-    logger.info(f"[LOAD_JSON] Loading chemicals from {json_filepath}")
-    
-    if self.check_revocation(parent_task_id):
-        logger.warning("[LOAD_JSON] Revoked")
-        return {
-            **kwargs,
-            'status': 'revoked',
-            'stage': 'load_json',
-            'revoked': True,
-        }
+    logger.info(
+        f"[LOAD_JSON] Stage 4 started - Checking job {job_id} on {node_name}"
+    )
     
     try:
-        # Wait for file to exist (HPC may still be writing)
-        max_retries_wait = 5
-        for retry in range(max_retries_wait):
-            if file_exists(json_filepath):
-                break
-            if retry < max_retries_wait - 1:
-                logger.info(
-                    f"[LOAD_JSON] File not ready, waiting... (attempt {retry + 1})"
-                )
-                raise FileNotFoundError(
-                    f"JSON file not ready: {json_filepath}"
-                )
+        # Check revocation
+        if self.check_revocation(parent_task_id):
+            logger.warning("[LOAD_JSON] Task revoked")
+            return {
+                **kwargs,
+                'status': 'revoked',
+                'stage': 'load_json',
+                'revoked': True,
+            }
         
-        # Load and parse JSON
-        with open(json_filepath, 'r') as f:
-            json_data = json.load(f)
+        # ✅ CRITICAL: Check job status BEFORE looking for JSON
+        # This tells us if job succeeded or failed
+        logger.debug(f"[LOAD_JSON] Checking job status for {job_id}")
+        job_status = get_pbs_job_status(job_id)
         
-        chemical_list = json_data.get('chemicals', [])
+        # Analyze job status
+        if job_status == 'FAILED':
+            # ✅ Job failed - this is the real error
+            error_msg = f"HPC job {job_id} completed with FAILURE status. No chemical output produced."
+            logger.error(f"[LOAD_JSON] {error_msg}")
+            
+            # ✅ IMPORTANT: Raise real error, DON'T retry
+            raise RuntimeError(error_msg)
+        
+        if job_status == 'RUNNING':
+            # Job still running at Stage 4?
+            # This shouldn't happen (monitor task waits for completion)
+            error_msg = (
+                f"HPC job {job_id} still RUNNING at JSON loading stage. "
+                f"This indicates monitor_task did not wait for completion properly."
+            )
+            logger.error(f"[LOAD_JSON] {error_msg}")
+            raise RuntimeError(error_msg)
+        
+        if job_status == 'QUEUED':
+            # Job still queued at Stage 4?
+            # This definitely shouldn't happen
+            error_msg = (
+                f"HPC job {job_id} still QUEUED at JSON loading stage. "
+                f"Critical error: monitor_task failed to wait for job completion."
+            )
+            logger.error(f"[LOAD_JSON] {error_msg}")
+            raise RuntimeError(error_msg)
+        
+        # After all the if job_status == checks:
+        if job_status not in ('COMPLETED', 'FAILED', 'RUNNING', 'QUEUED'):
+            error_msg = f"Unexpected job status: {job_status}"
+            logger.error(f"[LOAD_JSON] {error_msg}")
+            raise RuntimeError(error_msg)
+        
+        # ✅ Job COMPLETED - now check if JSON output was produced
+        logger.debug(f"[LOAD_JSON] Job {job_id} completed. Checking for JSON at {json_filepath}")
+        
+        if not os.path.exists(json_filepath):
+            # Job completed but no JSON?
+            # This means the HPC job ran to completion but didn't produce output
+            # This is unusual - either data was empty or job had a partial failure
+            error_msg = (
+                f"HPC job {job_id} completed successfully but produced no output JSON. "
+                f"Expected file: {json_filepath}"
+            )
+            logger.error(f"[LOAD_JSON] {error_msg}")
+            raise RuntimeError(error_msg)
+        
+        # ✅ JSON file exists - try to load it
+        logger.debug(f"[LOAD_JSON] Found JSON file, loading...")
+        
+        try:
+            with open(json_filepath, 'r') as f:
+                chemical_list = json.load(f)
+                
+        except json.JSONDecodeError as e:
+            error_msg = f"JSON file is corrupted: {e}"
+            logger.error(f"[LOAD_JSON] {error_msg}", exc_info=True)
+            raise ValueError(error_msg)
+            
+        except IOError as e:
+            error_msg = f"Cannot read JSON file: {e}"
+            logger.error(f"[LOAD_JSON] {error_msg}", exc_info=True)
+            raise
+        
+        # ✅ JSON loaded successfully
+        if not chemical_list:
+            chemical_count = 0
+            logger.warning(f"[LOAD_JSON] JSON file is empty (no chemicals)")
+        else:
+            chemical_count = len(chemical_list)
         
         logger.info(
-            f"[LOAD_JSON] ✓ Loaded {len(chemical_list)} chemicals"
+            f"[LOAD_JSON] ✓ Stage 4 complete - "
+            f"Loaded {chemical_count} chemicals from job {job_id}"
         )
         
         return {
@@ -855,11 +914,17 @@ def load_chemical_from_json(self, *args, **kwargs):
             'status': 'success',
             'stage': 'load_json',
             'chemical_list': chemical_list,
-            'chemical_count': len(chemical_list),
+            'chemical_count': chemical_count,
+            'job_status': job_status,
         }
         
+    except RuntimeError as e:
+        # Job failed or unexpected state - real error
+        logger.error(f"[LOAD_JSON] Job status check failed: {e}", exc_info=True)
+        raise
+        
     except Exception as e:
-        logger.error(f"[LOAD_JSON] Failed: {e}", exc_info=True)
+        logger.error(f"[LOAD_JSON] Unexpected error: {e}", exc_info=True)
         raise
 
 
@@ -1037,11 +1102,28 @@ def _submit_pbs_job(pbs_script_path):
     Raises:
         subprocess.CalledProcessError: If qsub fails
     """
+    
+    cmd = (
+        f'sh -c "(cd {os.getenv("TORQUE_USER_HOME")} && '
+        f'{os.getenv("TORQUE_HOME")}/bin/qsub {pbs_script_path})"'
+    )
+
     result = subprocess.run(
-        ['qsub', pbs_script_path],
+        cmd,
+        shell=True,
         capture_output=True,
         text=True,
-        check=True
+        check=False,
     )
+
+    if result.returncode != 0:
+        error_msg = result.stderr.strip() or result.stdout.strip()
+        raise subprocess.CalledProcessError(
+            result.returncode, cmd, output=result.stdout, stderr=result.stderr
+        )
+
     job_id = result.stdout.strip()
+    if not job_id:
+        raise ValueError("qsub returned empty job_id")
+
     return job_id
