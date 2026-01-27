@@ -1075,7 +1075,7 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
             'status': 'success',
             'stage': 'final',
             'parent_task_id': parent_task_id,
-            'filepath': output_filepath,
+            'filepath': absolute_path,
             'format': export_format,
             'chemical_count': chemical_count,
         }
