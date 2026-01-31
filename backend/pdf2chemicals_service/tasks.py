@@ -23,14 +23,13 @@ from pdf2chemicals_service.cleanup.cleanup_helpers import (
     remove_files,
 )
 from pdf2chemicals_service.cleanup.cleanup import cleanup_pdf2chemicals_resources
-from .util.util import file_exists, remove_file
+from .util.util import file_exists
 from .cluster import (
     ResourceUnavailable,
     ClusterNodeManager,
     generate_pbs_script,
     is_pbs_job_completed,
     get_pbs_job_status,
-    #cancel_hpc_job,
 )
 
 
