@@ -101,9 +101,9 @@ class ClusterNodeManager:
             
         return ""
     
-    def cleanup_stale_nodes(self, max_age_hours: int = 2):
+    def cleanup_stale_nodes(self, max_age_hours: int = 7):
         """Limpa registros antigos de nós ocupados"""
-        threshold = datetime.now().timestamp() - (max_age_hours * 3600)
+        threshold = datetime.now().timestamp() - (max_age_hours * 60 * 60)
         
         # Lista todas as chaves de nós
         for key in self.redis_client.scan_iter("cluster:node:*"):

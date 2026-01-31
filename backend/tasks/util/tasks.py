@@ -51,35 +51,6 @@ class BaseAbortableTask(AbortableTask):
         except Exception as e:
             logger.error(f"Error checking revocation for {check_id}: {e}")
             return False
-    
-    def after_return(self, status, retval, task_id, args, kwargs, einfo):
-        """
-        Called after task execution (success, failure, revocation).
-        Use this to detect revocation after task completes.
-        """
-        try:
-            user_task = UserTask.objects.filter(task_id=task_id).first()
-            
-            # If explicitly revoked, trigger cleanup
-            if user_task and user_task.is_revoked and status != 'REVOKED':
-                logger.warning(f'Cleaning up revoked task {task_id}')
-                self._perform_cleanup(task_id, kwargs, status='REVOKED')
-        except Exception as e:
-            logger.error(f'Error in after_return for {task_id}: {e}')
-    
-    def _perform_cleanup(self, task_id, kwargs, status='REVOKED'):
-        """
-        Hook point for subclasses to implement specific cleanup.
-        Override in subclasses that need custom cleanup logic.
-        
-        Args:
-            task_id: Celery task ID
-            kwargs: Original task kwargs (may contain resource info)
-            status: Cleanup trigger reason (REVOKED, FAILED, etc.)
-        
-        Default: Does nothing. Override in subclass.
-        """
-        pass
 
 class ChainedTask(BaseAbortableTask):
     """
@@ -105,7 +76,36 @@ class ChainedTask(BaseAbortableTask):
             args = ()
         return super(ChainedTask, self).__call__(*args, **kwargs)
     
-
+    def after_return(self, status, retval, task_id, args, kwargs, einfo):
+        """
+        Called after task execution (success, failure, revocation).
+        Use this to detect revocation after task completes.
+        """
+        try:
+            parent_task_id = retval.get('parent_task_id')
+            user_task = UserTask.objects.get(task_id=parent_task_id)
+            
+            # If explicitly revoked, trigger cleanup
+            if user_task and user_task.is_revoked:
+                logger.warning(f'Cleaning up revoked task {task_id}')
+                self._perform_cleanup(task_id, kwargs, status='REVOKED')
+        except Exception as e:
+            logger.error(f'Error in after_return for {task_id}: {e}')
+    
+    def _perform_cleanup(self, task_id, kwargs, status='REVOKED'):
+        """
+        Hook point for subclasses to implement specific cleanup.
+        Override in subclasses that need custom cleanup logic.
+        
+        Args:
+            task_id: Celery task ID
+            kwargs: Original task kwargs (may contain resource info)
+            status: Cleanup trigger reason (REVOKED, FAILED, etc.)
+        
+        Default: Does nothing. Override in subclass.
+        """
+        pass
+    
 class ChainedFinalTask(ChainedTask):
     abstract = True
     
@@ -115,10 +115,15 @@ class ChainedFinalTask(ChainedTask):
         return File(f, name=data_filename)
     
     def on_success(self, retval, task_id, args, kwargs):
-        format = retval.get('format', {})
-        filepath = retval.get('filepath', None)
         parent_task_id = retval.get('parent_task_id', None)
         
+        if retval.get('revoked') or retval.get('status') == 'revoked':
+            logger.info(f"[ON_SUCCESS] Task {parent_task_id} revoked - skipping update")
+            
+            return super().on_success(retval, task_id, args, kwargs)
+        
+        format = retval.get('format', {})
+        filepath = retval.get('filepath', None)
         data_file = self._get_file_field_from_path(filepath) if filepath else None
         
         result = {
@@ -143,6 +148,7 @@ class ChainedFinalTask(ChainedTask):
             data_file.close()
         
         return super().on_success(retval, task_id, args, kwargs)
+    
     
 def get_task_from_task_id(task_id):
     return AsyncResult(task_id, app=current_app)

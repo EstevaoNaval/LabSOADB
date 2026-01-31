@@ -17,6 +17,12 @@ from user.models import User
 from tasks.util.tasks import ChainedTask, ChainedFinalTask
 from chemicals.tasks import post_chemical
 
+from pdf2chemicals_service.cleanup.cleanup_helpers import (
+    release_gpu_node,
+    cancel_hpc_job,
+    remove_files,
+)
+from pdf2chemicals_service.cleanup.cleanup import cleanup_pdf2chemicals_resources
 from .util.util import file_exists, remove_file
 from .cluster import (
     ResourceUnavailable,
@@ -24,9 +30,9 @@ from .cluster import (
     generate_pbs_script,
     is_pbs_job_completed,
     get_pbs_job_status,
-    cancel_hpc_job,
+    #cancel_hpc_job,
 )
-from .cleanup import cleanup_pdf2chemicals_resources
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,10 +61,10 @@ def extract_and_save_chemicals_from_pdf(
     """
     Main orchestration task - initiates entire PDF2Chemicals workflow.
     
-    ✅ Creates UserTask record with PENDING status
-    ✅ Builds initial message dict with all parameters
-    ✅ Submits chain with proper error handler linking
-    ✅ Uses same parent_task_id throughout
+    - Creates UserTask record with PENDING status
+    - Builds initial message dict with all parameters
+    - Submits chain with proper error handler linking
+    - Uses same parent_task_id throughout
     
     Note: This task ONLY does orchestration.
     The actual workflow stages (create_pbs_script, send_hpc, etc.)
@@ -487,10 +493,10 @@ def create_pbs_script_task(self, *args, **kwargs):
     """
     Stage 1: Create PBS script and reserve cluster node.
     
-    ✅ Receives message dict from orchestration (ChainedTask merges args)
-    ✅ Creates cleanup_data dict (SOURCE of cleanup data)
-    ✅ Checks revocation at start and end
-    ✅ Returns enhanced message with all previous data
+    - Receives message dict from orchestration (ChainedTask merges args)
+    - Creates cleanup_data dict (SOURCE of cleanup data)
+    - Checks revocation at start and end
+    - Returns enhanced message with all previous data
     
     Message In: initial_message from orchestration
     Message Out: Same + pbs_script_path, node_name, reservation_id, cleanup_data
@@ -552,13 +558,13 @@ def create_pbs_script_task(self, *args, **kwargs):
         )
         
         if not file_exists(script_path):
-            cluster_node_manager.mark_node_as_available(node_name)
+            release_gpu_node(node_name)
             raise FileExistsError(f"PBS script not created: {script_path}")
         
         # Validate reservation
         if not cluster_node_manager.is_node_reservation_valid(node_name, reservation_id):
-            remove_file(script_path)
-            cluster_node_manager.mark_node_as_available(node_name)
+            remove_files([script_path])
+            release_gpu_node(node_name)
             raise KeyError("Reservation invalid")
         
         logger.info(
@@ -571,6 +577,9 @@ def create_pbs_script_task(self, *args, **kwargs):
         
         if self.check_revocation(parent_task_id):
             logger.warning("[PBS_SCRIPT] Revoked after script creation")
+            
+            release_gpu_node(node_name)
+            
             cleanup_data = {
                 'node_name': node_name,
                 'reservation_id': reservation_id,
@@ -578,7 +587,6 @@ def create_pbs_script_task(self, *args, **kwargs):
                 'json_filepath': json_filepath,
                 'pdf_path': absolute_pdf_path,
             }
-            _queue_cleanup(parent_task_id, 'revocation', cleanup_data)
             
             return {
                 **kwargs,
@@ -641,16 +649,21 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
     parent_task_id = kwargs.get('parent_task_id')
     pbs_script_path = kwargs.get('pbs_script_path')
     cleanup_data = kwargs.get('cleanup_data', {})
+    node_name = kwargs.get('node_name')
     
     logger.info(f"[HPC_SUBMIT] Submitting PBS job for {parent_task_id}")
     
     if self.check_revocation(parent_task_id):
         logger.warning("[HPC_SUBMIT] Revoked before submission")
+        
+        release_gpu_node(node_name)
+        
         return {
             **kwargs,
             'status': 'revoked',
             'stage': 'hpc_submit',
             'revoked': True,
+            'cleanup_data': cleanup_data,
         }
     
     try:
@@ -659,27 +672,24 @@ def send_pdf2chemicals_hpc_task(self, *args, **kwargs):
         
         # Submit to cluster
         job_id = _submit_pbs_job(pbs_script_path)
+        logger.info(f"[HPC_SUBMIT] Job {job_id} submitted successfully")
         
-        logger.info(f"[HPC_SUBMIT] ✓ Job {job_id} submitted successfully")
+        cleanup_data['job_id'] = job_id
         
         # Check revocation after submission
         if self.check_revocation(parent_task_id):
             logger.warning("[HPC_SUBMIT] Revoked after submission, killing job")
-            try:
-                cancel_hpc_job(job_id)
-            except Exception as e:
-                logger.warning(f"[HPC_SUBMIT] Failed to cancel job: {e}")
+            
+            release_gpu_node(node_name)
+            cancel_hpc_job(job_id)
             
             return {
                 **kwargs,
                 'status': 'revoked',
                 'stage': 'hpc_submit',
                 'revoked': True,
-                'job_id': job_id,
+                'cleanup_data': cleanup_data,
             }
-        
-        # Enhance cleanup_data with job_id
-        cleanup_data['job_id'] = job_id
         
         return {
             **kwargs,
@@ -710,11 +720,11 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
     """
     Stage 3: Monitor HPC job status until completion or timeout.
     
-    ✅ Uses Celery's built-in retry mechanism (not apply_async)
-    ✅ Always returns standard message dict (JSON serializable)
-    ✅ Exponential backoff with jitter (30s, 60s, 120s, ..., 300s max)
-    ✅ Respects task TTL (1 hour soft limit)
-    ✅ Periodic revocation checks
+    - Uses Celery's built-in retry mechanism (not apply_async)
+    - Always returns standard message dict (JSON serializable)
+    - Exponential backoff with jitter (30s, 60s, 120s, ..., 300s max)
+    - Respects task TTL (1 hour soft limit)
+    - Periodic revocation checks
     
     Message In: {pbs_script_path, node_name, job_id, cleanup_data, ...}
     Message Out: Same + job_completion confirmation
@@ -736,42 +746,36 @@ def monitor_pdf2chemicals_job(self, *args, **kwargs):
         # Check if task was revoked
         if self.check_revocation(parent_task_id):
             logger.warning("[MONITOR] Task revoked, cancelling job")
-            try:
-                cancel_hpc_job(job_id)
-            except Exception as e:
-                logger.warning(f"[MONITOR] Failed to cancel job: {e}")
+            
+            release_gpu_node(node_name)
+            cancel_hpc_job(job_id)
             
             return {
                 **kwargs,
                 'status': 'revoked',
                 'stage': 'monitor',
-                'revoked': True,
+                'revoked': True
             }
         
         # Check job completion status
         if is_pbs_job_completed(job_id):
-            logger.info(f"[MONITOR] ✓ Job {job_id} completed on {node_name}")
+            logger.info(f"[MONITOR] Job {job_id} completed on {node_name}")
+            
+            # ✅ CRITICAL FIX: Release GPU immediately on success
+            # Job finished = GPU no longer needed
+            # Don't wait for async cleanup task
+            release_gpu_node(node_name)
             
             # ✅ Return standard message dict (serializable)
             return {
                 **kwargs,
                 'status': 'success',
                 'stage': 'monitor',
-                'job_completed': True,
+                'job_completed': True
             }
         
         # Job still running
         logger.debug(f"[MONITOR] Job {job_id} still running, will retry")
-        
-        # CRITICAL: Raise exception instead of calling apply_async()
-        # Celery catches this and automatically:
-        # 1. Applies exponential backoff (30s, 60s, 120s, ..., 300s max)
-        # 2. Adds jitter to prevent thundering herd
-        # 3. Re-executes this task with same kwargs
-        # 4. Returns standard message dict (serializable) on success
-        # 5. Respects task TTL (1 hour soft limit)
-        # 6. Continues through chain to next stage
-        
         raise TimeoutError(
             f"Job {job_id} on {node_name} still running, waiting for completion"
         )
@@ -798,9 +802,9 @@ def load_chemical_from_json(self, *args, **kwargs):
     """
     Stage 4: Load chemicals from JSON output file.
     
-    ✅ Checks HPC job status FIRST
-    ✅ Fails immediately on job failure (no retries)
-    ✅ Clear error messages indicating actual problem
+    - Checks HPC job status FIRST
+    - Fails immediately on job failure (no retries)
+    - Clear error messages indicating actual problem
     
     Message In: job_id, json_filepath from Stage 2/3
     Message Out: Same + chemical_data and chemical_count
@@ -812,13 +816,14 @@ def load_chemical_from_json(self, *args, **kwargs):
     node_name = kwargs.get('node_name', 'unknown')
     
     logger.info(
-        f"[LOAD_JSON] Stage 4 started - Checking job {job_id} on {node_name}"
+        f"[LOAD_JSON] Loading chemicals from job {job_id} on {node_name}"
     )
     
     try:
         # Check revocation
         if self.check_revocation(parent_task_id):
             logger.warning("[LOAD_JSON] Task revoked")
+            
             return {
                 **kwargs,
                 'status': 'revoked',
@@ -941,9 +946,9 @@ def post_chemicals_in_db(self, *args, **kwargs):
     """
     Stage 5: Post chemicals to database asynchronously.
     
-    ✅ Creates group of post_chemical tasks (non-blocking)
-    ✅ Returns only count, NOT group result (non-serializable)
-    ✅ Chemical insertion happens in background
+    - Creates group of post_chemical tasks (non-blocking)
+    - Returns only count, NOT group result (non-serializable)
+    - Chemical insertion happens in background
     
     Message In: chemical_list from Stage 4, user_id from initial
     Message Out: Same + chemical_count (just the count, not list)
@@ -1023,29 +1028,38 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
     output_filename = kwargs.get('output_filename')
     export_format = kwargs.get('export_format')
     chemical_count = kwargs.get('chemical_count', 0)
+    cleanup_data = kwargs.get('cleanup_data', {})
     
     logger.info(f"[FINAL] Completing task {parent_task_id}")
     
-    # Handle revocation case
-    if kwargs.get('revoked'):
-        logger.warning("[FINAL] Task was revoked")
-        try:
-            user_task = UserTask.objects.get(task_id=parent_task_id)
-            user_task.status = UserTask.TaskStatus.REVOKED
-            user_task.concluded_at = timezone.now()
-            user_task.save()
-        except Exception as e:
-            logger.error(f"[FINAL] Failed to mark revoked: {e}")
+    try:
+        # Always queue file cleanup (success or revoked)
+        _queue_cleanup(parent_task_id, 'completion', cleanup_data)
         
+        # Clean up retry tracker (task succeeded)
         TaskRetryTracker.cleanup(parent_task_id)
         
-        return {
-            'status': 'revoked',
-            'stage': 'final',
-            'parent_task_id': parent_task_id,
-        }
-    
-    try:
+        # Handle revocation case
+        if kwargs.get('revoked'):
+            logger.warning("[FINAL] Task was revoked")
+            
+            try:
+                user_task = UserTask.objects.get(task_id=parent_task_id)
+                user_task.status = UserTask.TaskStatus.REVOKED
+                user_task.concluded_at = timezone.now()
+                user_task.save()
+            except Exception as e:
+                logger.error(f"[FINAL] Failed to mark revoked: {e}")
+
+            
+
+            return {
+                'status': 'revoked',
+                'stage': 'final',
+                'parent_task_id': parent_task_id,
+            }
+        
+        
         # Construct output file path
         output_filepath = os.path.join(
             output_dir,
@@ -1062,9 +1076,6 @@ def return_pdf2chemicals_task_final_result(self, *args, **kwargs):
             raise FileNotFoundError(f"Output file not found: {absolute_path}")
         
         logger.info(f"[FINAL] ✓ Result file ready: {output_filepath}")
-        
-        # Clean up retry tracker (task succeeded)
-        TaskRetryTracker.cleanup(parent_task_id)
         
         # Return message for ChainedFinalTask.on_success() hook
         # on_success() will:
