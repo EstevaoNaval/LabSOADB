@@ -32,15 +32,15 @@ def cleanup_pdf2chemicals_resources(self, cleanup_data):
     
     # Clean JSON file
     json_filepath = cleanup_data.get('json_filepath')
-    remove_files([json_filepath])
+    remove_files(json_filepath)
     
     # Clean PBS script
     pbs_script = cleanup_data.get('pbs_script_path')
-    remove_files([pbs_script])
+    remove_files(pbs_script)
     
     # Clean PDF
     pdf_path = cleanup_data.get('pdf_path')
-    remove_files([pdf_path])
+    remove_files(pdf_path)
     
     # Release cluster node
     node_name = cleanup_data.get('node_name')

@@ -562,7 +562,7 @@ def create_pbs_script_task(self, *args, **kwargs):
         
         # Validate reservation
         if not cluster_node_manager.is_node_reservation_valid(node_name, reservation_id):
-            remove_files([script_path])
+            remove_files(script_path)
             release_gpu_node(node_name)
             raise KeyError("Reservation invalid")
         
