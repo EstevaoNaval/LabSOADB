@@ -113,7 +113,7 @@ class ClusterNodeManager:
                 if timestamp < threshold:
                     self.redis_client.delete(key)
 
-def cancel_hpc_job(job_id: str):
+def delete_hpc_job(job_id: str):
     cmd = (
         f'sh -c "(cd {os.getenv("TORQUE_USER_HOME")} && '
         f'{os.getenv("TORQUE_HOME")}/bin/qdel {job_id})"'

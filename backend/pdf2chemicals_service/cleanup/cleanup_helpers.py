@@ -1,6 +1,6 @@
 import logging
 
-from pdf2chemicals_service.cluster import ClusterNodeManager, cancel_hpc_job
+from pdf2chemicals_service.cluster import ClusterNodeManager, delete_hpc_job
 from pdf2chemicals_service.util.util import remove_file, file_exists
 
 
@@ -28,7 +28,7 @@ def cancel_hpc_job(job_id):
         return False
     
     try:
-        cancel_hpc_job(job_id)
+        delete_hpc_job(job_id)
         logger.info(f"[CLEANUP] HPC job {job_id} cancelled")
         return True
     except Exception as e:
