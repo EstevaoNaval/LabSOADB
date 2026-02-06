@@ -81,16 +81,16 @@ class ChainedTask(BaseAbortableTask):
         Called after task execution (success, failure, revocation).
         Use this to detect revocation after task completes.
         """
-        try:
-            parent_task_id = retval.get('parent_task_id')
-            user_task = UserTask.objects.get(task_id=parent_task_id)
-            
-            # If explicitly revoked, trigger cleanup
-            if user_task and user_task.is_revoked:
-                logger.warning(f'Cleaning up revoked task {task_id}')
-                self._perform_cleanup(task_id, kwargs, status='REVOKED')
-        except Exception as e:
-            logger.error(f'Error in after_return for {task_id}: {e}')
+        #try:
+        #    parent_task_id = retval.get('parent_task_id')
+        #    user_task = UserTask.objects.get(task_id=parent_task_id)
+        #    
+        #    # If explicitly revoked, trigger cleanup
+        #    if user_task and user_task.is_revoked:
+        #        logger.warning(f'Cleaning up revoked task {task_id}')
+        #        self._perform_cleanup(task_id, kwargs, status='REVOKED')
+        #except Exception as e:
+        #    logger.error(f'Error in after_return for {task_id}: {e}')
     
     def _perform_cleanup(self, task_id, kwargs, status='REVOKED'):
         """
